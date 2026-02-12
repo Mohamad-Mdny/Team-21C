@@ -9,9 +9,9 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane fx:id="background" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="500.0" prefWidth="800.0" stylesheets="@../style/Login.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane fx:id="background" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="500.0" prefWidth="800.0" stylesheets="@../style/Logintest.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1">
    <children>
-      <AnchorPane fx:id="loginLeft" prefHeight="500.0" prefWidth="276.0" stylesheets="@../style/Login.css">
+      <AnchorPane fx:id="loginLeft" prefHeight="500.0" prefWidth="276.0" stylesheets="@../style/Logintest.css">
          <children>
             <Label fx:id="merchappLogo" layoutX="43.0" layoutY="250.0" text="Merchapp">
                <font>
