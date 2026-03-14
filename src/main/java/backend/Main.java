@@ -12,7 +12,7 @@ public class Main extends Application {
     //this is a test commit
     //testing branch
     public void start(Stage stage) throws IOException {
-        FXMLLoader fxmlLoader = new FXMLLoader(Main.class.getResource("/frontend/Logintest.fxml"));
+        FXMLLoader fxmlLoader = new FXMLLoader(Main.class.getResource("/frontend/tempHomePage.fxml"));
         Scene scene = new Scene(fxmlLoader.load(), 800, 500);
         stage.setTitle("Merchant App");
         stage.setScene(scene);
