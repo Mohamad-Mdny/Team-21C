@@ -5,8 +5,6 @@ import backend.models.Member;
 public class HomeController {
 
     public void switchToCommercialRegister(){
-        Member member = new Member();
-        member.createMember();
     }
     public void switchToNonCommercialRegister(){
 
