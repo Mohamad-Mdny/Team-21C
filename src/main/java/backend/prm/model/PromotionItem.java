@@ -1,4 +1,4 @@
-package main.java.backend.prm.model;
+package backend.prm.model;
 
 
 
