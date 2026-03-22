@@ -1,5 +1,7 @@
 package backend.models;
 import java.sql.*;
+import java.util.Random;
+
 import backend.DatabaseManager;
 import backend.interfaces.IApplicationAPI;
 
@@ -14,7 +16,7 @@ public class Member implements IApplicationAPI {
         try {
             PreparedStatement statement = connection.prepareStatement("INSERT INTO member(emailAddress,password,type,validityStatus,totalPurchases,firstLogin) VALUES (?,?,?,?,?,?)");
             statement.setString(1,email);
-            statement.setString(2,"GeneratedPassword");
+            statement.setString(2,generatePassword());
             statement.setString(3,"nonCommercial");
             statement.setString(4,"valid");
             statement.setInt(5,0);
@@ -59,6 +61,20 @@ public class Member implements IApplicationAPI {
 
     @Override
     public void getDeliveryStatus(int messageID) {
+
+    }
+
+    public String generatePassword(){
+        String password="";
+        String character = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890!@#$%&*?";
+        Random random = new Random();
+        for(int i=0; i<10 ; i++){
+            int randomNumber = random.nextInt(character.length()-1);
+            password = password + character.charAt(randomNumber);
+        }
+        System.out.println(password);
+        return password;
+
 
     }
 }
