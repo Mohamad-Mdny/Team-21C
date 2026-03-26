@@ -1,5 +1,6 @@
 package backend;
 
+import backend.communication.*;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -17,5 +18,14 @@ public class Main extends Application {
         stage.setTitle("Merchant App");
         stage.setScene(scene);
         stage.show();
+    }
+
+    public static void main(String[] args) {
+        EmailProvider provider = new GmailSmtpEmailProvider();
+        INotificationService service = new NotificationServiceImpl(provider);
+
+        EmailSendResult result = service.sendEmail("city@gmail.com", "hello", "hello");
+
+        System.out.println(result.getMessage());
     }
 }
