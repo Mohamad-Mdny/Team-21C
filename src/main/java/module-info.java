@@ -10,7 +10,10 @@ module org.example.merchapp {
     requires org.kordamp.bootstrapfx.core;
     requires eu.hansolo.tilesfx;
     requires com.almasb.fxgl.all;
+    requires java.sql;
 
     exports backend;
     opens backend to javafx.fxml;
+    exports backend.controllers;
+    opens backend.controllers to javafx.fxml;
 }
