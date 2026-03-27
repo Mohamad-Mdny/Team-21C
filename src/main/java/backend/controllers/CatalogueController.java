@@ -1,6 +1,7 @@
 package backend.controllers;
 
 import backend.DatabaseManager;
+import backend.Main;
 import backend.models.Item;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -29,6 +30,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
+import backend.Main.*;
 
 public class CatalogueController {
 
@@ -109,6 +111,12 @@ public class CatalogueController {
 
         configureFilters();
         configureSortButtons();
+
+        if (CheckoutController.pendingSearchText != null && !CheckoutController.pendingSearchText.isBlank()) {
+            searchField.setText(CheckoutController.pendingSearchText);
+            CheckoutController.pendingSearchText = "";
+            updateFilters();
+        }
 
         Catalogue.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
     }
@@ -380,6 +388,7 @@ public class CatalogueController {
         }
 
         checkout.put(selectedItem, selectedQuantity);
+        Main.m.addItem(selectedItem);
     }
 
     @FXML
