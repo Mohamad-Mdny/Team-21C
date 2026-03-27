@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane prefHeight="388.0" prefWidth="693.0" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="backend.controllers.CatalogueController">
+   <children>
+      <TableView fx:id="Catalogue" layoutX="11.0" layoutY="40.0" prefHeight="308.0" prefWidth="678.0" AnchorPane.bottomAnchor="40.0" AnchorPane.leftAnchor="11.0" AnchorPane.rightAnchor="4.0" AnchorPane.topAnchor="40.0">
+         <columns>
+            <TableColumn fx:id="ItemID" prefWidth="51.199995040893555" text="Item ID" />
+            <TableColumn fx:id="Description" prefWidth="99.20001983642578" text="Description" />
+            <TableColumn fx:id="PackageType" prefWidth="87.19998168945312" text="Package Type" />
+            <TableColumn fx:id="Unit" prefWidth="63.20001220703125" text="Unit" />
+            <TableColumn fx:id="UnitsInAPack" prefWidth="90.80001831054688" text="Units in a pack" />
+             <TableColumn fx:id="PackageCost" prefWidth="90.80001831054688" text="PackageCost" />
+            <TableColumn fx:id="Availability" prefWidth="106.0" text="Availability" />
+            <TableColumn fx:id="StockLimit" prefWidth="74.79995727539062" text="Stock Limit" />
+         </columns>
+      </TableView>
+      <TextField fx:id="quantity" layoutX="444.0" layoutY="348.0" promptText="Quantity" />
+      <Button layoutX="258.0" layoutY="348.0" mnemonicParsing="false" onAction="#addToCheckout" prefHeight="26.0" prefWidth="172.0" text="Add to Checkout" />
+      <Button onAction="#printCheckout" layoutX="59.0" layoutY="348.0" mnemonicParsing="false" text="printCheckout" />
+   </children>
+</AnchorPane>
