@@ -3,22 +3,165 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane prefHeight="388.0" prefWidth="693.0" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="backend.controllers.CatalogueController">
-   <children>
-      <TableView fx:id="Catalogue" layoutX="11.0" layoutY="40.0" prefHeight="308.0" prefWidth="678.0" AnchorPane.bottomAnchor="40.0" AnchorPane.leftAnchor="11.0" AnchorPane.rightAnchor="4.0" AnchorPane.topAnchor="40.0">
-         <columns>
-            <TableColumn fx:id="ItemID" prefWidth="51.199995040893555" text="Item ID" />
-            <TableColumn fx:id="Description" prefWidth="99.20001983642578" text="Description" />
-            <TableColumn fx:id="PackageType" prefWidth="87.19998168945312" text="Package Type" />
-            <TableColumn fx:id="Unit" prefWidth="63.20001220703125" text="Unit" />
-            <TableColumn fx:id="UnitsInAPack" prefWidth="90.80001831054688" text="Units in a pack" />
-             <TableColumn fx:id="PackageCost" prefWidth="90.80001831054688" text="PackageCost" />
-            <TableColumn fx:id="Availability" prefWidth="106.0" text="Availability" />
-            <TableColumn fx:id="StockLimit" prefWidth="74.79995727539062" text="Stock Limit" />
-         </columns>
-      </TableView>
-      <TextField fx:id="quantity" layoutX="444.0" layoutY="348.0" promptText="Quantity" />
-      <Button layoutX="258.0" layoutY="348.0" mnemonicParsing="false" onAction="#addToCheckout" prefHeight="26.0" prefWidth="172.0" text="Add to Checkout" />
-      <Button onAction="#printCheckout" layoutX="59.0" layoutY="348.0" mnemonicParsing="false" text="printCheckout" />
-   </children>
-</AnchorPane>
+<BorderPane prefHeight="700.0" prefWidth="1200.0"
+            xmlns="http://javafx.com/javafx/17.0.12"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="backend.controllers.CatalogueController">
+
+   <top>
+      <VBox spacing="12.0" style="-fx-background-color: #1f2937; -fx-padding: 16;">
+         <HBox>
+            <Label text="Merchant App"
+                   style="-fx-text-fill: white; -fx-font-size: 24px; -fx-font-weight: bold;" />
+            <Region HBox.hgrow="ALWAYS" />
+            <Label text="Promotions: Budget items • Bulk offers • Fast reorder"
+                   style="-fx-text-fill: #e5e7eb; -fx-font-size: 14px;" />
+         </HBox>
+
+         <StackPane>
+            <TextField fx:id="searchField"
+                       maxWidth="420.0"
+                       prefWidth="420.0"
+                       promptText="Search catalogue..." />
+         </StackPane>
+
+         <HBox spacing="10.0" alignment="CENTER_LEFT">
+            <Button mnemonicParsing="false" onAction="#goToCatalogue" text="Catalogue" />
+            <Button mnemonicParsing="false" onAction="#goToCurrentPromotions" text="Current Promotions" />
+
+            <Region HBox.hgrow="ALWAYS" />
+
+            <Button mnemonicParsing="false" onAction="#goToCheckout" text="Checkout" />
+            <Button mnemonicParsing="false" onAction="#goToAccountSettings" text="Account Settings" />
+         </HBox>
+      </VBox>
+   </top>
+
+   <left>
+      <VBox prefWidth="220.0"
+            spacing="10.0"
+            style="-fx-background-color: #f3f4f6; -fx-padding: 16; -fx-border-color: #d1d5db; -fx-border-width: 0 1 0 0;">
+         <Label text="Filters" style="-fx-font-size: 18px; -fx-font-weight: bold;" />
+
+         <CheckBox fx:id="inStockOnly" text="In stock only" />
+         <CheckBox fx:id="lowStockOnly" text="Low stock only" />
+
+         <Label text="Package Type" />
+         <ComboBox fx:id="packageTypeFilter" promptText="All package types" />
+
+         <Label text="Unit" />
+         <ComboBox fx:id="unitFilter" promptText="All units" />
+
+         <Label text="Maximum price" />
+         <TextField fx:id="maxPriceField" promptText="e.g. 1.50" />
+
+         <Button mnemonicParsing="false" onAction="#clearFilters" text="Clear Filters" />
+      </VBox>
+   </left>
+
+   <center>
+      <BorderPane style="-fx-padding: 12;">
+         <center>
+            <TableView fx:id="Catalogue">
+               <columns>
+                  <TableColumn fx:id="ItemID" prefWidth="95.0" sortable="true">
+                     <graphic>
+                        <Button fx:id="sortItemIDButton"
+                                maxWidth="1.7976931348623157E308"
+                                mnemonicParsing="false"
+                                onAction="#handleSortButtonClick"
+                                style="-fx-background-color: transparent; -fx-font-weight: bold;"
+                                text="Item ID" />
+                     </graphic>
+                  </TableColumn>
+
+                  <TableColumn fx:id="Description" prefWidth="170.0" sortable="true">
+                     <graphic>
+                        <Button fx:id="sortDescriptionButton"
+                                maxWidth="1.7976931348623157E308"
+                                mnemonicParsing="false"
+                                onAction="#handleSortButtonClick"
+                                style="-fx-background-color: transparent; -fx-font-weight: bold;"
+                                text="Description" />
+                     </graphic>
+                  </TableColumn>
+
+                  <TableColumn fx:id="PackageType" prefWidth="130.0" sortable="true">
+                     <graphic>
+                        <Button fx:id="sortPackageTypeButton"
+                                maxWidth="1.7976931348623157E308"
+                                mnemonicParsing="false"
+                                onAction="#handleSortButtonClick"
+                                style="-fx-background-color: transparent; -fx-font-weight: bold;"
+                                text="Package Type" />
+                     </graphic>
+                  </TableColumn>
+
+                  <TableColumn fx:id="Unit" prefWidth="100.0" sortable="true">
+                     <graphic>
+                        <Button fx:id="sortUnitButton"
+                                maxWidth="1.7976931348623157E308"
+                                mnemonicParsing="false"
+                                onAction="#handleSortButtonClick"
+                                style="-fx-background-color: transparent; -fx-font-weight: bold;"
+                                text="Unit" />
+                     </graphic>
+                  </TableColumn>
+
+                  <TableColumn fx:id="UnitsInAPack" prefWidth="130.0" sortable="true">
+                     <graphic>
+                        <Button fx:id="sortUnitsInAPackButton"
+                                maxWidth="1.7976931348623157E308"
+                                mnemonicParsing="false"
+                                onAction="#handleSortButtonClick"
+                                style="-fx-background-color: transparent; -fx-font-weight: bold;"
+                                text="Units In Pack" />
+                     </graphic>
+                  </TableColumn>
+
+                  <TableColumn fx:id="PackageCost" prefWidth="120.0" sortable="true">
+                     <graphic>
+                        <Button fx:id="sortPackageCostButton"
+                                maxWidth="1.7976931348623157E308"
+                                mnemonicParsing="false"
+                                onAction="#handleSortButtonClick"
+                                style="-fx-background-color: transparent; -fx-font-weight: bold;"
+                                text="Package Cost" />
+                     </graphic>
+                  </TableColumn>
+
+                  <TableColumn fx:id="Availability" prefWidth="120.0" sortable="true">
+                     <graphic>
+                        <Button fx:id="sortAvailabilityButton"
+                                maxWidth="1.7976931348623157E308"
+                                mnemonicParsing="false"
+                                onAction="#handleSortButtonClick"
+                                style="-fx-background-color: transparent; -fx-font-weight: bold;"
+                                text="Availability" />
+                     </graphic>
+                  </TableColumn>
+
+                  <TableColumn fx:id="StockLimit" prefWidth="110.0" sortable="true">
+                     <graphic>
+                        <Button fx:id="sortStockLimitButton"
+                                maxWidth="1.7976931348623157E308"
+                                mnemonicParsing="false"
+                                onAction="#handleSortButtonClick"
+                                style="-fx-background-color: transparent; -fx-font-weight: bold;"
+                                text="Stock Limit" />
+                     </graphic>
+                  </TableColumn>
+               </columns>
+            </TableView>
+         </center>
+
+         <bottom>
+            <HBox spacing="12.0" style="-fx-padding: 12 0 0 0;">
+               <Button mnemonicParsing="false" onAction="#printCheckout" text="Print Checkout" />
+               <Button mnemonicParsing="false" onAction="#addToCheckout" prefWidth="160.0" text="Add to Checkout" />
+               <TextField fx:id="quantity" prefWidth="150.0" promptText="Quantity" />
+            </HBox>
+         </bottom>
+      </BorderPane>
+   </center>
+</BorderPane>
