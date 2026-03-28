@@ -4,15 +4,18 @@ public class NotificationServiceImpl implements INotificationService {
 
     private final EmailProvider emailProvider;
 
+    // initialise the notification with an email provider
     public NotificationServiceImpl(EmailProvider emailProvider) {
         this.emailProvider = emailProvider;
     }
 
+    // send an email using specific parameters, to, subject, body
     @Override
     public EmailSendResult sendEmail (String to, String subject, String body) {
         return sendEmail(new EmailMessage(to, subject, body));
     }
 
+    // checks if the body is empty then sends it using the provider
     @Override
     public EmailSendResult sendEmail(EmailMessage message) {
         if (message == null ||
@@ -31,6 +34,7 @@ public class NotificationServiceImpl implements INotificationService {
 
     }
 
+    // checks if a string is null or empty
     private boolean isBlank(String string) {
         return string == null || string.trim().isEmpty();
     }
