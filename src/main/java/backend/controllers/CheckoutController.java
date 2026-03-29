@@ -2,27 +2,35 @@ package backend.controllers;
 
 import backend.Main;
 import backend.models.Item;
-import java.util.LinkedHashMap;
-import java.util.Map;import javafx.collections.FXCollections;
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
+import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Objects;
 
 public class CheckoutController {
 
+    private static final double VAT_RATE = 0.00;
+
     @FXML
     private TextField searchField;
+
     @FXML
     private TableView<BasketRow> basketTable;
     @FXML
@@ -38,11 +46,46 @@ public class CheckoutController {
     @FXML
     private TableColumn<BasketRow, String> subtotalColumn;
 
+    @FXML
+    private Label itemCountLabel;
+    @FXML
+    private Label subtotalSideLabel;
+    @FXML
+    private Label vatSideLabel;
+    @FXML
+    private Label totalSideLabel;
+    @FXML
+    private Label subtotalBottomLabel;
+    @FXML
+    private Label vatBottomLabel;
+    @FXML
+    private Label totalBottomLabel;
+
+    @FXML
+    private ComboBox<String> deliveryAddressBox;
+    @FXML
+    private ComboBox<String> paymentMethodBox;
+    @FXML
+    private ComboBox<String> deliveryOptionBox;
+
+    @FXML
+    private Button accountButton;
+
+    @FXML
+    private TextArea orderNotesArea;
+
+    @FXML
+    private Label purchaseStatusLabel;
+
     public static String pendingSearchText = "";
+
 
     @FXML
     void initialize() {
         configureBasketTable();
+        configureCheckoutOptions();
+        basketTable.setPlaceholder(new Label("Your basket is empty."));
+        updateAccountButton();
         loadUserBasket();
     }
 
@@ -55,11 +98,35 @@ public class CheckoutController {
         subtotalColumn.setCellValueFactory(new PropertyValueFactory<>("subtotal"));
     }
 
+    private void configureCheckoutOptions() {
+        deliveryAddressBox.getItems().setAll(
+                "Home - 12 High Street",
+                "Work - 21 Business Park",
+                "Warehouse - Unit 7"
+        );
+        deliveryAddressBox.setValue("Home - 12 High Street");
+
+        paymentMethodBox.getItems().setAll(
+                "Visa ending 1234",
+                "Mastercard ending 5678",
+                "PayPal"
+        );
+        paymentMethodBox.setValue("Visa ending 1234");
+
+        deliveryOptionBox.getItems().setAll(
+                "Standard Delivery",
+                "Next Day Delivery",
+                "Click & Collect"
+        );
+        deliveryOptionBox.setValue("Standard Delivery");
+    }
+
     private void loadUserBasket() {
         ObservableList<BasketRow> rows = FXCollections.observableArrayList();
 
         if (Main.m == null || Main.m.getBasket() == null || Main.m.getBasket().isEmpty()) {
             basketTable.setItems(rows);
+            updateSummaryLabels(0, 0.0);
             return;
         }
 
@@ -80,22 +147,80 @@ public class CheckoutController {
             accumulator.quantity++;
         }
 
+        int totalItemCount = 0;
+        double subtotal = 0.0;
+
         for (BasketAccumulator accumulator : groupedItems.values()) {
             Item item = accumulator.item;
             int quantity = accumulator.quantity;
-            float subtotal = item.getPackageCost() * quantity;
+            double lineSubtotal = item.getPackageCost() * quantity;
+
+            totalItemCount += quantity;
+            subtotal += lineSubtotal;
 
             rows.add(new BasketRow(
                     item.getDescription(),
                     item.getPackageType(),
                     item.getUnit(),
                     quantity,
-                    String.format("£%.2f", item.getPackageCost()),
-                    String.format("£%.2f", subtotal)
+                    money(item.getPackageCost()),
+                    money(lineSubtotal)
             ));
         }
 
         basketTable.setItems(rows);
+        updateSummaryLabels(totalItemCount, subtotal);
+    }
+
+    private void updateSummaryLabels(int itemCount, double subtotal) {
+        double vat = subtotal * VAT_RATE;
+        double total = subtotal + vat;
+
+        itemCountLabel.setText("Items in basket: " + itemCount);
+
+        subtotalSideLabel.setText("Subtotal: " + money(subtotal));
+        vatSideLabel.setText("VAT: " + money(vat));
+        totalSideLabel.setText("Total: " + money(total));
+
+        subtotalBottomLabel.setText("Subtotal: " + money(subtotal));
+        vatBottomLabel.setText("VAT: " + money(vat));
+        totalBottomLabel.setText("Total: " + money(total));
+    }
+
+    private String money(double value) {
+        return String.format("£%.2f", value);
+    }
+
+    @FXML
+    public void clearBasket(ActionEvent event) {
+        if (Main.m != null && Main.m.getBasket() != null) {
+            Main.m.getBasket().clear();
+        }
+
+        purchaseStatusLabel.setText("Basket cleared.");
+        loadUserBasket();
+    }
+
+    @FXML
+    public void purchaseBasket(ActionEvent event) {
+        if (Main.m == null) {
+            purchaseStatusLabel.setText("No user is currently loaded.");
+            return;
+        }
+
+        String address = deliveryAddressBox.getValue();
+        String paymentMethod = paymentMethodBox.getValue();
+        String deliveryOption = deliveryOptionBox.getValue();
+        String notes = orderNotesArea.getText();
+
+        boolean success = Main.m.purchase(address, paymentMethod, deliveryOption, notes);
+
+        if (success) {
+            purchaseStatusLabel.setText("Purchase completed successfully.");
+            loadUserBasket();
+        } else {
+            purchaseStatusLabel.setText("Purchase failed. Check your basket, address, and payment method.");
+        }
     }
 
     @FXML
@@ -106,9 +231,6 @@ public class CheckoutController {
             pendingSearchText = text.trim();
             switchPage(event, "Catalogue.fxml");
         }
-    }
-    @FXML
-    public void clearBasket(ActionEvent event) {
     }
 
     @FXML
@@ -126,9 +248,21 @@ public class CheckoutController {
         switchPage(event, "Checkout.fxml");
     }
 
+    private void updateAccountButton() {
+        if (Main.m != null && Main.m.isSignedIn()) {
+            accountButton.setText("Account Settings");
+        } else {
+            accountButton.setText("Sign In");
+        }
+    }
+
     @FXML
-    public void goToAccountSettings(ActionEvent event) {
-        switchPage(event, "AccountSettings.fxml");
+    public void handleAccountButton(ActionEvent event) {
+        if (Main.m != null && Main.m.isSignedIn()) {
+            switchPage(event, "AccountSettings.fxml");
+        } else {
+            switchPage(event, "Logintest.fxml");
+        }
     }
 
     private void switchPage(ActionEvent event, String fxmlFile) {
@@ -143,6 +277,16 @@ public class CheckoutController {
 
         } catch (IOException e) {
             e.printStackTrace();
+        }
+    }
+
+    private static class BasketAccumulator {
+        private final Item item;
+        private int quantity;
+
+        private BasketAccumulator(Item item) {
+            this.item = item;
+            this.quantity = 0;
         }
     }
 
@@ -185,15 +329,6 @@ public class CheckoutController {
 
         public String getSubtotal() {
             return subtotal;
-        }
-    }
-    private static class BasketAccumulator {
-        private final Item item;
-        private int quantity;
-
-        private BasketAccumulator(Item item) {
-            this.item = item;
-            this.quantity = 0;
         }
     }
 }

@@ -69,7 +69,8 @@ public class CatalogueController {
     private Button sortAvailabilityButton;
     @FXML
     private Button sortStockLimitButton;
-
+    @FXML
+    private Button accountButton;
     @FXML
     private TextField quantity;
     @FXML
@@ -84,6 +85,7 @@ public class CatalogueController {
     private CheckBox inStockOnly;
     @FXML
     private CheckBox lowStockOnly;
+
 
     private final HashMap<Item, Integer> checkout = new HashMap<>();
     private final ObservableList<Item> masterData = FXCollections.observableArrayList();
@@ -111,6 +113,7 @@ public class CatalogueController {
 
         configureFilters();
         configureSortButtons();
+        updateAccountButton();
 
         if (CheckoutController.pendingSearchText != null && !CheckoutController.pendingSearchText.isBlank()) {
             searchField.setText(CheckoutController.pendingSearchText);
@@ -217,9 +220,7 @@ public class CatalogueController {
             if (!searchText.isEmpty()) {
                 boolean matchesSearch =
                         String.valueOf(item.getItemID()).toLowerCase().contains(searchText) ||
-                                safeLower(item.getDescription()).contains(searchText) ||
-                                safeLower(item.getPackageType()).contains(searchText) ||
-                                safeLower(item.getUnit()).contains(searchText);
+                                safeLower(item.getDescription()).contains(searchText);
 
                 if (!matchesSearch) {
                     return false;
@@ -392,13 +393,6 @@ public class CatalogueController {
     }
 
     @FXML
-    public void printCheckout(ActionEvent event) {
-        for (Item item : checkout.keySet()) {
-            System.out.println(item.getDescription() + " x " + checkout.get(item));
-        }
-    }
-
-    @FXML
     public void goToCatalogue(ActionEvent event) {
         switchPage(event, "Catalogue.fxml");
     }
@@ -413,9 +407,21 @@ public class CatalogueController {
         switchPage(event, "Checkout.fxml");
     }
 
+    private void updateAccountButton() {
+        if (Main.m != null && Main.m.isSignedIn()) {
+            accountButton.setText("Account Settings");
+        } else {
+            accountButton.setText("Sign In");
+        }
+    }
+
     @FXML
-    public void goToAccountSettings(ActionEvent event) {
-        switchPage(event, "AccountSettings.fxml");
+    public void handleAccountButton(ActionEvent event) {
+        if (Main.m != null && Main.m.isSignedIn()) {
+            switchPage(event, "AccountSettings.fxml");
+        } else {
+            switchPage(event, "Logintest.fxml");
+        }
     }
 
     private void switchPage(ActionEvent event, String fxmlFile) {
