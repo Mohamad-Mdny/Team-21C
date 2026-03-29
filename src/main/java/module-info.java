@@ -11,6 +11,7 @@ module org.example.merchapp {
     requires eu.hansolo.tilesfx;
     requires com.almasb.fxgl.all;
     requires java.sql;
+    //requires org.example.merchapp;
 
     exports backend;
     opens backend to javafx.fxml;

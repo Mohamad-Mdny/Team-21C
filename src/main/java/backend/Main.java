@@ -1,6 +1,7 @@
 package backend;
 
 import backend.models.User;
+
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
