@@ -2,10 +2,13 @@ package backend;
 
 import backend.communication.*;
 import backend.models.User;
+import com.almasb.fxgl.notification.NotificationService;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import org.controlsfx.control.tableview2.filter.filtereditor.SouthFilter;
+
 
 import java.io.IOException;
 
@@ -22,7 +25,10 @@ public class Main extends Application {
     }
 
     public static void main(String[] args) {
-       EmailSendResult result = SendGmail.sendGmail("tariq.nagi@city.ac.uk", "Test 123", "Hello world java");
+        //dont remove
+        launch(args);
+
+        //EmailSendResult result = SendGmail.sendGmail("surya.premkumar@city.ac.uk", "Test 123", "Hello world java");
     }
 
 }

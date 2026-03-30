@@ -1,6 +1,8 @@
 package backend.models;
 
 import backend.DatabaseManager;
+import backend.communication.EmailSendResult;
+import backend.communication.SendGmail;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
@@ -18,6 +20,7 @@ public class User {
 
     public User() {
         signedIn = false;
+        /*
         DatabaseManager databaseManager = new DatabaseManager();
         Connection connection = databaseManager.makeConnection();
         if (connection == null) {
@@ -43,6 +46,8 @@ public class User {
         catch (SQLException e) {
             e.printStackTrace();
         }
+
+         */
     }
 
     public void addItem(Item item) {
@@ -89,14 +94,16 @@ public class User {
         if (deliveryOption == null || deliveryOption.isBlank()) {
             return false;
         }
+        String body = "Thank you for your purchase. \nDelivery Address: " + deliveryAddress + "\nDelivery Option: " + deliveryOption +
+                "\nNotes: " + notes +
+                "\nItems purchased:";
 
-        System.out.println("Purchase successful");
-        System.out.println("Delivery Address: " + deliveryAddress);
-        System.out.println("Payment Method: " + paymentMethod);
-        System.out.println("Delivery Option: " + deliveryOption);
-        System.out.println("Notes: " + notes);
-        System.out.println("Items purchased: " + Basket.size());
-        System.out.println("Subtotal: £" + String.format("%.2f", getBasketSubtotal()));
+        for (Item item : Basket) {
+            body = body + "\n   - " + item.getDescription();
+        }
+        body = body + "\n\nPayment Method: " + paymentMethod + "\n \n    Subtotal: £" + String.format("%.2f", getBasketSubtotal());
+
+        EmailSendResult result = SendGmail.sendGmail("surya.premkumar@city.ac.uk", "Order ", body);
 
         Basket.clear();
         return true;
