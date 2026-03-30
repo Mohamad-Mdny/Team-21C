@@ -12,9 +12,12 @@ module org.example.merchapp {
     requires com.almasb.fxgl.all;
     requires java.sql;
     requires jakarta.mail;
+    //requires org.example.merchapp;
 
     exports backend;
     opens backend to javafx.fxml;
     exports backend.controllers;
     opens backend.controllers to javafx.fxml;
+    exports backend.models;
+    opens backend.models to javafx.fxml;
 }
