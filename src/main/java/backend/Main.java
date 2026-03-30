@@ -1,11 +1,12 @@
 package backend;
 
-import backend.models.User;
-
+import backend.communication.*;
+import com.almasb.fxgl.notification.NotificationService;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import org.controlsfx.control.tableview2.filter.filtereditor.SouthFilter;
 
 import java.io.IOException;
 
@@ -20,4 +21,15 @@ public class Main extends Application {
         stage.setScene(scene);
         stage.show();
     }
+
+    public static void main(String[] args) {
+        String email = System.getenv("EMAIL");
+        String password = System.getenv("EMAIL_PASSWORD");
+
+        EmailProvider provider = new GmailSmtpEmailProvider(email, password);
+        INotificationService service = new NotificationServiceImpl(provider);
+
+        EmailSendResult result = service.sendEmail("email@gmail.com", "subject", "Email message");
+    }
+
 }
