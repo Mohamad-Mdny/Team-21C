@@ -1,13 +1,48 @@
 package backend.models;
 
+import backend.DatabaseManager;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
+
 
 public class User {
     ArrayList<Item> Basket = new ArrayList<>();
     boolean signedIn;
+    private final ArrayList<Item> masterData = new ArrayList<>();
 
     public User() {
         signedIn = false;
+        DatabaseManager databaseManager = new DatabaseManager();
+        Connection connection = databaseManager.makeConnection();
+        if (connection == null) {
+            System.out.println("Database connection failed.");
+            return;
+        }
+        String sql = "SELECT * FROM Catalogue";
+        try (connection;
+             Statement statement = connection.createStatement();
+             ResultSet resultSet = statement.executeQuery(sql)) {
+            while (resultSet.next()) {
+                masterData.add(new Item(resultSet.getInt("ItemID"),
+                        resultSet.getString("Description"),
+                        resultSet.getString("PackageType"),
+                        resultSet.getString("Unit"),
+                        resultSet.getInt("UnitsInAPack"),
+                        resultSet.getFloat("PackageCost"),
+                        resultSet.getInt("Availability"),
+                        resultSet.getInt("StockLimit"))
+                );
+            }
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     public void addItem(Item item) {

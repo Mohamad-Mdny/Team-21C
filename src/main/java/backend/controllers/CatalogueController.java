@@ -6,195 +6,91 @@ import backend.models.Item;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
-import javafx.collections.transformation.SortedList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
-import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-
 import java.io.IOException;
 import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Objects;
-import backend.Main.*;
+import java.sql.ResultSet; import java.sql.SQLException;
+import java.sql.Statement; import java.util.Objects;
 
 public class CatalogueController {
+    @FXML private GridPane catalogueGrid;
+    @FXML private Button accountButton;
+    @FXML private TextField searchField;
+    @FXML private ComboBox<String> packageTypeFilter;
+    @FXML private ComboBox<String> unitFilter;
+    @FXML private TextField maxPriceField;
+    @FXML private CheckBox inStockOnly;
+    @FXML private CheckBox lowStockOnly;
 
-    @FXML
-    private TableView<Item> Catalogue;
-    @FXML
-    private TableColumn<Item, Integer> ItemID;
-    @FXML
-    private TableColumn<Item, String> Description;
-    @FXML
-    private TableColumn<Item, String> PackageType;
-    @FXML
-    private TableColumn<Item, String> Unit;
-    @FXML
-    private TableColumn<Item, Integer> UnitsInAPack;
-    @FXML
-    private TableColumn<Item, Float> PackageCost;
-    @FXML
-    private TableColumn<Item, Integer> Availability;
-    @FXML
-    private TableColumn<Item, Integer> StockLimit;
-
-    @FXML
-    private Button sortItemIDButton;
-    @FXML
-    private Button sortDescriptionButton;
-    @FXML
-    private Button sortPackageTypeButton;
-    @FXML
-    private Button sortUnitButton;
-    @FXML
-    private Button sortUnitsInAPackButton;
-    @FXML
-    private Button sortPackageCostButton;
-    @FXML
-    private Button sortAvailabilityButton;
-    @FXML
-    private Button sortStockLimitButton;
-    @FXML
-    private Button accountButton;
-    @FXML
-    private TextField quantity;
-    @FXML
-    private TextField searchField;
-    @FXML
-    private ComboBox<String> packageTypeFilter;
-    @FXML
-    private ComboBox<String> unitFilter;
-    @FXML
-    private TextField maxPriceField;
-    @FXML
-    private CheckBox inStockOnly;
-    @FXML
-    private CheckBox lowStockOnly;
-
-
-    private final HashMap<Item, Integer> checkout = new HashMap<>();
     private final ObservableList<Item> masterData = FXCollections.observableArrayList();
-    private FilteredList<Item> filteredData;
+    private FilteredList<Item> filteredData; private Integer selectedItemId = null;
 
-    private final Map<Button, TableColumn<Item, ?>> sortButtonToColumn = new LinkedHashMap<>();
-    private final Map<Button, String> sortButtonLabels = new LinkedHashMap<>();
-    private final Map<Button, SortState> sortStates = new LinkedHashMap<>();
-
-    private enum SortState {
-        INACTIVE,
-        ASCENDING,
-        DESCENDING
-    }
-
-    @FXML
-    void initialize() {
-        configureTable();
+    @FXML void initialize() {
         loadData();
-
         filteredData = new FilteredList<>(masterData, item -> true);
-        SortedList<Item> sortedData = new SortedList<>(filteredData);
-        sortedData.comparatorProperty().bind(Catalogue.comparatorProperty());
-        Catalogue.setItems(sortedData);
-
         configureFilters();
-        configureSortButtons();
         updateAccountButton();
-
         if (CheckoutController.pendingSearchText != null && !CheckoutController.pendingSearchText.isBlank()) {
             searchField.setText(CheckoutController.pendingSearchText);
             CheckoutController.pendingSearchText = "";
-            updateFilters();
         }
-
-        Catalogue.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
-    }
-
-    private void configureTable() {
-        ItemID.setCellValueFactory(new PropertyValueFactory<>("itemID"));
-        Description.setCellValueFactory(new PropertyValueFactory<>("description"));
-        PackageType.setCellValueFactory(new PropertyValueFactory<>("packageType"));
-        Unit.setCellValueFactory(new PropertyValueFactory<>("unit"));
-        UnitsInAPack.setCellValueFactory(new PropertyValueFactory<>("unitsInAPack"));
-        PackageCost.setCellValueFactory(new PropertyValueFactory<>("packageCost"));
-        Availability.setCellValueFactory(new PropertyValueFactory<>("availability"));
-        StockLimit.setCellValueFactory(new PropertyValueFactory<>("stockLimit"));
-    }
-
+        updateFilters(); }
     private void loadData() {
         DatabaseManager databaseManager = new DatabaseManager();
         Connection connection = databaseManager.makeConnection();
-
         if (connection == null) {
             System.out.println("Database connection failed.");
             return;
         }
-
         String sql = "SELECT * FROM Catalogue";
-
-        try (connection;
-             Statement statement = connection.createStatement();
-             ResultSet resultSet = statement.executeQuery(sql)) {
-
+        try (
+                connection;
+                Statement statement = connection.createStatement();
+                ResultSet resultSet = statement.executeQuery(sql)) {
             while (resultSet.next()) {
-                masterData.add(new Item(
-                        resultSet.getInt("ItemID"),
+                masterData.add(new Item( resultSet.getInt("ItemID"),
                         resultSet.getString("Description"),
                         resultSet.getString("PackageType"),
                         resultSet.getString("Unit"),
                         resultSet.getInt("UnitsInAPack"),
                         resultSet.getFloat("PackageCost"),
                         resultSet.getInt("Availability"),
-                        resultSet.getInt("StockLimit")
-                ));
+                        resultSet.getInt("StockLimit") )
+                );
             }
-
-        } catch (SQLException e) {
+        }
+        catch (SQLException e) {
             e.printStackTrace();
         }
     }
 
     private void configureFilters() {
-
-
         packageTypeFilter.getItems().clear();
+
         packageTypeFilter.getItems().add("All");
         packageTypeFilter.getItems().addAll(
-                masterData.stream()
-                        .map(Item::getPackageType)
-                        .filter(Objects::nonNull)
-                        .distinct()
-                        .sorted()
-                        .toList()
-        );
+                masterData.stream().map(Item::getPackageType).filter(Objects::nonNull).distinct().sorted().toList());
         packageTypeFilter.setValue("All");
-
         unitFilter.getItems().clear();
         unitFilter.getItems().add("All");
-        unitFilter.getItems().addAll(
-                masterData.stream()
-                        .map(Item::getUnit)
-                        .filter(Objects::nonNull)
-                        .distinct()
-                        .sorted()
-                        .toList()
-        );
+        unitFilter.getItems().addAll( masterData.stream() .map(Item::getUnit) .filter(Objects::nonNull) .distinct() .sorted() .toList() );
         unitFilter.setValue("All");
-
         searchField.textProperty().addListener((obs, oldValue, newValue) -> updateFilters());
         packageTypeFilter.valueProperty().addListener((obs, oldValue, newValue) -> updateFilters());
         unitFilter.valueProperty().addListener((obs, oldValue, newValue) -> updateFilters());
@@ -203,160 +99,99 @@ public class CatalogueController {
         lowStockOnly.selectedProperty().addListener((obs, oldValue, newValue) -> updateFilters());
     }
 
+
     private void updateFilters() {
-        if (filteredData == null) {
-            return;
-        }
-
+        if (filteredData == null) { return;}
         filteredData.setPredicate(item -> {
-            if (item == null) {
-                return false;
-            }
-
+            if (item == null) { return false; }
             String searchText = safeLower(searchField.getText());
             String selectedPackageType = packageTypeFilter.getValue();
             String selectedUnit = unitFilter.getValue();
-
             if (!searchText.isEmpty()) {
-                boolean matchesSearch =
-                        String.valueOf(item.getItemID()).toLowerCase().contains(searchText) ||
-                                safeLower(item.getDescription()).contains(searchText);
-
-                if (!matchesSearch) {
-                    return false;
-                }
+                boolean matchesSearch = String.valueOf(item.getItemID()).toLowerCase().contains(searchText) ||
+                        safeLower(item.getDescription()).contains(searchText);
+                if (!matchesSearch) { return false; }
             }
-
-
             if (selectedPackageType != null && !selectedPackageType.equals("All")) {
-                if (!safeLower(item.getPackageType()).equals(selectedPackageType.toLowerCase())) {
-                    return false;
-                }
+                if (!safeLower(item.getPackageType()).equals(selectedPackageType.toLowerCase())) { return false; }
             }
-
             if (selectedUnit != null && !selectedUnit.equals("All")) {
-                if (!safeLower(item.getUnit()).equals(selectedUnit.toLowerCase())) {
-                    return false;
-                }
+                if (!safeLower(item.getUnit()).equals(selectedUnit.toLowerCase())) { return false; }
             }
-
-            if (inStockOnly.isSelected() && item.getAvailability() <= 0) {
-                return false;
-            }
-
-            if (lowStockOnly.isSelected() && item.getAvailability() > item.getStockLimit()) {
-                return false;
-            }
-
+            if (inStockOnly.isSelected() && item.getAvailability() <= 0) { return false; }
+            if (lowStockOnly.isSelected() && item.getAvailability() > item.getStockLimit()) { return false; }
             String maxPriceText = maxPriceField.getText() == null ? "" : maxPriceField.getText().trim();
             if (!maxPriceText.isEmpty()) {
                 try {
                     float maxPrice = Float.parseFloat(maxPriceText);
-                    if (item.getPackageCost() > maxPrice) {
-                        return false;
-                    }
-                } catch (NumberFormatException ignored) {
-                }
-            }
+                    if (item.getPackageCost() > maxPrice) { return false; }
+                } catch (NumberFormatException ignored) { }
+            } return true; }
+        );
+        refreshCatalogueGrid();
+    }
 
-            return true;
+    private void refreshCatalogueGrid() {
+        catalogueGrid.getChildren().clear();
+        int column = 0;
+        int row = 0;
+        for (Item item : filteredData) {
+            VBox itemCard = createItemCard(item);
+            catalogueGrid.add(itemCard, column, row);
+            column++;
+            if (column == 5) {
+                column = 0;
+                row++; }
+        }
+    }
+
+    private VBox createItemCard(Item item) {
+        VBox card = new VBox(8);
+        card.setPadding(new Insets(12));
+        card.setPrefWidth(180); card.setMinWidth(180);
+        card.setMaxWidth(Double.MAX_VALUE);
+        card.setAlignment(Pos.TOP_LEFT);
+        applyCardStyle(card, item);
+        Label titleLabel = new Label(item.getDescription());
+        titleLabel.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
+        titleLabel.setWrapText(true);
+        Label itemIdLabel = new Label("Item ID: " + item.getItemID());
+        Label packageTypeLabel = new Label("Package: " + item.getPackageType());
+        Label unitLabel = new Label("Unit: " + item.getUnit());
+        Label unitsInPackLabel = new Label("Units in pack: " + item.getUnitsInAPack());
+        Label priceLabel = new Label(String.format("Price: £%.2f", item.getPackageCost()));
+        Label availabilityLabel = new Label("Availability: " + item.getAvailability());
+        Label stockLimitLabel = new Label("Stock limit: " + item.getStockLimit());
+        Region spacer = new Region();
+        VBox.setVgrow(spacer, Priority.ALWAYS);
+        Button addToCartButton = new Button("Add to Cart");
+        addToCartButton.setMaxWidth(Double.MAX_VALUE);
+        addToCartButton.setOnAction(event -> addItemToCart(item));
+        card.setOnMouseClicked(event -> { selectedItemId = item.getItemID();
+            refreshCatalogueGrid();
         });
+        card.getChildren().addAll( titleLabel, itemIdLabel, packageTypeLabel, unitLabel, unitsInPackLabel, priceLabel, availabilityLabel, stockLimitLabel, spacer, addToCartButton );
+        return card;
     }
 
-    private void configureSortButtons() {
-        registerSortButton(sortItemIDButton, ItemID, "Item ID");
-        registerSortButton(sortDescriptionButton, Description, "Description");
-        registerSortButton(sortPackageTypeButton, PackageType, "Package Type");
-        registerSortButton(sortUnitButton, Unit, "Unit");
-        registerSortButton(sortUnitsInAPackButton, UnitsInAPack, "Units In Pack");
-        registerSortButton(sortPackageCostButton, PackageCost, "Package Cost");
-        registerSortButton(sortAvailabilityButton, Availability, "Availability");
-        registerSortButton(sortStockLimitButton, StockLimit, "Stock Limit");
-
-        updateAllSortButtonTexts();
+    private void applyCardStyle(VBox card, Item item) {
+        boolean isSelected = selectedItemId != null && selectedItemId == item.getItemID();
+        String baseStyle = "-fx-background-color: white; " + "-fx-border-color: #d1d5db; " + "-fx-border-radius: 8; " + "-fx-background-radius: 8; " + "-fx-cursor: hand;";
+        String selectedStyle = "-fx-border-color: #2563eb; -fx-border-width: 2;";
+        String normalStyle = "-fx-border-width: 1;";
+        card.setStyle(baseStyle + (isSelected ? selectedStyle : normalStyle));
     }
 
-    private void registerSortButton(Button button, TableColumn<Item, ?> column, String label) {
-        sortButtonToColumn.put(button, column);
-        sortButtonLabels.put(button, label);
-        sortStates.put(button, SortState.INACTIVE);
-    }
-
-    @FXML
-    private void handleSortButtonClick(ActionEvent event) {
-        Button clickedButton = (Button) event.getSource();
-        SortState currentState = sortStates.get(clickedButton);
-        SortState nextState = nextState(currentState);
-
-        for (Button button : sortStates.keySet()) {
-            if (button != clickedButton) {
-                sortStates.put(button, SortState.INACTIVE);
-            }
-        }
-
-        sortStates.put(clickedButton, nextState);
-        applySort(clickedButton, nextState);
-        updateAllSortButtonTexts();
-    }
-
-    private SortState nextState(SortState currentState) {
-        return switch (currentState) {
-            case INACTIVE -> SortState.ASCENDING;
-            case ASCENDING -> SortState.DESCENDING;
-            case DESCENDING -> SortState.INACTIVE;
-        };
-    }
-
-    private void applySort(Button button, SortState state) {
-        TableColumn<Item, ?> column = sortButtonToColumn.get(button);
-
-        if (column == null) {
-            return;
-        }
-
-        column.setSortable(true);
-        Catalogue.getSortOrder().clear();
-
-        if (state == SortState.INACTIVE) {
-            Catalogue.sort();
-            return;
-        }
-
-        if (state == SortState.ASCENDING) {
-            column.setSortType(TableColumn.SortType.ASCENDING);
-        } else {
-            column.setSortType(TableColumn.SortType.DESCENDING);
-        }
-
-        Catalogue.getSortOrder().add(column);
-        Catalogue.sort();
-    }
-
-    private void updateAllSortButtonTexts() {
-        for (Button button : sortStates.keySet()) {
-            updateSortButtonText(button);
-        }
-    }
-
-    private void updateSortButtonText(Button button) {
-        String baseLabel = sortButtonLabels.get(button);
-        SortState state = sortStates.get(button);
-
-        String suffix = switch (state) {
-            case INACTIVE -> "";
-            case ASCENDING -> " ▲";
-            case DESCENDING -> " ▼";
-        };
-
-        button.setText(baseLabel + suffix);
+    private void addItemToCart(Item item) {
+        if (item == null) { return; }
+        Main.m.addItem(item);
+        System.out.println(item.getDescription() + " added to cart.");
     }
 
     private String safeLower(String value) {
-        return value == null ? "" : value.toLowerCase();
-    }
+        return value == null ? "" : value.toLowerCase(); }
 
-    @FXML
-    public void clearFilters(ActionEvent event) {
+    @FXML public void clearFilters(ActionEvent event) {
         searchField.clear();
         packageTypeFilter.setValue("All");
         unitFilter.setValue("All");
@@ -366,44 +201,15 @@ public class CatalogueController {
         updateFilters();
     }
 
-    @FXML
-    public void addToCheckout(ActionEvent event) {
-        Item selectedItem = Catalogue.getSelectionModel().getSelectedItem();
-        if (selectedItem == null) {
-            return;
-        }
-
-        int selectedQuantity = 1;
-
-        try {
-            String enteredText = quantity.getText();
-            if (enteredText != null && !enteredText.isBlank()) {
-                selectedQuantity = Integer.parseInt(enteredText.trim());
-            }
-        } catch (NumberFormatException e) {
-            selectedQuantity = 1;
-        }
-
-        if (selectedQuantity <= 0) {
-            selectedQuantity = 1;
-        }
-
-        checkout.put(selectedItem, selectedQuantity);
-        Main.m.addItem(selectedItem);
-    }
-
-    @FXML
-    public void goToCatalogue(ActionEvent event) {
+    @FXML public void goToCatalogue(ActionEvent event) {
         switchPage(event, "Catalogue.fxml");
     }
 
-    @FXML
-    public void goToCurrentPromotions(ActionEvent event) {
+    @FXML public void goToCurrentPromotions(ActionEvent event) {
         switchPage(event, "CurrentPromotions.fxml");
     }
 
-    @FXML
-    public void goToCheckout(ActionEvent event) {
+    @FXML public void goToCheckout(ActionEvent event) {
         switchPage(event, "Checkout.fxml");
     }
 
@@ -415,27 +221,22 @@ public class CatalogueController {
         }
     }
 
-    @FXML
-    public void handleAccountButton(ActionEvent event) {
+    @FXML public void handleAccountButton(ActionEvent event) {
         if (Main.m != null && Main.m.isSignedIn()) {
             switchPage(event, "AccountSettings.fxml");
         } else {
             switchPage(event, "Logintest.fxml");
         }
     }
-
     private void switchPage(ActionEvent event, String fxmlFile) {
         try {
-            Parent root = FXMLLoader.load(
-                    Objects.requireNonNull(getClass().getResource("/frontend/" + fxmlFile))
-            );
-
+            Parent root = FXMLLoader.load( Objects.requireNonNull(getClass().getResource("/frontend/" + fxmlFile)) );
             Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
             stage.getScene().setRoot(root);
-            stage.show();
-
-        } catch (IOException e) {
+            stage.show(); }
+        catch (IOException e) {
             e.printStackTrace();
         }
     }
+
 }
