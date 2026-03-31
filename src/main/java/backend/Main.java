@@ -1,6 +1,7 @@
 package backend;
 
 import backend.communication.*;
+import backend.models.Member;
 import backend.models.User;
 import com.almasb.fxgl.notification.NotificationService;
 import javafx.application.Application;
@@ -14,6 +15,7 @@ import java.io.IOException;
 
 public class Main extends Application {
     public static User m = new User();
+    public static Member member;
     @Override
 
     public void start(Stage stage) throws IOException {

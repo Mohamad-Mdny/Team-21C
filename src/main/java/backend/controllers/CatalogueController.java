@@ -38,10 +38,17 @@ public class CatalogueController {
     @FXML private CheckBox inStockOnly;
     @FXML private CheckBox lowStockOnly;
 
+    @FXML
+    private Label memberSession;
+
     private final ObservableList<Item> masterData = FXCollections.observableArrayList();
     private FilteredList<Item> filteredData; private Integer selectedItemId = null;
 
     @FXML void initialize() {
+        if(Main.member !=null) {
+            if (Main.member.isSignedIn())
+                memberSession.setText(Main.member.getEmailAddress());
+        }
         loadData();
         filteredData = new FilteredList<>(masterData, item -> true);
         configureFilters();
@@ -225,7 +232,8 @@ public class CatalogueController {
         if (Main.m != null && Main.m.isSignedIn()) {
             switchPage(event, "AccountSettings.fxml");
         } else {
-            switchPage(event, "Logintest.fxml");
+            System.out.println("Going to login");
+            switchPage(event, "Login.fxml");
         }
     }
     private void switchPage(ActionEvent event, String fxmlFile) {
@@ -233,10 +241,13 @@ public class CatalogueController {
             Parent root = FXMLLoader.load( Objects.requireNonNull(getClass().getResource("/frontend/" + fxmlFile)) );
             Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
             stage.getScene().setRoot(root);
-            stage.show(); }
+            stage.show();
+        }
         catch (IOException e) {
             e.printStackTrace();
         }
     }
+
+
 
 }

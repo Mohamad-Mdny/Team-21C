@@ -66,6 +66,10 @@ public class User {
         return signedIn;
     }
 
+    public void setSignedIn(boolean signedIn){
+        this.signedIn=signedIn;
+    }
+
     public double getBasketSubtotal() {
         double subtotal = 0.0;
 
