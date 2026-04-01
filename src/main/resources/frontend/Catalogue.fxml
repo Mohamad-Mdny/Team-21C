@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
@@ -24,7 +25,8 @@
             <Region HBox.hgrow="ALWAYS" />
 
             <Button mnemonicParsing="false" onAction="#goToCheckout" text="Checkout" />
-            <Button fx:id="accountButton" mnemonicParsing="false" onAction="#handleAccountButton" text="Account Settings" />         </HBox>
+            <Button fx:id="accountButton" mnemonicParsing="false" onAction="#handleAccountButton" text="Account Settings" />
+         </HBox>
       </VBox>
    </top>
 
@@ -45,75 +47,29 @@
          <TextField fx:id="maxPriceField" promptText="e.g. 1.50" />
 
          <Button mnemonicParsing="false" onAction="#clearFilters" text="Clear Filters" />
+         <Label fx:id="memberSession" prefHeight="42.0" prefWidth="108.0" />
       </VBox>
    </left>
 
    <center>
       <BorderPane style="-fx-padding: 12;">
-         <center>
-            <TableView fx:id="Catalogue">
-               <columns>
-                  <TableColumn fx:id="ItemID" prefWidth="95.0" sortable="true">
-                     <graphic>
-                        <Button fx:id="sortItemIDButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#handleSortButtonClick" style="-fx-background-color: transparent; -fx-font-weight: bold;" text="Item ID" />
-                     </graphic>
-                  </TableColumn>
-
-                  <TableColumn fx:id="Description" prefWidth="170.0" sortable="true">
-                     <graphic>
-                        <Button fx:id="sortDescriptionButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#handleSortButtonClick" style="-fx-background-color: transparent; -fx-font-weight: bold;" text="Description" />
-                     </graphic>
-                  </TableColumn>
-
-                  <TableColumn fx:id="PackageType" prefWidth="130.0" sortable="true">
-                     <graphic>
-                        <Button fx:id="sortPackageTypeButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#handleSortButtonClick" style="-fx-background-color: transparent; -fx-font-weight: bold;" text="Package Type" />
-                     </graphic>
-                  </TableColumn>
-
-                  <TableColumn fx:id="Unit" prefWidth="100.0" sortable="true">
-                     <graphic>
-                        <Button fx:id="sortUnitButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#handleSortButtonClick" style="-fx-background-color: transparent; -fx-font-weight: bold;" text="Unit" />
-                     </graphic>
-                  </TableColumn>
-
-                  <TableColumn fx:id="UnitsInAPack" prefWidth="130.0" sortable="true">
-                     <graphic>
-                        <Button fx:id="sortUnitsInAPackButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#handleSortButtonClick" style="-fx-background-color: transparent; -fx-font-weight: bold;" text="Units In Pack" />
-                     </graphic>
-                  </TableColumn>
-
-                  <TableColumn fx:id="PackageCost" prefWidth="120.0" sortable="true">
-                     <graphic>
-                        <Button fx:id="sortPackageCostButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#handleSortButtonClick" style="-fx-background-color: transparent; -fx-font-weight: bold;" text="Package Cost" />
-                     </graphic>
-                  </TableColumn>
-
-                  <TableColumn fx:id="Availability" prefWidth="120.0" sortable="true">
-                     <graphic>
-                        <Button fx:id="sortAvailabilityButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#handleSortButtonClick" style="-fx-background-color: transparent; -fx-font-weight: bold;" text="Availability" />
-                     </graphic>
-                  </TableColumn>
-
-                  <TableColumn fx:id="StockLimit" prefWidth="110.0" sortable="true">
-                     <graphic>
-                        <Button fx:id="sortStockLimitButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#handleSortButtonClick" style="-fx-background-color: transparent; -fx-font-weight: bold;" text="Stock Limit" />
-                     </graphic>
-                  </TableColumn>
-               </columns>
-            </TableView>
-         </center>
-
-         <bottom>
-            <HBox spacing="12.0" style="-fx-padding: 12 0 0 0;">
-
-
-               <Button mnemonicParsing="false" onAction="#addToCheckout" prefWidth="160.0" text="Add to Checkout" />
-
-
-               <TextField fx:id="quantity" prefWidth="150.0" promptText="Quantity" />
+         <top>
+            <HBox alignment="CENTER_LEFT" style="-fx-padding: 0 0 12 0;">
+               <Label style="-fx-font-size: 22px; -fx-font-weight: bold;" text="Catalogue" />
             </HBox>
-         </bottom>
+         </top>
+
+         <center>
+            <ScrollPane fx:id="catalogueScrollPane" fitToWidth="true" hbarPolicy="NEVER" pannable="true" style="-fx-background-color: transparent;">
+               <content>
+                  <GridPane fx:id="catalogueGrid" hgap="16.0" style="-fx-background-color: white;" vgap="16.0">
+                     <padding>
+                        <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
+                     </padding>
+                  </GridPane>
+               </content>
+            </ScrollPane>
+         </center>
       </BorderPane>
    </center>
 </BorderPane>

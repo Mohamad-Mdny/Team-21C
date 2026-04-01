@@ -11,7 +11,6 @@ public class EmailSendResult {
         this.message = message;
     }
 
-
     // returns true if email was sent
     public boolean isSuccess() {
         return success;

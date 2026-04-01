@@ -77,7 +77,6 @@ public class CheckoutController {
     @FXML
     private Label purchaseStatusLabel;
 
-    public static String pendingSearchText = "";
 
 
     @FXML
@@ -228,7 +227,7 @@ public class CheckoutController {
         String text = searchField.getText();
 
         if (text != null && !text.isBlank()) {
-            pendingSearchText = text.trim();
+            CatalogueController.pendingSearchText = text.trim();
             switchPage(event, "Catalogue.fxml");
         }
     }
@@ -261,7 +260,7 @@ public class CheckoutController {
         if (Main.m != null && Main.m.isSignedIn()) {
             switchPage(event, "AccountSettings.fxml");
         } else {
-            switchPage(event, "Logintest.fxml");
+            switchPage(event, "Login.fxml");
         }
     }
 

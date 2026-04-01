@@ -1,10 +1,22 @@
 package backend.models;
 
+import backend.DatabaseManager;
+import backend.communication.EmailSendResult;
+import backend.communication.SendGmail;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
+
 
 public class User {
     ArrayList<Item> Basket = new ArrayList<>();
     boolean signedIn;
+    private final ArrayList<Item> masterData = new ArrayList<>();
 
     public User() {
         signedIn = false;
@@ -24,6 +36,10 @@ public class User {
 
     public boolean isSignedIn() {
         return signedIn;
+    }
+
+    public void setSignedIn(){
+        this.signedIn=true;
     }
 
     public double getBasketSubtotal() {
@@ -54,16 +70,23 @@ public class User {
         if (deliveryOption == null || deliveryOption.isBlank()) {
             return false;
         }
+        String body = "Thank you for your purchase. " +
+                "\nItems purchased:";
 
-        System.out.println("Purchase successful");
-        System.out.println("Delivery Address: " + deliveryAddress);
-        System.out.println("Payment Method: " + paymentMethod);
-        System.out.println("Delivery Option: " + deliveryOption);
-        System.out.println("Notes: " + notes);
-        System.out.println("Items purchased: " + Basket.size());
-        System.out.println("Subtotal: £" + String.format("%.2f", getBasketSubtotal()));
+        for (Item item : Basket) {
+            body = body + "\n   - " + item.getDescription();
+        }
+        body = body + "\nDelivery Address: " + deliveryAddress + "\nDelivery Option: " + deliveryOption +
+                "\nNotes: " + notes ;
+
+        body = body + "\n\nPayment Method: " + paymentMethod + "\n \n    Subtotal: £" + String.format("%.2f", getBasketSubtotal());
+
+        EmailSendResult result = SendGmail.sendGmail("surya.premkumar@city.ac.uk", "Order ", body);
 
         Basket.clear();
         return true;
+    }
+
+    public void update(){
     }
 }

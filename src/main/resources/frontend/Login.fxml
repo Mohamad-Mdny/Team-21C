@@ -3,10 +3,75 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="backend.controllers.LoginController">
-   <children>
-      <TextField fx:id="emailInput" layoutX="226.0" layoutY="110.0" promptText="Enter Email" />
-      <PasswordField fx:id="passwordInput" layoutX="227.0" layoutY="175.0" promptText="Enter Password" />
-      <Button onAction="#login" layoutX="274.0" layoutY="223.0" mnemonicParsing="false" text="Button" />
-   </children>
-</AnchorPane>
+<BorderPane prefHeight="700.0" prefWidth="1400.0"
+            xmlns="http://javafx.com/javafx/17.0.12"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="backend.controllers.LoginController">
+
+    <top>
+        <VBox spacing="12.0" style="-fx-background-color: #1f2937; -fx-padding: 16;">
+            <HBox>
+                <Label text="IPOS-PU"
+                       style="-fx-text-fill: white; -fx-font-size: 24px; -fx-font-weight: bold;" />
+                <Region HBox.hgrow="ALWAYS" />
+                <Label text="Login"
+                       style="-fx-text-fill: #e5e7eb; -fx-font-size: 14px;" />
+            </HBox>
+
+            <StackPane>
+                <TextField fx:id="searchField"
+                           maxWidth="420.0"
+                           prefWidth="420.0"
+                           promptText="Search catalogue..."
+                           onAction="#handleSearchEnter" />
+            </StackPane>
+
+            <HBox spacing="10.0" alignment="CENTER_LEFT">
+                <Button mnemonicParsing="false" text="Catalogue" onAction="#goToCatalogue" />
+                <Button mnemonicParsing="false" text="Current Promotions" onAction="#goToCurrentPromotions" />
+
+                <Region HBox.hgrow="ALWAYS" />
+
+                <Button mnemonicParsing="false" text="Checkout" onAction="#goToCheckout" />
+                <Button fx:id="SignIn" mnemonicParsing="false" text="Sign In" />
+            </HBox>
+        </VBox>
+    </top>
+
+    <center>
+        <StackPane style="-fx-padding: 40;">
+            <VBox spacing="14.0"
+                  alignment="CENTER"
+                  maxWidth="420.0"
+                  style="-fx-background-color: white; -fx-padding: 28; -fx-border-color: #d1d5db; -fx-border-radius: 12; -fx-background-radius: 12;">
+
+                <Label text="Sign in"
+                       style="-fx-font-size: 22px; -fx-font-weight: bold;" />
+
+                <Label text="Use your email and password to access your account."
+                       wrapText="true"
+                       style="-fx-text-fill: #4b5563;" />
+
+                <Separator />
+
+                <VBox spacing="8.0">
+                    <Label text="Email" style="-fx-font-weight: bold;" />
+                    <TextField fx:id="emailInput" promptText="Enter Email" />
+                </VBox>
+
+                <VBox spacing="8.0">
+                    <Label text="Password" style="-fx-font-weight: bold;" />
+                    <PasswordField fx:id="passwordInput" promptText="Enter Password" />
+                </VBox>
+
+                <Button text="Login"
+                        mnemonicParsing="false"
+                        maxWidth="Infinity"
+                        onAction="#login"
+                        style="-fx-font-weight: bold; -fx-padding: 10 0 10 0;"
+                />
+            </VBox>
+        </StackPane>
+    </center>
+
+</BorderPane>
