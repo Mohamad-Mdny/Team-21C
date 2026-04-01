@@ -38,6 +38,9 @@ public class CatalogueController {
     @FXML private CheckBox inStockOnly;
     @FXML private CheckBox lowStockOnly;
 
+    public static String pendingSearchText = "";
+
+
     @FXML
     private Label memberSession;
 
@@ -53,9 +56,9 @@ public class CatalogueController {
         filteredData = new FilteredList<>(masterData, item -> true);
         configureFilters();
         updateAccountButton();
-        if (CheckoutController.pendingSearchText != null && !CheckoutController.pendingSearchText.isBlank()) {
-            searchField.setText(CheckoutController.pendingSearchText);
-            CheckoutController.pendingSearchText = "";
+        if (pendingSearchText != null && !pendingSearchText.isBlank()) {
+            searchField.setText(pendingSearchText);
+            pendingSearchText = "";
         }
         updateFilters(); }
     private void loadData() {
@@ -211,11 +214,9 @@ public class CatalogueController {
     @FXML public void goToCatalogue(ActionEvent event) {
         switchPage(event, "Catalogue.fxml");
     }
-
     @FXML public void goToCurrentPromotions(ActionEvent event) {
         switchPage(event, "CurrentPromotions.fxml");
     }
-
     @FXML public void goToCheckout(ActionEvent event) {
         switchPage(event, "Checkout.fxml");
     }

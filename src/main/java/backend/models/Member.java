@@ -14,8 +14,9 @@ public class Member extends User{
     public Member(String emailAddress){
         super();
         this.emailAddress = emailAddress;
-
+        signedIn = true;
     }
+
 
 
     public String getEmailAddress(){

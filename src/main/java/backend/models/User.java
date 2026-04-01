@@ -20,34 +20,6 @@ public class User {
 
     public User() {
         signedIn = false;
-        /*
-        DatabaseManager databaseManager = new DatabaseManager();
-        Connection connection = databaseManager.makeConnection();
-        if (connection == null) {
-            System.out.println("Database connection failed.");
-            return;
-        }
-        String sql = "SELECT * FROM Catalogue";
-        try (connection;
-             Statement statement = connection.createStatement();
-             ResultSet resultSet = statement.executeQuery(sql)) {
-            while (resultSet.next()) {
-                masterData.add(new Item(resultSet.getInt("ItemID"),
-                        resultSet.getString("Description"),
-                        resultSet.getString("PackageType"),
-                        resultSet.getString("Unit"),
-                        resultSet.getInt("UnitsInAPack"),
-                        resultSet.getFloat("PackageCost"),
-                        resultSet.getInt("Availability"),
-                        resultSet.getInt("StockLimit"))
-                );
-            }
-        }
-        catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-         */
     }
 
     public void addItem(Item item) {
@@ -66,8 +38,8 @@ public class User {
         return signedIn;
     }
 
-    public void setSignedIn(boolean signedIn){
-        this.signedIn=signedIn;
+    public void setSignedIn(){
+        this.signedIn=true;
     }
 
     public double getBasketSubtotal() {
@@ -98,18 +70,23 @@ public class User {
         if (deliveryOption == null || deliveryOption.isBlank()) {
             return false;
         }
-        String body = "Thank you for your purchase. \nDelivery Address: " + deliveryAddress + "\nDelivery Option: " + deliveryOption +
-                "\nNotes: " + notes +
+        String body = "Thank you for your purchase. " +
                 "\nItems purchased:";
 
         for (Item item : Basket) {
             body = body + "\n   - " + item.getDescription();
         }
+        body = body + "\nDelivery Address: " + deliveryAddress + "\nDelivery Option: " + deliveryOption +
+                "\nNotes: " + notes ;
+
         body = body + "\n\nPayment Method: " + paymentMethod + "\n \n    Subtotal: £" + String.format("%.2f", getBasketSubtotal());
 
         EmailSendResult result = SendGmail.sendGmail("surya.premkumar@city.ac.uk", "Order ", body);
 
         Basket.clear();
         return true;
+    }
+
+    public void update(){
     }
 }
