@@ -52,18 +52,25 @@ public class LoginController {
 
                         if(resultSet.getString("type").equals("nonCommercial")) {
 
+
+
+
                             System.out.println("non commercial login");
                             System.out.println("successful login");
-                            Main.m.setSignedIn();
+                            Main.m.signIn();
                             Main.member = new Member(email);
+
+
+
                             System.out.println(Main.member.getEmailAddress()+" "+Main.member.isSignedIn());
+
+
+
                             try{System.out.println("TRYING TO SWITCH TO CATALOGUE");
                             Parent root = FXMLLoader.load(getClass().getResource("/frontend/Catalogue.fxml"));
                             Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
                             stage.getScene().setRoot(root);
                             stage.show();
-
-
 
 
                             }
@@ -133,6 +140,10 @@ public class LoginController {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    private void updateFunction() {
+
     }
 
 

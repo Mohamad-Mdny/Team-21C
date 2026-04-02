@@ -60,14 +60,13 @@
          </top>
 
          <center>
-            <ScrollPane fx:id="catalogueScrollPane" fitToWidth="true" hbarPolicy="NEVER" pannable="true" style="-fx-background-color: transparent;">
-               <content>
-                  <GridPane fx:id="catalogueGrid" hgap="16.0" style="-fx-background-color: white;" vgap="16.0">
-                     <padding>
-                        <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
-                     </padding>
-                  </GridPane>
-               </content>
+            <ScrollPane fx:id="catalogueScrollPane" fitToWidth="true" hbarPolicy="NEVER" pannable="true"
+                        style="-fx-background-color: transparent;">
+               <GridPane fx:id="catalogueGrid" hgap="16.0" style="-fx-background-color: white;" vgap="16.0">
+                  <padding>
+                     <Insets bottom="4.0" left="4.0" right="4.0" top="4.0"/>
+                  </padding>
+               </GridPane>
             </ScrollPane>
          </center>
       </BorderPane>

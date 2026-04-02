@@ -1,15 +1,8 @@
 package backend.models;
 
-import backend.DatabaseManager;
 import backend.communication.EmailSendResult;
 import backend.communication.SendGmail;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 
 
@@ -38,9 +31,14 @@ public class User {
         return signedIn;
     }
 
-    public void setSignedIn(){
+    public void signIn(){
         this.signedIn=true;
     }
+
+    public void signOut(){
+        this.signedIn=false;
+    }
+
 
     public double getBasketSubtotal() {
         double subtotal = 0.0;

@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane prefHeight="700.0" prefWidth="1400.0"
+            xmlns="http://javafx.com/javafx/17.0.12"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="backend.controllers.AccountSettingsController">
+
+    <top>
+        <VBox spacing="12.0" style="-fx-background-color: #1f2937; -fx-padding: 16;">
+            <HBox>
+                <Label text="IPOS-PU"
+                       style="-fx-text-fill: white; -fx-font-size: 24px; -fx-font-weight: bold;" />
+                <Region HBox.hgrow="ALWAYS" />
+                <Label text="Account Settings"
+                       style="-fx-text-fill: #e5e7eb; -fx-font-size: 14px;" />
+            </HBox>
+
+            <StackPane>
+                <TextField fx:id="searchField"
+                           maxWidth="420.0"
+                           prefWidth="420.0"
+                           promptText="Search catalogue..."
+                           onAction="#handleSearchEnter" />
+            </StackPane>
+
+            <HBox spacing="10.0" alignment="CENTER_LEFT">
+                <Button mnemonicParsing="false" text="Catalogue" onAction="#goToCatalogue" />
+                <Button mnemonicParsing="false" text="Current Promotions" onAction="#goToCurrentPromotions" />
+
+                <Region HBox.hgrow="ALWAYS" />
+
+                <Button mnemonicParsing="false" text="Checkout" onAction="#goToCheckout" />
+                <Button fx:id="accountSettingsButton" mnemonicParsing="false" text="Account Settings" disable="true" />
+            </HBox>
+        </VBox>
+    </top>
+
+    <center>
+        <ScrollPane fitToWidth="true" style="-fx-background-color: transparent;">
+            <content>
+                <StackPane style="-fx-padding: 40;">
+                    <VBox spacing="16.0"
+                          maxWidth="820.0"
+                          style="-fx-background-color: white; -fx-padding: 28; -fx-border-color: #d1d5db; -fx-border-radius: 12; -fx-background-radius: 12;">
+
+                        <HBox alignment="CENTER_LEFT" spacing="10">
+                            <Label text="Member Account Details"
+                                   style="-fx-font-size: 22px; -fx-font-weight: bold;" />
+                            <Region HBox.hgrow="ALWAYS"/>
+                            <Label fx:id="statusLabel"
+                                   style="-fx-text-fill: #6b7280; -fx-font-size: 13px;" />
+                        </HBox>
+
+                        <Label text="Review your details below. Click Edit to make changes, then Save."
+                               wrapText="true"
+                               style="-fx-text-fill: #4b5563;" />
+
+                        <Separator />
+
+                        <GridPane hgap="14" vgap="12">
+                            <columnConstraints>
+                                <ColumnConstraints minWidth="160" prefWidth="180" />
+                                <ColumnConstraints hgrow="ALWAYS" />
+                            </columnConstraints>
+
+                            <Label text="Email" style="-fx-font-weight: bold;" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+                            <TextField fx:id="emailField" editable="false" promptText="Email address"
+                                       GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+
+                            <Label text="Account Type" style="-fx-font-weight: bold;" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+                            <Button fx:id="typeBox" onAction="#updateTypeBox" disable="true" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+
+                            <Label text="Validity Status" style="-fx-font-weight: bold;" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+                            <TextField fx:id="validityField" editable="false" promptText="e.g. normal / suspended / in default"
+                                       GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+                        </GridPane>
+
+                        <Separator />
+
+                        <Label text="Personal Details"
+                               style="-fx-font-size: 16px; -fx-font-weight: bold;" />
+
+                        <GridPane hgap="14" vgap="12">
+                            <columnConstraints>
+                                <ColumnConstraints minWidth="160" prefWidth="180" />
+                                <ColumnConstraints hgrow="ALWAYS" />
+                            </columnConstraints>
+
+                            <Label text="Address" style="-fx-font-weight: bold;" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+                            <TextField fx:id="DeliveryAddress" editable="false" promptText="123 Avery Road"
+                                       GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+
+                            <Label text="Card Number" style="-fx-font-weight: bold;" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+                            <TextField fx:id="CardNumber" editable="false" promptText="1234 1234 1234 1234"
+                                       GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+
+                            <Label text="CVV " style="-fx-font-weight: bold;" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+                            <TextField fx:id="CVV" editable="false" promptText="123"
+                                       GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+
+                            <Label text="Billing Address" style="-fx-font-weight: bold;" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
+                            <TextArea fx:id="BillingAddress" editable="false" wrapText="true" prefRowCount="3"
+                                      promptText="123 Avery Road"
+                                      GridPane.rowIndex="3" GridPane.columnIndex="1"/>
+
+                            <Label text="Phone Number" style="-fx-font-weight: bold;" GridPane.rowIndex="4" GridPane.columnIndex="0"/>
+                            <TextArea fx:id="PhoneNumber" editable="false" prefRowCount="1" promptText="07123456789"
+                                      GridPane.rowIndex="4" GridPane.columnIndex="1"/>
+                        </GridPane>
+
+                        <Separator />
+
+                        <HBox spacing="10" alignment="CENTER_RIGHT">
+                            <Button fx:id="editButton" text="Edit" mnemonicParsing="false" onAction="#onEdit"/>
+                            <Button fx:id="saveButton" text="Save" mnemonicParsing="false" disable="true" onAction="#onSave"/>
+                            <Button fx:id="cancelButton" text="Cancel" mnemonicParsing="false" disable="true" onAction="#onCancel"/>
+
+                            <Region HBox.hgrow="ALWAYS"/>
+
+                            <Button text="Sign Out"
+                                    mnemonicParsing="false"
+                                    onAction="#signOut"
+                                    style="-fx-font-weight: bold; -fx-padding: 10 18 10 18;" />
+                        </HBox>
+
+                    </VBox>
+                </StackPane>
+            </content>
+        </ScrollPane>
+    </center>
+
+</BorderPane>

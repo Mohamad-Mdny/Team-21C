@@ -13,11 +13,7 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Parent;
-import javafx.scene.control.Button;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
@@ -29,6 +25,7 @@ import java.sql.ResultSet; import java.sql.SQLException;
 import java.sql.Statement; import java.util.Objects;
 
 public class CatalogueController {
+    public ScrollPane catalogueScrollPane;
     @FXML private GridPane catalogueGrid;
     @FXML private Button accountButton;
     @FXML private TextField searchField;
@@ -229,8 +226,9 @@ public class CatalogueController {
         }
     }
 
-    @FXML public void handleAccountButton(ActionEvent event) {
-        if (Main.m != null && Main.m.isSignedIn()) {
+    @FXML
+    public void handleAccountButton(ActionEvent event) {
+        if (Main.m.isSignedIn()) {
             switchPage(event, "AccountSettings.fxml");
         } else {
             System.out.println("Going to login");
