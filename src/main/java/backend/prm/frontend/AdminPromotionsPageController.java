@@ -153,6 +153,7 @@ public class AdminPromotionsPageController {
             e.printStackTrace();
         }
     }
+
     @FXML
     private void handleUpdateCampaign() {
         PromotionCampaign selected = campaignListView.getSelectionModel().getSelectedItem();
@@ -192,6 +193,7 @@ public class AdminPromotionsPageController {
             e.printStackTrace();
         }
     }
+
     @FXML
     private void handleManageItems() {
         PromotionCampaign selected = campaignListView.getSelectionModel().getSelectedItem();

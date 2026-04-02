@@ -3,6 +3,9 @@ package backend.prm.service;
 import backend.prm.model.PromotionCampaign;
 import backend.prm.model.PromotionItem;
 import backend.prm.model.PromotionStatus;
+import backend.prm.report.CampaignHitReportRow;
+import backend.prm.report.CampaignReportRow;
+import backend.prm.report.SalesReportRow;
 import backend.prm.repository.PromotionRepository;
 
 import java.time.LocalDateTime;
@@ -10,17 +13,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * This class contains all business logic for the promotion package.
- * Data storage is fully delegated to PromotionRepository.
- *
- * Responsibilities:
- *  - Create, cancel and retrieve promotion campaigns (Admin operations)
- *  - Manage items within a campaign (Admin operations)
- *  - Track click counters per campaign (Customer interactions)
- *  - Track addedToOrder and purchased counters per item (Order events)
- *  - Calculate conversion rates for reporting
- */
 public class PromotionService {
 
     private final PromotionRepository repository;
@@ -29,9 +21,172 @@ public class PromotionService {
         this.repository = repository;
     }
 
-    public PromotionCampaign createCampaign(String title, String description,
+    public PromotionCampaign createCampaign(String title,
+                                            String description,
                                             LocalDateTime startDateTime,
                                             LocalDateTime endDateTime) {
+        validateCampaignInput(title, startDateTime, endDateTime);
+        PromotionCampaign campaign = new PromotionCampaign(0, null, title.trim(), description, startDateTime, endDateTime);
+        return repository.saveCampaign(campaign);
+    }
+
+    public List<PromotionCampaign> getAllCampaigns() {
+        return repository.findAllCampaigns();
+    }
+
+    public List<PromotionCampaign> getActiveCampaigns(LocalDateTime now) {
+        return repository.findActiveCampaigns(now);
+    }
+
+    public PromotionCampaign getCampaignById(long campaignId) {
+        return getCampaignOrThrow(campaignId);
+    }
+
+    public void cancelCampaign(long campaignId) {
+        PromotionCampaign campaign = getCampaignOrThrow(campaignId);
+        if (campaign.getStatus(LocalDateTime.now()) == PromotionStatus.EXPIRED) {
+            throw new IllegalStateException("Expired campaigns cannot be cancelled.");
+        }
+        campaign.setCancelledAt(LocalDateTime.now());
+        repository.updateCampaign(campaign);
+    }
+
+    public void reactivateCampaign(long campaignId) {
+        PromotionCampaign campaign = getCampaignOrThrow(campaignId);
+        if (campaign.getStatus(LocalDateTime.now()) != PromotionStatus.CANCELLED) {
+            throw new IllegalStateException("Only cancelled campaigns can be reactivated.");
+        }
+        campaign.setCancelledAt(null);
+        repository.updateCampaign(campaign);
+    }
+
+    public PromotionItem addItemToCampaign(long campaignId, String productId, double discountPercent) {
+        getCampaignOrThrow(campaignId);
+        validateItemInput(productId, discountPercent);
+        if (repository.itemExistsInCampaign(campaignId, productId)) {
+            throw new IllegalArgumentException("Product already exists in campaign: " + productId);
+        }
+        PromotionItem item = new PromotionItem(0, campaignId, productId.trim(), discountPercent, 0.0);
+        return repository.saveItem(item);
+    }
+
+    public List<PromotionItem> getItemsByCampaign(long campaignId) {
+        getCampaignOrThrow(campaignId);
+        return repository.findItemsByCampaignId(campaignId);
+    }
+
+    public void recordCampaignClick(long campaignId) {
+        PromotionCampaign campaign = getCampaignOrThrow(campaignId);
+        validateCampaignIsActive(campaign);
+        repository.incrementCampaignClick(campaignId);
+    }
+
+    public void recordItemAddedToOrder(long campaignId, long itemId, int quantity) {
+        recordItemAddedToOrder(campaignId, itemId, quantity, null);
+    }
+
+    public void recordItemAddedToOrder(long campaignId, long itemId, int quantity, String orderReference) {
+        validateQuantity(quantity);
+        PromotionCampaign campaign = getCampaignOrThrow(campaignId);
+        validateCampaignIsActive(campaign);
+        PromotionItem item = getItemOrThrow(campaignId, itemId);
+        repository.incrementItemAddedCount(campaignId, itemId, quantity);
+        repository.savePromotionOrderEvent(campaignId, itemId, item.getProductId(), "ADDED", quantity,
+                item.getPromotionalPrice(), orderReference, LocalDateTime.now());
+    }
+
+    public void recordItemPurchased(long campaignId, long itemId, int quantity) {
+        recordItemPurchased(campaignId, itemId, quantity, null);
+    }
+
+    public void recordItemPurchased(long campaignId, long itemId, int quantity, String orderReference) {
+        validateQuantity(quantity);
+        getCampaignOrThrow(campaignId);
+        PromotionItem item = getItemOrThrow(campaignId, itemId);
+        repository.incrementItemPurchasedCount(campaignId, itemId, quantity);
+        repository.savePromotionOrderEvent(campaignId, itemId, item.getProductId(), "PURCHASED", quantity,
+                item.getPromotionalPrice(), orderReference, LocalDateTime.now());
+    }
+
+    public PromotionCampaign updateCampaign(long campaignId,
+                                            String title,
+                                            String description,
+                                            LocalDateTime startDateTime,
+                                            LocalDateTime endDateTime) {
+        validateCampaignInput(title, startDateTime, endDateTime);
+        PromotionCampaign campaign = getCampaignOrThrow(campaignId);
+        campaign.setTitle(title.trim());
+        campaign.setDescription(description);
+        campaign.setStartDateTime(startDateTime);
+        campaign.setEndDateTime(endDateTime);
+        return repository.updateCampaign(campaign);
+    }
+
+    public PromotionItem updateItem(long campaignId, long itemId, String productId, double discountPercent) {
+        getCampaignOrThrow(campaignId);
+        validateItemInput(productId, discountPercent);
+        PromotionItem existingItem = getItemOrThrow(campaignId, itemId);
+        existingItem.setProductId(productId.trim());
+        existingItem.setDiscountPercent(discountPercent);
+        return repository.updateItem(existingItem);
+    }
+
+    public void deleteCampaign(long campaignId) {
+        getCampaignOrThrow(campaignId);
+        repository.deleteCampaign(campaignId);
+    }
+
+    public void deleteItem(long itemId) {
+        repository.deleteItem(itemId);
+    }
+
+    public double getConversionRate(long campaignId, long itemId) {
+        PromotionItem item = getItemOrThrow(campaignId, itemId);
+        return item.getConversionRate();
+    }
+
+    public Map<Long, Double> getCampaignConversionRates(long campaignId) {
+        List<PromotionItem> items = getItemsByCampaign(campaignId);
+        Map<Long, Double> rates = new HashMap<>();
+        for (PromotionItem item : items) {
+            rates.put(item.getId(), item.getConversionRate());
+        }
+        return rates;
+    }
+
+    public List<SalesReportRow> getSalesReport(LocalDateTime from, LocalDateTime to) {
+        validateRange(from, to);
+        return repository.getSalesReport(from, to);
+    }
+
+    public List<CampaignReportRow> getCampaignReport(LocalDateTime from, LocalDateTime to) {
+        validateRange(from, to);
+        return repository.getCampaignReport(from, to);
+    }
+
+    public List<CampaignHitReportRow> getCampaignHitReport(LocalDateTime from, LocalDateTime to) {
+        validateRange(from, to);
+        return repository.getCampaignHitReport(from, to);
+    }
+
+    private PromotionCampaign getCampaignOrThrow(long campaignId) {
+        return repository.findCampaignById(campaignId)
+                .orElseThrow(() -> new IllegalArgumentException("Campaign not found with ID: " + campaignId));
+    }
+
+    private PromotionItem getItemOrThrow(long campaignId, long itemId) {
+        return repository.findItemByIdAndCampaignId(itemId, campaignId)
+                .orElseThrow(() -> new IllegalArgumentException("Item not found with ID: " + itemId + " in campaign: " + campaignId));
+    }
+
+    private void validateCampaignIsActive(PromotionCampaign campaign) {
+        PromotionStatus status = campaign.getStatus(LocalDateTime.now());
+        if (status != PromotionStatus.ACTIVE) {
+            throw new IllegalStateException("Operation requires an ACTIVE campaign. Current status: " + status);
+        }
+    }
+
+    private void validateCampaignInput(String title, LocalDateTime startDateTime, LocalDateTime endDateTime) {
         if (title == null || title.trim().isEmpty()) {
             throw new IllegalArgumentException("Campaign title must not be empty.");
         }
@@ -41,157 +196,29 @@ public class PromotionService {
         if (!endDateTime.isAfter(startDateTime)) {
             throw new IllegalArgumentException("End date/time must be after start date/time.");
         }
-
-        PromotionCampaign campaign = new PromotionCampaign(
-                0, title, description, startDateTime, endDateTime
-        );
-        return repository.saveCampaign(campaign);
     }
 
-
-    //Cancels an active or scheduled campaign.
-    public void cancelCampaign(long campaignId) {
-        PromotionCampaign campaign = getCampaignOrThrow(campaignId);
-        LocalDateTime now = LocalDateTime.now();
-
-        PromotionStatus status = campaign.getStatus(now);
-        if (status == PromotionStatus.CANCELLED) {
-            throw new IllegalStateException("Campaign is already cancelled.");
+    private void validateItemInput(String productId, double discountPercent) {
+        if (productId == null || productId.isBlank()) {
+            throw new IllegalArgumentException("Product ID must not be empty.");
         }
-        if (status == PromotionStatus.EXPIRED) {
-            throw new IllegalStateException("Campaign has already expired and cannot be cancelled.");
-        }
-
-        campaign.setCancelledAt(now);
-        repository.updateCampaign(campaign);
-    }
-
-    /**
-     * Returns all campaigns regardless of status.
-     * Used by Admin to manage all campaigns.
-     */
-    public List<PromotionCampaign> getAllCampaigns() {
-        return repository.findAllCampaigns();
-    }
-
-
-    //Returns only campaigns that are currently ACTIVE at the given time.
-    public List<PromotionCampaign> getActiveCampaigns(LocalDateTime now) {
-        return repository.findActiveCampaigns(now);
-    }
-
-    //Returns a single campaign by ID.
-
-    public PromotionCampaign getCampaignById(long campaignId) {
-        return getCampaignOrThrow(campaignId);
-    }
-
-
-
-    public PromotionItem addItemToCampaign(long campaignId, long productId, double discountPercent) {
-        PromotionCampaign campaign = getCampaignOrThrow(campaignId);
-
-        // Only allow adding items to campaigns that haven't started yet
-        PromotionStatus status = campaign.getStatus(LocalDateTime.now());
-        if (status != PromotionStatus.SCHEDULED) {
-            throw new IllegalStateException(
-                    "Items can only be added to SCHEDULED campaigns. Current status: " + status);
-        }
-
         if (discountPercent < 0 || discountPercent > 100) {
             throw new IllegalArgumentException("Discount percent must be between 0 and 100.");
         }
-
-        // Prevent duplicate products within the same campaign
-        if (repository.itemExistsInCampaign(campaignId, productId)) {
-            throw new IllegalArgumentException(
-                    "Product ID " + productId + " is already in campaign " + campaignId);
-        }
-
-        PromotionItem item = new PromotionItem(0, campaignId, productId, discountPercent);
-        return repository.saveItem(item);
     }
 
-
-    //Returns all items belonging to a specific campaign.
-    public List<PromotionItem> getItemsByCampaign(long campaignId) {
-        getCampaignOrThrow(campaignId); // validate campaign exists
-        return repository.findItemsByCampaignId(campaignId);
-    }
-
-
-    //Records a click on a campaign link by a customer.
-    public void recordCampaignClick(long campaignId) {
-        PromotionCampaign campaign = getCampaignOrThrow(campaignId);
-        validateCampaignIsActive(campaign);
-        campaign.incrementClickCount();
-        repository.updateCampaign(campaign);
-    }
-
-    //Records that a customer added promotional items to an order.
-    public void recordItemAddedToOrder(long campaignId, long itemId, int quantity) {
+    private void validateQuantity(int quantity) {
         if (quantity <= 0) {
             throw new IllegalArgumentException("Quantity must be greater than zero.");
         }
-        PromotionCampaign campaign = getCampaignOrThrow(campaignId);
-        validateCampaignIsActive(campaign);
-
-        PromotionItem item = getItemOrThrow(campaignId, itemId);
-        item.incrementAddedToOrderCount(quantity);
-        repository.updateItem(item);
     }
 
-
-    //Records that items from a promotional campaign were actually purchased (order paid).
-    public void recordItemPurchased(long campaignId, long itemId, int quantity) {
-        if (quantity <= 0) {
-            throw new IllegalArgumentException("Quantity must be greater than zero.");
+    private void validateRange(LocalDateTime from, LocalDateTime to) {
+        if (from == null || to == null) {
+            throw new IllegalArgumentException("Period start and end are required.");
         }
-
-        getCampaignOrThrow(campaignId);
-
-        PromotionItem item = getItemOrThrow(campaignId, itemId);
-        item.incrementPurchasedCount(quantity);
-        repository.updateItem(item);
-    }
-
-
-    //Calculates the conversion rate for a specific promotion item.
-    public double getConversionRate(long campaignId, long itemId) {
-        PromotionItem item = getItemOrThrow(campaignId, itemId);
-        return item.getConversionRate();
-    }
-
-
-    //Returns conversion rates for all items in a campaign.
-    public Map<Long, Double> getCampaignConversionRates(long campaignId) {
-        List<PromotionItem> items = getItemsByCampaign(campaignId);
-        Map<Long, Double> rates = new HashMap<>();
-        for (PromotionItem item : items) {
-            rates.put(item.getId(), getConversionRate(campaignId, item.getId()));
-        }
-        return rates;
-    }
-
-
-    private PromotionCampaign getCampaignOrThrow(long campaignId) {
-        return repository.findCampaignById(campaignId)
-                .orElseThrow(() -> new IllegalArgumentException(
-                        "Campaign not found with ID: " + campaignId));
-    }
-
-    private PromotionItem getItemOrThrow(long campaignId, long itemId) {
-        return repository.findItemByIdAndCampaignId(itemId, campaignId)
-                .orElseThrow(() -> new IllegalArgumentException(
-                        "Item not found with ID: " + itemId + " in campaign: " + campaignId));
-    }
-
-    private void validateCampaignIsActive(PromotionCampaign campaign) {
-        LocalDateTime now = LocalDateTime.now();
-        PromotionStatus status = campaign.getStatus(now);
-        if (status != PromotionStatus.ACTIVE) {
-            throw new IllegalStateException(
-                    "Operation requires an ACTIVE campaign. Current status: " + status);
+        if (to.isBefore(from)) {
+            throw new IllegalArgumentException("Period end must be after period start.");
         }
     }
 }

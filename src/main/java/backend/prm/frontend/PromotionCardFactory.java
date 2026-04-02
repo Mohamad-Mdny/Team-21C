@@ -73,16 +73,16 @@ public class PromotionCardFactory {
                         "-fx-padding: 10 18 10 18;"
         );
 
-//        Button saveButton = new Button("Save");
-//        saveButton.setStyle(
-//                "-fx-background-color: white;" +
-//                        "-fx-text-fill: #374151;" +
-//                        "-fx-font-weight: 700;" +
-//                        "-fx-border-color: #d1d5db;" +
-//                        "-fx-border-radius: 12;" +
-//                        "-fx-background-radius: 12;" +
-//                        "-fx-padding: 10 18 10 18;"
-//        );
+        Button saveButton = new Button("Save");
+        saveButton.setStyle(
+                "-fx-background-color: white;" +
+                        "-fx-text-fill: #374151;" +
+                        "-fx-font-weight: 700;" +
+                        "-fx-border-color: #d1d5db;" +
+                        "-fx-border-radius: 12;" +
+                        "-fx-background-radius: 12;" +
+                        "-fx-padding: 10 18 10 18;"
+        );
 
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);

@@ -3,7 +3,7 @@ package backend.prm.frontend;
 import backend.prm.controller.PromotionController;
 import backend.prm.model.PromotionCampaign;
 import backend.prm.model.PromotionItem;
-//import backend.prm.repository.ProductDAO;
+import backend.prm.repository.ProductDAO;
 import backend.prm.repository.PromotionRepository;
 import backend.prm.service.PromotionService;
 import javafx.collections.FXCollections;

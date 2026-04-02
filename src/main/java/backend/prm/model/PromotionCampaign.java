@@ -1,11 +1,11 @@
 package backend.prm.model;
 
-
 import java.time.LocalDateTime;
 
 public class PromotionCampaign {
 
     private long id;
+    private String campaignCode;
     private String title;
     private String description;
     private LocalDateTime startDateTime;
@@ -16,13 +16,19 @@ public class PromotionCampaign {
     public PromotionCampaign() {
     }
 
-    public PromotionCampaign(long id, String title, String description,
-                             LocalDateTime startDateTime, LocalDateTime endDateTime) {
+    public PromotionCampaign(long id,
+                             String campaignCode,
+                             String title,
+                             String description,
+                             LocalDateTime startDateTime,
+                             LocalDateTime endDateTime) {
         this.id = id;
+        this.campaignCode = campaignCode;
         this.title = title;
         this.description = description;
         this.startDateTime = startDateTime;
         this.endDateTime = endDateTime;
+        this.clickCount = 0;
     }
 
     public long getId() {
@@ -31,6 +37,14 @@ public class PromotionCampaign {
 
     public void setId(long id) {
         this.id = id;
+    }
+
+    public String getCampaignCode() {
+        return campaignCode;
+    }
+
+    public void setCampaignCode(String campaignCode) {
+        this.campaignCode = campaignCode;
     }
 
     public String getTitle() {
@@ -73,6 +87,18 @@ public class PromotionCampaign {
         this.cancelledAt = cancelledAt;
     }
 
+    public int getClickCount() {
+        return clickCount;
+    }
+
+    public void setClickCount(int clickCount) {
+        this.clickCount = clickCount;
+    }
+
+    public void incrementClickCount() {
+        this.clickCount++;
+    }
+
     public PromotionStatus getStatus(LocalDateTime now) {
         if (cancelledAt != null) {
             return PromotionStatus.CANCELLED;
@@ -85,10 +111,10 @@ public class PromotionCampaign {
         }
         return PromotionStatus.ACTIVE;
     }
-    public void incrementClickCount() {
-        this.clickCount++;
-    }
-    public int getClickCount() {
-        return clickCount;
+
+    @Override
+    public String toString() {
+        String code = campaignCode == null || campaignCode.isBlank() ? "Campaign" : campaignCode;
+        return code + " - " + title;
     }
 }
