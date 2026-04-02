@@ -2,17 +2,21 @@ package backend.communication;
 
 public class ProductStats {
     private String productName;
-    private int timesBought;
+    private int quantitySold;
+    private double unitPrice;
 
-    public ProductStats(String productName, int timesBought) {
+    public ProductStats(String productName, int timesBought, double unitPrice) {
         this.productName = productName;
-        this.timesBought = timesBought;
+        this.quantitySold = timesBought;
+        this.unitPrice = unitPrice;
     }
 
     public String getProductName() {
         return productName;
     }
-    public int getTimesBought() {
-        return timesBought;
+    public int getQuantitySold() {
+        return quantitySold;
     }
+    public double getUnitPrice() {return unitPrice;}
+    public double getTotalRevenue() {return getQuantitySold()  * getUnitPrice();}
 }

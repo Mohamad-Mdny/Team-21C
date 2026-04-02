@@ -21,10 +21,10 @@ public class SalesReport {
         document.add(title);
         document.add(Chunk.NEWLINE);
 
-        PdfPTable table = new PdfPTable(2);
+        PdfPTable table = new PdfPTable(4);
         table.setWidthPercentage(100);
 
-        for (String header : new String[]{"Product Name", "X bought"}) {
+        for (String header : new String[]{"Product Name", "Quantity", "Unit Price", "Total Revenue"}) {
             PdfPCell cell = new PdfPCell(new Phrase(header, new Font(Font.FontFamily.TIMES_ROMAN, 12, Font.BOLD)));
             cell.setBackgroundColor(BaseColor.LIGHT_GRAY);
             cell.setPadding(8);
@@ -33,8 +33,11 @@ public class SalesReport {
 
         for (ProductStats product : products) {
             table.addCell(product.getProductName());
-            table.addCell(String.valueOf(product.getTimesBought()));
+            table.addCell(String.valueOf(product.getQuantitySold()));
+            table.addCell(String.format("%.2f", product.getUnitPrice()));
+            table.addCell(String.format("%.2f", product.getTotalRevenue()));
         }
+
 
         document.add(table);
         document.close();
