@@ -24,9 +24,8 @@ import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.ResultSet; import java.sql.SQLException;
-import java.sql.Statement; import java.util.Objects;
+import java.sql.*;
+import java.util.Objects;
 
 public class CatalogueController {
     @FXML private GridPane catalogueGrid;

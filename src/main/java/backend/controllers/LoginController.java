@@ -26,7 +26,6 @@ public class LoginController {
     private TextField searchField;
     @FXML
     TextField emailInput;
-
     @FXML
     TextField passwordInput;
 

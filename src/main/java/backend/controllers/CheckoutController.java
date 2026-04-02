@@ -1,5 +1,6 @@
 package backend.controllers;
 
+import backend.DatabaseManager;
 import backend.Main;
 import backend.models.Item;
 import javafx.collections.FXCollections;
@@ -20,6 +21,10 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -173,7 +178,15 @@ public class CheckoutController {
 
     private void updateSummaryLabels(int itemCount, double subtotal) {
         double vat = subtotal * VAT_RATE;
-        double total = subtotal + vat;
+        double total;
+        if(Main.member.isSignedIn()&& checkMemberDiscount(Main.member.getEmailAddress())){
+            total = (subtotal * 0.90)+ vat;
+        }
+        else{
+            total = subtotal + vat;
+        }
+
+
 
         itemCountLabel.setText("Items in basket: " + itemCount);
 
@@ -279,6 +292,54 @@ public class CheckoutController {
         }
     }
 
+
+
+    //gathers the number of purchases made by the member that is logged in
+    //if the number of purchases is divisible by 10 then it will return true else false
+    private boolean checkMemberDiscount(String emailAddress){
+        DatabaseManager database = new DatabaseManager();
+        Connection connection= database.makeConnection();
+        try{
+            PreparedStatement statement = connection.prepareStatement("SELECT totalPurchases FROM member WHERE emailAddress=?");
+            statement.setString(1,emailAddress);
+            ResultSet resultSet = statement.executeQuery();
+            if(resultSet.next()){
+                if (resultSet.getInt("totalPurchases") % 10 == 0){
+                    System.out.println("Discount Active");
+                    return true;
+                }
+            }
+
+        }catch(SQLException e){
+            e.printStackTrace();
+        }
+        return false;
+    }
+    //this finds the number of purchases made by the member
+    //updates the table to increments total purchases by 1
+    private void incrementMemberPurchases(String emailAddress){
+        int totalPurchases=0;
+        DatabaseManager database = new DatabaseManager();
+        Connection connection= database.makeConnection();
+        try{
+            PreparedStatement statement = connection.prepareStatement("SELECT totalPurchases FROM member WHERE emailAddress=?");
+            statement.setString(1,emailAddress);
+            ResultSet resultSet = statement.executeQuery();
+            if(resultSet.next()){
+                totalPurchases=resultSet.getInt("totalPurchases");
+            }
+            PreparedStatement statementTwo = connection.prepareStatement("UPDATE member SET totalPurchases=? WHERE emailAddress=?");
+            statementTwo.setInt(1,totalPurchases+1);
+            statementTwo.setString(2,emailAddress);
+            statementTwo.execute();
+
+
+        }catch(SQLException e){
+            e.printStackTrace();
+        }
+
+    }
+
     private static class BasketAccumulator {
         private final Item item;
         private int quantity;
@@ -330,4 +391,5 @@ public class CheckoutController {
             return subtotal;
         }
     }
+
 }
