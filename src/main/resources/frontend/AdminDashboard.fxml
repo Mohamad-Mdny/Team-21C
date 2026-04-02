@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<BorderPane xmlns="http://javafx.com/javafx/25"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="backend.prm.frontend.AdminDashboardController">
+
+    <left>
+        <VBox spacing="12" prefWidth="340">
+            <padding>
+                <Insets top="18" right="18" bottom="18" left="18"/>
+            </padding>
+
+            <Label text="Campaigns"/>
+            <ListView fx:id="campaignListView" prefHeight="650"/>
+
+            <Button text="Refresh List" onAction="#handleRefreshCampaigns"/>
+        </VBox>
+    </left>
+
+    <center>
+        <VBox spacing="12">
+            <padding>
+                <Insets top="18" right="18" bottom="18" left="18"/>
+            </padding>
+
+            <Label text="Admin Dashboard"/>
+
+            <TabPane fx:id="tabPane" tabClosingPolicy="UNAVAILABLE">
+                <tabs>
+
+                    <Tab text="Campaign Details">
+                        <VBox spacing="12">
+                            <padding>
+                                <Insets top="16" right="16" bottom="16" left="16"/>
+                            </padding>
+
+                            <Label fx:id="selectedCampaignLabel" text="No campaign selected"/>
+
+                            <TextField fx:id="titleField" promptText="Campaign title"/>
+                            <TextArea fx:id="descriptionArea" promptText="Description" prefRowCount="5"/>
+
+                            <Label text="Start date"/>
+                            <DatePicker fx:id="startDatePicker"/>
+
+                            <Label text="End date"/>
+                            <DatePicker fx:id="endDatePicker"/>
+
+                            <VBox spacing="10">
+                                <HBox fx:id="campaignMainActionsBox" spacing="10">
+                                    <Button fx:id="createCampaignButton" text="Create New" onAction="#handleCreateNew"/>
+                                    <Button fx:id="editCampaignButton" text="Edit" onAction="#handleEditMode"/>
+                                    <Button fx:id="deleteCampaignButton" text="Delete" onAction="#handleDeleteCampaign"/>
+                                    <Button fx:id="cancelCampaignButton" text="Cancel Campaign" onAction="#handleCancelCampaign"/>
+                                </HBox>
+
+                                <HBox fx:id="campaignEditActionsBox" spacing="10" visible="false" managed="false">
+                                    <Button fx:id="saveCampaignChangesButton" text="Save Changes" onAction="#handleSaveChanges"/>
+                                    <Button fx:id="discardCampaignChangesButton" text="Discard Changes" onAction="#handleCancelChanges"/>
+                                </HBox>
+                            </VBox>
+                        </VBox>
+                    </Tab>
+
+                    <Tab text="Campaign Items">
+                        <VBox spacing="12">
+                            <padding>
+                                <Insets top="16" right="16" bottom="16" left="16"/>
+                            </padding>
+
+                            <Label fx:id="itemsCampaignLabel" text="No campaign selected"/>
+                            <ListView fx:id="itemsListView" prefHeight="420"/>
+
+                            <TextField fx:id="productIdField" promptText="Product ID"/>
+                            <TextField fx:id="discountField" promptText="Discount percent"/>
+
+                            <VBox spacing="10">
+                                <HBox spacing="10">
+                                    <Button fx:id="addItemButton" text="Add Item" onAction="#handleAddItem"/>
+                                    <Button fx:id="editItemButton" text="Edit Item" onAction="#handleEditItemMode"/>
+                                    <Button fx:id="deleteItemButton" text="Delete Selected" onAction="#handleDeleteItem"/>
+                                </HBox>
+
+                                <HBox fx:id="itemEditActionsBox" spacing="10" visible="false" managed="false">
+                                    <Button fx:id="saveItemChangesButton" text="Save Changes" onAction="#handleSaveItemChanges"/>
+                                    <Button fx:id="cancelItemChangesButton" text="Cancel" onAction="#handleCancelItemChanges"/>
+                                </HBox>
+
+                                <Button text="Refresh Items" onAction="#handleRefreshItems"/>
+                            </VBox>
+                        </VBox>
+                    </Tab>
+
+                </tabs>
+            </TabPane>
+
+            <Label fx:id="statusLabel" text="Ready"/>
+        </VBox>
+    </center>
+</BorderPane>
