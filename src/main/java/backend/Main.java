@@ -26,8 +26,9 @@ public class Main extends Application {
     }
 
     public static void main(String[] args) {
-        List<ProductStats> stats = List.of(new ProductStats("Widget A", 42, 23.45), new ProductStats("Widget B", 17, 34.34), new ProductStats("Widget C", 89, 67.45));
-        SalesReport.generateReport(stats, "sales_report.pdf");
+        //Report creation
+       // List<ProductStats> stats = List.of(new ProductStats("Widget A", 42, 23.45), new ProductStats("Widget B", 17, 34.34), new ProductStats("Widget C", 89, 67.45));
+        //SalesReport.generateReport(stats, "sales_report.pdf");
 
         //dont remove
         launch(args);
