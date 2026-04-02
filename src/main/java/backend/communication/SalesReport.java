@@ -1,0 +1,49 @@
+package backend.communication;
+
+import com.itextpdf.text.*;
+import com.itextpdf.text.pdf.*;
+
+import com.itextpdf.text.Document;
+import java.io.FileOutputStream;
+import java.util.List;
+
+public class SalesReport {
+
+    public static void generateReport(List<ProductStats> products, String Path) {
+        Document document = new Document();
+        try {
+            PdfWriter.getInstance(document, new FileOutputStream(Path));
+            document.open();
+
+        Font titleFont = new Font(Font.FontFamily.TIMES_ROMAN, 14, Font.BOLD);
+        Paragraph title = new Paragraph("Sales Report");
+        title.setAlignment(Element.ALIGN_CENTER);
+        document.add(title);
+        document.add(Chunk.NEWLINE);
+
+        PdfPTable table = new PdfPTable(2);
+        table.setWidthPercentage(100);
+
+        for (String header : new String[]{"Product Name", "X bought"}) {
+            PdfPCell cell = new PdfPCell(new Phrase(header, new Font(Font.FontFamily.TIMES_ROMAN, 12, Font.BOLD)));
+            cell.setBackgroundColor(BaseColor.LIGHT_GRAY);
+            cell.setPadding(8);
+            table.addCell(cell);
+        }
+
+        for (ProductStats product : products) {
+            table.addCell(product.getProductName());
+            table.addCell(String.valueOf(product.getTimesBought()));
+        }
+
+        document.add(table);
+        document.close();
+        System.out.println("Report made at: " + Path);
+
+
+
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+    }
+}

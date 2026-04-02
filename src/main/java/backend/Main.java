@@ -3,19 +3,18 @@ package backend;
 import backend.communication.*;
 import backend.models.Member;
 import backend.models.User;
-import com.almasb.fxgl.notification.NotificationService;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-import org.controlsfx.control.tableview2.filter.filtereditor.SouthFilter;
-
-
 import java.io.IOException;
+import java.util.List;
+
 
 public class Main extends Application {
     public static User m = new User();
     public static Member member;
+
     @Override
 
     public void start(Stage stage) throws IOException {
@@ -27,10 +26,12 @@ public class Main extends Application {
     }
 
     public static void main(String[] args) {
+        List<ProductStats> stats = List.of(new ProductStats("Widget A", 42), new ProductStats("Widget B", 17), new ProductStats("Widget C", 89));
+        SalesReport.generateReport(stats, "sales_report.pdf");
+
         //dont remove
         launch(args);
 
         //EmailSendResult result = SendGmail.sendGmail("surya.premkumar@city.ac.uk", "Test 123", "Hello world java");
     }
-
 }

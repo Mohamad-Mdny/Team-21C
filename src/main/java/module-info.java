@@ -13,6 +13,8 @@ module org.example.merchapp {
     requires java.sql;
     requires jakarta.mail;
     requires javafx.graphics;
+    requires java.desktop;
+    requires itextpdf;
     //requires org.example.merchapp;
 
     exports backend;
