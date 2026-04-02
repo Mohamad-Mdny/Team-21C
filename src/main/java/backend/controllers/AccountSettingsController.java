@@ -93,8 +93,9 @@ public class AccountSettingsController {
         String email = emailField.getText();
         String deliveryAddress = DeliveryAddress.getText();
         String cardNumber = CardNumber.getText();
+        String billingAddress = BillingAddress.getText();
         int cvv = Integer.parseInt(CVV.getText());
-        int phoneNumber = Integer.parseInt(PhoneNumber.getText());
+        String phoneNumber = PhoneNumber.getText();
 
         if (email == null || email.isBlank()) {
             return;
@@ -103,6 +104,7 @@ public class AccountSettingsController {
         member.setEmailAddress(email);
         member.setDeliveryAddress(deliveryAddress);
         member.setCardNumber(cardNumber);
+        member.setBillingAddress(billingAddress);
         member.setCVV(cvv);
         member.setPhoneNumber(phoneNumber);
 
@@ -138,7 +140,7 @@ public class AccountSettingsController {
         CardNumber.setText((member.getCardNumber()));
         BillingAddress.setText(safe(member.getBillingAddress()));
         CVV.setText((Integer.toString(member.getCVV())));
-        PhoneNumber.setText((Integer.toString(member.getPhoneNumber())));
+        PhoneNumber.setText(member.getPhoneNumber());
 
     }
 

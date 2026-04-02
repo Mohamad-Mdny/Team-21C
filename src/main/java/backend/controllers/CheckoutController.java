@@ -99,18 +99,17 @@ public class CheckoutController {
 
     private void configureCheckoutOptions() {
         deliveryAddressBox.getItems().setAll(
-                "Home - 12 High Street",
-                "Work - 21 Business Park",
-                "Warehouse - Unit 7"
+                Main.member.getDeliveryAddress()
         );
-        deliveryAddressBox.setValue("Home - 12 High Street");
+
+        deliveryAddressBox.setValue(
+                Main.member.getDeliveryAddress()
+        );
 
         paymentMethodBox.getItems().setAll(
-                "Visa ending 1234",
-                "Mastercard ending 5678",
-                "PayPal"
+                "Card ending in " + Main.member.getCardNumber()
         );
-        paymentMethodBox.setValue("Visa ending 1234");
+        paymentMethodBox.setValue("Card ending in " + Main.member.getCardNumber());
 
         deliveryOptionBox.getItems().setAll(
                 "Standard Delivery",

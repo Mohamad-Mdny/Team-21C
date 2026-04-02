@@ -15,7 +15,7 @@ public class Member extends User{
     private String cardNumber = "123412341234";
     private int CVV;
     private String BillingAddress;
-    private int phoneNumber;
+    private String phoneNumber;
 
     public Member(String emailAddress){
         super();
@@ -85,7 +85,7 @@ public class Member extends User{
     }
 
     public String getCardNumber(){
-        return cardNumber;
+        return cardNumber.substring(cardNumber.length() - 4);
     }
     public void setCardNumber(String cardNumber){
         this.cardNumber = cardNumber;
@@ -105,10 +105,10 @@ public class Member extends User{
         BillingAddress = billingAddress;
     }
 
-    public int getPhoneNumber(){
+    public String getPhoneNumber(){
         return phoneNumber;
     }
-    public void setPhoneNumber(int phoneNumber){
+    public void setPhoneNumber(String phoneNumber){
         this.phoneNumber = phoneNumber;
     }
 
