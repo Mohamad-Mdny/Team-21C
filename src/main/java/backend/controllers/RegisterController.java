@@ -5,6 +5,7 @@ import backend.interfaces.IApplicationAPI;
 import backend.models.Member;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 
@@ -26,6 +27,8 @@ public class RegisterController {
     TextField typeOfBusiness;
     @FXML
     TextField businessAddress;
+    @FXML
+    Label errorLabel;
     //creates a member object and calls the function to register a non-commercial member while passing the required arguments
     public void submitNonCommercialApplication(ActionEvent event){
         submitNonCommercialApplication(email.getText());
@@ -39,29 +42,35 @@ public class RegisterController {
     public void submitCommercialApplication(String emailAddress, String password, int companyRegNumber, String CompanyDirector,String businessType, String businessAddress ) {
         DatabaseManager database = new DatabaseManager();
         Connection connection = database.makeConnection();
-        try {
-            PreparedStatement statement = connection.prepareStatement("INSERT INTO member(emailAddress,password,type,validityStatus,CompanyRegistration, CompanyDirector, typeOfBusiness,  businessAddress) VALUES (?,?,?,?,?,?,?,?)");
-            statement.setString(1,emailAddress);
-            statement.setString(2,password);
-            statement.setString(3,"nonCommercial");
-            statement.setString(4,"valid");
-            statement.setInt(5,companyRegNumber);
-            statement.setString(6,CompanyDirector);
-            statement.setString(7,businessType);
-            statement.setString(8, businessAddress);
-            statement.execute();
+        if(emailCheck(emailAddress)){
+            try {
+                PreparedStatement statement = connection.prepareStatement("INSERT INTO member(emailAddress,password,type,validityStatus,CompanyRegistration, CompanyDirector, typeOfBusiness,  businessAddress) VALUES (?,?,?,?,?,?,?,?)");
+                statement.setString(1,emailAddress.toLowerCase());
+                statement.setString(2,password);
+                statement.setString(3,"nonCommercial");
+                statement.setString(4,"valid");
+                statement.setInt(5,companyRegNumber);
+                statement.setString(6,CompanyDirector);
+                statement.setString(7,businessType);
+                statement.setString(8, businessAddress);
+                statement.execute();
+            }
+            catch(SQLException e){
+                e.printStackTrace();
+            }
+        }else{
+            errorLabel.setText("Invalid Email Address");
         }
-        catch(SQLException e){
-            e.printStackTrace();
-        }
+
     }
     //Inserts all non-commercial user's into the database (registration)
-    public void submitNonCommercialApplication(String email){
+    public void submitNonCommercialApplication(String emailAddress){
         DatabaseManager database = new DatabaseManager();
         Connection connection = database.makeConnection();
+        if(emailCheck(emailAddress)){}
         try {
             PreparedStatement statement = connection.prepareStatement("INSERT INTO member(emailAddress,password,type,validityStatus,totalPurchases,firstLogin) VALUES (?,?,?,?,?,?)");
-            statement.setString(1,email);
+            statement.setString(1,emailAddress.toLowerCase());
             statement.setString(2,generatePassword());
             statement.setString(3,"nonCommercial");
             statement.setString(4,"valid");
@@ -82,5 +91,11 @@ public class RegisterController {
         }
         System.out.println(password);
         return password;
+    }
+    public boolean emailCheck(String email){
+        if(email.contains("@") && email.contains(".com")){
+            return true;
+        }
+        return false;
     }
 }

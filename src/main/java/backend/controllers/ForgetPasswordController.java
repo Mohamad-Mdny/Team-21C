@@ -4,10 +4,12 @@ import backend.DatabaseManager;
 import backend.Main;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class ForgetPasswordController {
@@ -17,6 +19,8 @@ public class ForgetPasswordController {
     TextField passwordInput;
     @FXML
     TextField newPasswordInput;
+    @FXML
+    Label errorLabel;
 
 
     public void changePassword(ActionEvent event){
@@ -24,11 +28,20 @@ public class ForgetPasswordController {
         Connection connection = database.makeConnection();
 
         try{
-            PreparedStatement statement = connection.prepareStatement("UPDATE member SET password=? WHERE emailAddress=?");
-            statement.setString(1, newPasswordInput.getText());
-            statement.setString(2, emailInput.getText());
-            statement.execute();
-            System.out.println("password has been changed");
+            PreparedStatement statement = connection.prepareStatement("Select * from users where email=?);");
+            statement.setString(1,emailInput.getText());
+            ResultSet resultSet = statement.executeQuery();
+            if(resultSet.next()){
+
+                PreparedStatement statementTwo = connection.prepareStatement("UPDATE member SET password=? WHERE emailAddress=?");
+                statementTwo.setString(1, newPasswordInput.getText());
+                statementTwo.setString(2, emailInput.getText());
+                statementTwo.execute();
+                
+            }
+            else{
+                errorLabel.setText("Email or password is wrong!");
+            }
         }
         catch(SQLException e){
             e.printStackTrace();

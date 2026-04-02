@@ -219,6 +219,8 @@ public class CatalogueController {
     @FXML public void goToCheckout(ActionEvent event) {
         switchPage(event, "Checkout.fxml");
     }
+    @FXML public void goToCommercialRegister(ActionEvent event){switchPage(event, "CommercialRegister.fxml");}
+    @FXML public void goToNonCommercialRegister(ActionEvent event){switchPage(event, "NonCommercialRegister.fxml");}
 
     private void updateAccountButton() {
         if (Main.m != null && Main.m.isSignedIn()) {
