@@ -61,13 +61,13 @@ public class RegisterController {
             } catch (SQLException e) {
                 e.printStackTrace();
             }
-            EmailSendResult result = SendGmail.sendGmail(emailAddress, "AccountCreation", "Account Created!\n   Your random generated password is:" + generatedPassword);
+            EmailSendResult result = SendGmail.sendGmail(emailAddress, "AccountCreation", "Account Created!\n   Your random generated password is : " + generatedPassword);
         } else {
             errorLabel.setText("Invalid Email Address");
         }
     }
 
-    
+
 
     //creates a member object and calls the function to register a commercial member while passing the required arguments
     public void submitCommercialApplication(ActionEvent event) {
@@ -94,7 +94,7 @@ public class RegisterController {
             catch(SQLException e){
                 e.printStackTrace();
             }
-            EmailSendResult result = SendGmail.sendGmail("mateusz.niedbalski@city.ac.uk", "Account validation in progress", "Your account is getting validated. This may take a while.");
+            EmailSendResult result = SendGmail.sendGmail(emailAddress, "Account validation in progress", "Your account is getting validated. This may take a while.");
         }else{
             errorLabel.setText("Invalid Email Address");
         }
