@@ -37,7 +37,7 @@ public class ForgetPasswordController {
                 statementTwo.setString(1, newPasswordInput.getText());
                 statementTwo.setString(2, emailInput.getText());
                 statementTwo.execute();
-                
+
             }
             else{
                 errorLabel.setText("Email or password is wrong!");

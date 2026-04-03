@@ -13,6 +13,7 @@ module org.example.merchapp {
     requires java.sql;
     requires jakarta.mail;
     requires javafx.graphics;
+    requires mysql.connector.j;
     //requires org.example.merchapp;
 
     exports backend;
