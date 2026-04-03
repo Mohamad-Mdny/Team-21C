@@ -73,6 +73,9 @@ public class LoginController {
 
                                     Main.member = new Member(email);
 
+                                    Main.m.signIn();
+                                    Main.member.bringBasket(Main.m.getBasket());
+
                                     Parent root = FXMLLoader.load(getClass().getResource("/frontend/Catalogue.fxml"));
                                     Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
                                     stage.getScene().setRoot(root);

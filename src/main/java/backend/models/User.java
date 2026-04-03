@@ -39,6 +39,13 @@ public class User {
         this.signedIn=false;
     }
 
+    public void bringBasket(ArrayList<Item> basket) {
+        this.Basket=basket;
+    }
+    public ArrayList<Item>  getBasketItems() {
+        return Basket;
+    }
+
 
     public double getBasketSubtotal() {
         double subtotal = 0.0;
