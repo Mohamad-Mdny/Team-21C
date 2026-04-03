@@ -1,6 +1,6 @@
 package backend.prm.repository;
 
-import backend.prm.database.DatabaseConnection;
+import backend.DatabaseManager;
 import backend.prm.model.PromotionCampaign;
 import backend.prm.model.PromotionItem;
 import backend.prm.model.PromotionStatus;
@@ -23,7 +23,7 @@ public class PromotionRepository {
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """;
 
-        try (Connection connection = DatabaseConnection.getConnection();
+        try (Connection connection = DatabaseManager.makeConnection();
              PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
             ps.setInt(1, 1);
