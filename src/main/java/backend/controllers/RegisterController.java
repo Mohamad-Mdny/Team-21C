@@ -41,7 +41,7 @@ public class RegisterController {
     //creates a member object and calls the function to register a non-commercial member while passing the required arguments
     public void submitNonCommercialApplication(ActionEvent event){
         submitNonCommercialApplication(email.getText());
-
+        switchPage(event, "Login.fxml");
     };
 
     //creates a member object and calls the function to register a commercial member while passing the required arguments
@@ -49,6 +49,8 @@ public class RegisterController {
         submitCommercialApplication(email.getText(), Integer.parseInt(CompanyRegistration.getText()), CompanyDirector.getText(), typeOfBusiness.getText(), businessAddress.getText());
     }
 
+
+    // Ship to json file
     public void submitCommercialApplication(String emailAddress, int companyRegNumber, String CompanyDirector,String businessType, String businessAddress ) {
         DatabaseManager database = new DatabaseManager();
         Connection connection = database.makeConnection();
@@ -74,27 +76,25 @@ public class RegisterController {
 
     }
     //Inserts all non-commercial user's into the database (registration)
-    public void submitNonCommercialApplication(String emailAddress){
+    public void submitNonCommercialApplication(String emailAddress) {
         DatabaseManager database = new DatabaseManager();
         Connection connection = database.makeConnection();
-        String generatedPassword=generatePassword();
-        if(emailCheck(emailAddress)){
-        try {
-            PreparedStatement statement = connection.prepareStatement("INSERT INTO member(emailAddress,password,type,validityStatus,totalPurchases,firstLogin) VALUES (?,?,?,?,?,?)");
-            statement.setString(1,emailAddress.toLowerCase());
-            statement.setString(2,generatedPassword);
-            statement.setString(3,"nonCommercial");
-            statement.setString(4,"valid");
-            statement.setInt(5,0);
-            statement.setBoolean(6,true);
-            statement.execute();
-        }
-        catch(SQLException e){
-            e.printStackTrace();
-        }
-            EmailSendResult result = SendGmail.sendGmail("mateusz.niedbalski@city.ac.uk", "AccountCreation", "Account Created!\n Your random generated password is:"+generatedPassword);
-        }
-        else{
+        String generatedPassword = generatePassword();
+        if (emailCheck(emailAddress)) {
+            try {
+                PreparedStatement statement = connection.prepareStatement("INSERT INTO member(emailAddress,password,type,validityStatus,totalPurchases,firstLogin) VALUES (?,?,?,?,?,?)");
+                statement.setString(1, emailAddress.toLowerCase());
+                statement.setString(2, generatedPassword);
+                statement.setString(3, "nonCommercial");
+                statement.setString(4, "valid");
+                statement.setInt(5, 0);
+                statement.setBoolean(6, true);
+                statement.execute();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+            EmailSendResult result = SendGmail.sendGmail(emailAddress, "AccountCreation", "Account Created!\n   Your random generated password is:" + generatedPassword);
+        } else {
             errorLabel.setText("Invalid Email Address");
         }
     }
