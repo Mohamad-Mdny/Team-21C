@@ -33,6 +33,7 @@ public class Main extends Application {
         //dont remove
         launch(args);
 
-        //EmailSendResult result = SendGmail.sendGmail("surya.premkumar@city.ac.uk", "Test 123", "Hello world java");
     }
+
+
 }

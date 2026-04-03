@@ -155,12 +155,10 @@ public class BasketController {
 
     private void updateSummaryLabels(int itemCount, double subtotal) {
         double vat = subtotal * VAT_RATE;
-        double total;
-        if(Main.member.isSignedIn()&& checkMemberDiscount(Main.member.getEmailAddress())){
-            total = (subtotal * 0.90)+ vat;
-        }
-        else{
-            total = subtotal + vat;
+        double total = subtotal + vat;
+
+        if(Main.m.isSignedIn()&& checkMemberDiscount(Main.member.getEmailAddress())){
+            total*=0.9;
         }
 
 
@@ -185,8 +183,6 @@ public class BasketController {
         if (Main.m != null && Main.m.getBasket() != null) {
             Main.m.getBasket().clear();
         }
-
-        purchaseStatusLabel.setText("Basket cleared.");
         loadUserBasket();
     }
 

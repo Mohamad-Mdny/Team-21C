@@ -150,15 +150,7 @@ public class CheckoutAccountController {
 
     @FXML
     public void purchaseAccount(ActionEvent event) {
-        purchaseStatusLabel.setText("");
-        if (Main.m == null) {
-            purchaseStatusLabel.setText("No user session is loaded.");
-            return;
-        }
-        if (!Main.m.isSignedIn()) {
-            purchaseStatusLabel.setText("You are not signed in. Please use Guest Checkout.");
-            return;
-        }
+
         String address = deliveryAddressBox.getValue();
         String paymentMethod = paymentMethodBox.getValue();
         String deliveryOption = deliveryOptionBox.getValue();
@@ -175,7 +167,7 @@ public class CheckoutAccountController {
             purchaseStatusLabel.setText("Please select a delivery option.");
             return;
         }
-        boolean success = Main.m.purchase(address, paymentMethod, deliveryOption, notes);
+        boolean success = Main.member.purchase(address, paymentMethod, deliveryOption, notes);
         if (success) {
             purchaseStatusLabel.setText("Purchase completed successfully.");
             loadBasket();
@@ -183,6 +175,7 @@ public class CheckoutAccountController {
         } else {
             purchaseStatusLabel.setText("Purchase failed. Please check your basket and details.");
         }
+
     }
 
     @FXML

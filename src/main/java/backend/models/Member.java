@@ -1,6 +1,9 @@
 package backend.models;
 
 
+import backend.communication.EmailSendResult;
+import backend.communication.SendGmail;
+
 public class Member extends User{
     private String emailAddress;
     private String password;
@@ -112,7 +115,38 @@ public class Member extends User{
         this.phoneNumber = phoneNumber;
     }
 
+    public boolean purchase(String deliveryAddress, String paymentMethod, String deliveryOption, String notes) {
+        if (Basket == null || Basket.isEmpty()) {
+            return false;
+        }
 
+        if (deliveryAddress == null || deliveryAddress.isBlank()) {
+            return false;
+        }
+
+        if (paymentMethod == null || paymentMethod.isBlank()) {
+            return false;
+        }
+
+        if (deliveryOption == null || deliveryOption.isBlank()) {
+            return false;
+        }
+        String body = "Thank you for your purchase. " +
+                "\nItems purchased:";
+
+        for (Item item : Basket) {
+            body = body + "\n   - " + item.getDescription();
+        }
+        body = body + "\nDelivery Address: " + deliveryAddress + "\nDelivery Option: " + deliveryOption +
+                "\nNotes: " + notes ;
+
+        body = body + "\n\nPayment Method: " + paymentMethod + "\n \n    Subtotal: £" + String.format("%.2f", getBasketSubtotal());
+
+        EmailSendResult result = SendGmail.sendGmail(getEmailAddress(), "Order ", body);
+
+        Basket.clear();
+        return true;
+    }
 
 
 }

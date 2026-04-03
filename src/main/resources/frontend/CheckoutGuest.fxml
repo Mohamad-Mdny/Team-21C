@@ -126,6 +126,12 @@
 
             <Separator />
 
+            <Label text="Email Address" />
+            <TextField fx:id="emailField"
+                       promptText="abc@email.com" />
+            <Separator />
+
+
             <Button fx:id="purchaseButton"
                     mnemonicParsing="false"
                     text="Purchase"

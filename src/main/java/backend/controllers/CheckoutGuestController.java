@@ -20,6 +20,9 @@ import java.util.Objects;
 
 public class CheckoutGuestController {
     private static final double VAT_RATE = 0.00;
+
+    @FXML
+    public TextField emailField;
     @FXML
     private TextField searchField;
     @FXML
@@ -141,6 +144,8 @@ public class CheckoutGuestController {
         String billingAddress = safe(billingAddressArea.getText());
         String cardNumberRaw = safe(cardNumberField.getText());
         String cvvRaw = safe(cvvField.getText());
+        String email = safe(emailField.getText());
+
         String notes = safe(orderNotesArea.getText());
         if (deliveryAddress.isBlank()) {
             purchaseStatusLabel.setText("Please enter a delivery address.");
@@ -159,10 +164,14 @@ public class CheckoutGuestController {
             purchaseStatusLabel.setText("CVV must be 3 or 4 digits.");
             return;
         }
+        if (email.isBlank()) {
+            purchaseStatusLabel.setText("Please enter an email address.");
+            return;
+        }
         String last4 = cardDigits.substring(cardDigits.length() - 4);
         String paymentMethod = "Card ending in " + last4;
         String deliveryOption = "Standard Delivery";
-        boolean success = Main.m.purchase(deliveryAddress, paymentMethod, deliveryOption, notes);
+        boolean success = Main.m.purchase(email, deliveryAddress, paymentMethod, deliveryOption, notes);
         if (success) {
             purchaseStatusLabel.setText("Purchase completed successfully.");
             loadBasket();
