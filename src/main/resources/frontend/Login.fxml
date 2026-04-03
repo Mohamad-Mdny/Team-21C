@@ -3,36 +3,27 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<BorderPane prefHeight="700.0" prefWidth="1400.0"
-            xmlns="http://javafx.com/javafx/17.0.12"
-            xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="backend.controllers.LoginController">
+<BorderPane prefHeight="700.0" prefWidth="1400.0" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="backend.controllers.LoginController">
 
     <top>
         <VBox spacing="12.0" style="-fx-background-color: #1f2937; -fx-padding: 16;">
             <HBox>
-                <Label text="IPOS-PU"
-                       style="-fx-text-fill: white; -fx-font-size: 24px; -fx-font-weight: bold;" />
+                <Label style="-fx-text-fill: white; -fx-font-size: 24px; -fx-font-weight: bold;" text="IPOS-PU" />
                 <Region HBox.hgrow="ALWAYS" />
-                <Label text="Login"
-                       style="-fx-text-fill: #e5e7eb; -fx-font-size: 14px;" />
+                <Label style="-fx-text-fill: #e5e7eb; -fx-font-size: 14px;" text="Login" />
             </HBox>
 
             <StackPane>
-                <TextField fx:id="searchField"
-                           maxWidth="420.0"
-                           prefWidth="420.0"
-                           promptText="Search catalogue..."
-                           onAction="#handleSearchEnter" />
+                <TextField fx:id="searchField" maxWidth="420.0" onAction="#handleSearchEnter" prefWidth="420.0" promptText="Search catalogue..." />
             </StackPane>
 
-            <HBox spacing="10.0" alignment="CENTER_LEFT">
-                <Button mnemonicParsing="false" text="Catalogue" onAction="#goToCatalogue" />
-                <Button mnemonicParsing="false" text="Current Promotions" onAction="#goToCurrentPromotions" />
+            <HBox alignment="CENTER_LEFT" spacing="10.0">
+                <Button mnemonicParsing="false" onAction="#goToCatalogue" text="Catalogue" />
+                <Button mnemonicParsing="false" onAction="#goToCurrentPromotions" text="Current Promotions" />
 
                 <Region HBox.hgrow="ALWAYS" />
 
-                <Button mnemonicParsing="false" text="Checkout" onAction="#goToCheckout" />
+                <Button mnemonicParsing="false" onAction="#goToCheckout" text="Checkout" />
                 <Button fx:id="SignIn" mnemonicParsing="false" text="Sign In" />
             </HBox>
         </VBox>
@@ -40,38 +31,29 @@
 
     <center>
         <StackPane style="-fx-padding: 40;">
-            <VBox spacing="14.0"
-                  alignment="CENTER"
-                  maxWidth="420.0"
-                  style="-fx-background-color: white; -fx-padding: 28; -fx-border-color: #d1d5db; -fx-border-radius: 12; -fx-background-radius: 12;">
+            <VBox alignment="CENTER" maxWidth="420.0" spacing="14.0" style="-fx-background-color: white; -fx-padding: 28; -fx-border-color: #d1d5db; -fx-border-radius: 12; -fx-background-radius: 12;">
 
-                <Label text="Sign in"
-                       style="-fx-font-size: 22px; -fx-font-weight: bold;" />
+                <Label style="-fx-font-size: 22px; -fx-font-weight: bold;" text="Sign in" />
 
-                <Label text="Use your email and password to access your account."
-                       wrapText="true"
-                       style="-fx-text-fill: #4b5563;" />
+                <Label style="-fx-text-fill: #4b5563;" text="Use your email and password to access your account." wrapText="true" />
 
                 <Separator />
 
                 <VBox spacing="8.0">
-                    <Label text="Email" style="-fx-font-weight: bold;" />
+                    <Label style="-fx-font-weight: bold;" text="Email" />
                     <TextField fx:id="emailInput" promptText="Enter Email" />
                 </VBox>
 
                 <VBox spacing="8.0">
-                    <Label text="Password" style="-fx-font-weight: bold;" />
+                    <Label style="-fx-font-weight: bold;" text="Password" />
                     <PasswordField fx:id="passwordInput" promptText="Enter Password" />
                 </VBox>
 
-                <Button text="Login"
-                        mnemonicParsing="false"
-                        maxWidth="Infinity"
-                        onAction="#login"
-                        style="-fx-font-weight: bold; -fx-padding: 10 0 10 0;"
-                />
+                <Button maxWidth="Infinity" mnemonicParsing="false" onAction="#login" style="-fx-font-weight: bold; -fx-padding: 10 0 10 0;" text="Login" />
+                <Label fx:id="errorLabel" layoutX="176.0" layoutY="339.0" prefHeight="19.0" prefWidth="247.0" />
             </VBox>
         </StackPane>
+
     </center>
 
 </BorderPane>

@@ -20,9 +20,8 @@ import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.ResultSet; import java.sql.SQLException;
-import java.sql.Statement; import java.util.Objects;
+import java.sql.*;
+import java.util.Objects;
 
 public class CatalogueController {
     public ScrollPane catalogueScrollPane;
@@ -217,6 +216,8 @@ public class CatalogueController {
     @FXML public void goToCheckout(ActionEvent event) {
         switchPage(event, "Checkout.fxml");
     }
+    @FXML public void goToCommercialRegister(ActionEvent event){switchPage(event, "CommercialRegister.fxml");}
+    @FXML public void goToNonCommercialRegister(ActionEvent event){switchPage(event, "NonCommercialRegister.fxml");}
 
     private void updateAccountButton() {
         if (Main.m != null && Main.m.isSignedIn()) {
