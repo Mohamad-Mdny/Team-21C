@@ -211,7 +211,7 @@ public class CatalogueController {
         switchPage(event, "Catalogue.fxml");
     }
     @FXML public void goToCurrentPromotions(ActionEvent event) {
-        switchPage(event, "CurrentPromotions.fxml");
+        switchPage(event, "PromotionsPage.fxml");
     }
     @FXML public void goToCheckout(ActionEvent event) {
         switchPage(event, "Basket.fxml");
