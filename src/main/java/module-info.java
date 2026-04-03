@@ -15,7 +15,7 @@ module org.example.merchapp {
     requires javafx.graphics;
     requires java.desktop;
     requires itextpdf;
-    requires mysql.connector.j;
+    //requires mysql.connector.j;
     //requires org.example.merchapp;
 
     exports backend;
