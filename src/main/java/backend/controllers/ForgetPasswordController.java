@@ -53,7 +53,7 @@ public class ForgetPasswordController {
         catch(SQLException e){
             e.printStackTrace();
         }
-        switchPage(event, "AccountSettings.fxml");
+        switchPage(event, "Login.fxml");
     }
 
     @FXML public void goToCatalogue(ActionEvent event) {
@@ -64,7 +64,6 @@ public class ForgetPasswordController {
     }
     @FXML public void goToBasket(ActionEvent event) {switchPage(event, "Basket.fxml");}
     @FXML public void goToLogin(ActionEvent event) {switchPage(event, "Login.fxml");}
-    @FXML public void goToAccountSettings(ActionEvent event) {switchPage(event, "AccountSettings.fxml");}
 
 
 
