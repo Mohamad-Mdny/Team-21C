@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane prefHeight="700.0" prefWidth="1400.0"
+            xmlns="http://javafx.com/javafx/17.0.12"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="backend.controllers.CheckoutGuestController">
+
+    <top>
+        <VBox spacing="12.0" style="-fx-background-color: #1f2937; -fx-padding: 16;">
+            <HBox>
+                <Label text="IPOS-PU"
+                       style="-fx-text-fill: white; -fx-font-size: 24px; -fx-font-weight: bold;" />
+                <Region HBox.hgrow="ALWAYS" />
+                <Label text="Guest Checkout"
+                       style="-fx-text-fill: #e5e7eb; -fx-font-size: 14px;" />
+            </HBox>
+
+            <StackPane>
+                <TextField fx:id="searchField"
+                           maxWidth="420.0"
+                           prefWidth="420.0"
+                           promptText="Search catalogue..." />
+            </StackPane>
+
+            <HBox spacing="10.0" alignment="CENTER_LEFT">
+                <Button mnemonicParsing="false" text="Catalogue" onAction="#goToCatalogue"/>
+                <Button mnemonicParsing="false" text="Current Promotions" onAction="#goToCurrentPromotions" />
+
+                <Region HBox.hgrow="ALWAYS" />
+
+                <Button mnemonicParsing="false" text="Basket" />
+                <Button fx:id="accountButton" mnemonicParsing="false" text="Sign In" onAction="#handleAccountButton"/>
+            </HBox>
+        </VBox>
+    </top>
+
+    <left>
+        <VBox prefWidth="260.0"
+              spacing="12.0"
+              style="-fx-background-color: #f3f4f6; -fx-padding: 16; -fx-border-color: #d1d5db; -fx-border-width: 0 1 0 0;">
+            <Label text="Order Summary" style="-fx-font-size: 18px; -fx-font-weight: bold;" />
+
+            <Label fx:id="itemCountLabel" text="Items in basket: 0" />
+            <Label fx:id="subtotalSideLabel" text="Subtotal: £0.00" />
+            <Label fx:id="vatSideLabel" text="VAT: £0.00" />
+            <Label fx:id="totalSideLabel" text="Total: £0.00" />
+
+            <Separator />
+
+            <Button mnemonicParsing="false" text="Back to Basket" />
+        </VBox>
+    </left>
+
+    <center>
+        <BorderPane style="-fx-padding: 12;">
+            <top>
+                <Label text="Your Basket"
+                       style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-padding: 0 0 12 0;" />
+            </top>
+
+            <center>
+                <TableView fx:id="basketTable">
+                    <columns>
+                        <TableColumn fx:id="itemColumn" prefWidth="220.0" text="Item" />
+                        <TableColumn fx:id="packageColumn" prefWidth="140.0" text="Package Type" />
+                        <TableColumn fx:id="unitColumn" prefWidth="120.0" text="Unit" />
+                        <TableColumn fx:id="quantityColumn" prefWidth="120.0" text="Quantity" />
+                        <TableColumn fx:id="priceColumn" prefWidth="120.0" text="Unit Price" />
+                        <TableColumn fx:id="subtotalColumn" prefWidth="140.0" text="Subtotal" />
+                    </columns>
+                </TableView>
+            </center>
+
+            <bottom>
+                <VBox spacing="8.0" style="-fx-padding: 12 0 0 0;">
+                    <HBox spacing="20.0">
+                        <Label fx:id="subtotalBottomLabel" text="Subtotal: £0.00"
+                               style="-fx-font-size: 14px; -fx-font-weight: bold;" />
+                        <Label fx:id="vatBottomLabel" text="VAT: £0.00"
+                               style="-fx-font-size: 14px; -fx-font-weight: bold;" />
+                        <Label fx:id="totalBottomLabel" text="Total: £0.00"
+                               style="-fx-font-size: 16px; -fx-font-weight: bold;" />
+                    </HBox>
+
+                    <TextArea fx:id="orderNotesArea"
+                              promptText="Order notes (Leave with neighbour etc.)"
+                              prefHeight="80.0"
+                              wrapText="true" />
+                </VBox>
+            </bottom>
+        </BorderPane>
+    </center>
+
+    <right>
+        <VBox prefWidth="320.0"
+              spacing="12.0"
+              style="-fx-background-color: #f9fafb; -fx-padding: 16; -fx-border-color: #d1d5db; -fx-border-width: 0 0 0 1;">
+
+            <Label text="Guest Details"
+                   style="-fx-font-size: 18px; -fx-font-weight: bold;" />
+
+            <Label text="Delivery Address" />
+            <TextArea fx:id="deliveryAddressArea"
+                      promptText="Enter delivery address"
+                      prefRowCount="3"
+                      wrapText="true" />
+
+            <Label text="Billing Address" />
+            <TextArea fx:id="billingAddressArea"
+                      promptText="Enter billing address"
+                      prefRowCount="3"
+                      wrapText="true" />
+
+            <Separator />
+
+            <Label text="Card Number" />
+            <TextField fx:id="cardNumberField"
+                       promptText="1234 5678 9012 3456" />
+
+            <Label text="CVV" />
+            <PasswordField fx:id="cvvField"
+                           promptText="123" />
+
+            <Separator />
+
+            <Label text="Email Address" />
+            <TextField fx:id="emailField"
+                       promptText="abc@email.com" />
+            <Separator />
+
+
+            <Button fx:id="purchaseButton"
+                    mnemonicParsing="false"
+                    text="Purchase"
+                    maxWidth="Infinity"
+                    onAction="#purchaseGuest"
+                    style="-fx-font-weight: bold; -fx-padding: 10 0 10 0;" />
+
+            <Label fx:id="purchaseStatusLabel"
+                   text=""
+                   wrapText="true"
+                   style="-fx-font-size: 13px;" />
+        </VBox>
+    </right>
+
+</BorderPane>

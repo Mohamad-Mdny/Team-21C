@@ -15,6 +15,12 @@ module org.example.merchapp {
     requires javafx.graphics;
     requires java.desktop;
     requires itextpdf;
+    //requires mysql.connector.j;
+    //requires org.example.merchapp;
+
+
+    requires javafx.base;
+
     //requires org.example.merchapp;
 
     exports backend;
@@ -23,4 +29,6 @@ module org.example.merchapp {
     opens backend.controllers to javafx.fxml;
     exports backend.models;
     opens backend.models to javafx.fxml;
+    opens backend.prm.frontend to javafx.fxml;
+
 }

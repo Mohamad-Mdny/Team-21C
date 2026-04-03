@@ -6,15 +6,14 @@
 <BorderPane prefHeight="700.0" prefWidth="1400.0"
             xmlns="http://javafx.com/javafx/17.0.12"
             xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="backend.controllers.CheckoutController">
+            fx:controller="backend.controllers.CheckoutAccountController">
 
     <top>
         <VBox spacing="12.0" style="-fx-background-color: #1f2937; -fx-padding: 16;">
             <HBox>
-                <Label text="IPOS-PU"
-                       style="-fx-text-fill: white; -fx-font-size: 24px; -fx-font-weight: bold;" />
+                <Label style="-fx-text-fill: white; -fx-font-size: 24px; -fx-font-weight: bold;" text="IPOS-PU" />
                 <Region HBox.hgrow="ALWAYS" />
-                <Label text="Suriya did this asw"
+                <Label text="Account Checkout"
                        style="-fx-text-fill: #e5e7eb; -fx-font-size: 14px;" />
             </HBox>
 
@@ -32,8 +31,9 @@
 
                 <Region HBox.hgrow="ALWAYS" />
 
-                <Button mnemonicParsing="false" onAction="#goToCheckout" text="Checkout" />
-                <Button fx:id="accountButton" mnemonicParsing="false" onAction="#handleAccountButton" text="Account Settings" />            </HBox>
+                <Button mnemonicParsing="false" onAction="#goToBasket" text="Basket" />
+                <Button fx:id="accountButton" mnemonicParsing="false" onAction="#handleAccountButton" text="Account Settings" />
+            </HBox>
         </VBox>
     </top>
 
@@ -41,7 +41,7 @@
         <VBox prefWidth="260.0"
               spacing="12.0"
               style="-fx-background-color: #f3f4f6; -fx-padding: 16; -fx-border-color: #d1d5db; -fx-border-width: 0 1 0 0;">
-            <Label text="Checkout Summary" style="-fx-font-size: 18px; -fx-font-weight: bold;" />
+            <Label text="Order Summary" style="-fx-font-size: 18px; -fx-font-weight: bold;" />
 
             <Label fx:id="itemCountLabel" text="Items in basket: 0" />
             <Label fx:id="subtotalSideLabel" text="Subtotal: £0.00" />
@@ -50,15 +50,14 @@
 
             <Separator />
 
-            <Button mnemonicParsing="false" onAction="#clearBasket" text="Clear Basket" />
+            <Button mnemonicParsing="false" onAction="#goToBasket" text="Back to Basket" />
         </VBox>
     </left>
 
     <center>
         <BorderPane style="-fx-padding: 12;">
             <top>
-                <Label text="Your Basket"
-                       style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-padding: 0 0 12 0;" />
+                <Label style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-padding: 0 0 12 0;" text="Your Basket" />
             </top>
 
             <center>
@@ -77,41 +76,41 @@
             <bottom>
                 <VBox spacing="8.0" style="-fx-padding: 12 0 0 0;">
                     <HBox spacing="20.0">
-                        <Label fx:id="subtotalBottomLabel" text="Subtotal: £0.00"
-                               style="-fx-font-size: 14px; -fx-font-weight: bold;" />
-                        <Label fx:id="vatBottomLabel" text="VAT: £0.00"
-                               style="-fx-font-size: 14px; -fx-font-weight: bold;" />
-                        <Label fx:id="totalBottomLabel" text="Total: £0.00"
-                               style="-fx-font-size: 16px; -fx-font-weight: bold;" />
+                        <Label fx:id="subtotalBottomLabel" style="-fx-font-size: 14px; -fx-font-weight: bold;" text="Subtotal: £0.00" />
+                        <Label fx:id="vatBottomLabel" style="-fx-font-size: 14px; -fx-font-weight: bold;" text="VAT: £0.00" />
+                        <Label fx:id="totalBottomLabel" style="-fx-font-size: 16px; -fx-font-weight: bold;" text="Total: £0.00" />
                     </HBox>
 
-                    <TextArea fx:id="orderNotesArea"
-                              promptText="Order notes (Leave with neighbour etc.)"
-                              prefHeight="80.0"
-                              wrapText="true" />
+                    <TextArea fx:id="orderNotesArea" prefHeight="80.0" promptText="Order notes (Leave with neighbour etc.)" wrapText="true" />
                 </VBox>
             </bottom>
         </BorderPane>
     </center>
 
     <right>
-        <VBox prefWidth="280.0"
+        <VBox prefWidth="320.0"
               spacing="12.0"
               style="-fx-background-color: #f9fafb; -fx-padding: 16; -fx-border-color: #d1d5db; -fx-border-width: 0 0 0 1;">
-            <Label text="Delivery and Payment" style="-fx-font-size: 18px; -fx-font-weight: bold;" />
+            <Label text="Delivery and Payment"
+                   style="-fx-font-size: 18px; -fx-font-weight: bold;" />
 
             <Label text="Delivery Address" />
             <ComboBox fx:id="deliveryAddressBox" promptText="Select address" />
 
             <Label text="Payment Method" />
-            <ComboBox fx:id="paymentMethodBox" promptText="Select payment method" />
+            <ComboBox fx:id="paymentMethodBox" promptText="Select saved card" />
 
             <Label text="Delivery Option" />
             <ComboBox fx:id="deliveryOptionBox" promptText="Select delivery option" />
 
             <Separator />
 
-            <Button mnemonicParsing="false" onAction="#purchaseBasket" text="Purchase" />
+            <Button fx:id="purchaseButton"
+                    mnemonicParsing="false"
+                    onAction="#purchaseAccount"
+                    text="Purchase"
+                    maxWidth="Infinity"
+                    style="-fx-font-weight: bold; -fx-padding: 10 0 10 0;" />
 
             <Label fx:id="purchaseStatusLabel"
                    text=""
@@ -119,4 +118,5 @@
                    style="-fx-font-size: 13px;" />
         </VBox>
     </right>
+
 </BorderPane>

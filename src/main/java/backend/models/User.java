@@ -1,15 +1,8 @@
 package backend.models;
 
-import backend.DatabaseManager;
 import backend.communication.EmailSendResult;
 import backend.communication.SendGmail;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 
 
@@ -38,9 +31,21 @@ public class User {
         return signedIn;
     }
 
-    public void setSignedIn(){
+    public void signIn(){
         this.signedIn=true;
     }
+
+    public void signOut(){
+        this.signedIn=false;
+    }
+
+    public void bringBasket(ArrayList<Item> basket) {
+        this.Basket=basket;
+    }
+    public ArrayList<Item>  getBasketItems() {
+        return Basket;
+    }
+
 
     public double getBasketSubtotal() {
         double subtotal = 0.0;
@@ -54,7 +59,7 @@ public class User {
         return subtotal;
     }
 
-    public boolean purchase(String deliveryAddress, String paymentMethod, String deliveryOption, String notes) {
+    public boolean purchase(String email, String deliveryAddress, String paymentMethod, String deliveryOption, String notes) {
         if (Basket == null || Basket.isEmpty()) {
             return false;
         }
@@ -81,7 +86,7 @@ public class User {
 
         body = body + "\n\nPayment Method: " + paymentMethod + "\n \n    Subtotal: £" + String.format("%.2f", getBasketSubtotal());
 
-        EmailSendResult result = SendGmail.sendGmail("surya.premkumar@city.ac.uk", "Order ", body);
+        EmailSendResult result = SendGmail.sendGmail(email, "Order ", body);
 
         Basket.clear();
         return true;

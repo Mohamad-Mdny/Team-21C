@@ -13,22 +13,18 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Parent;
-import javafx.scene.control.Button;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.ResultSet; import java.sql.SQLException;
-import java.sql.Statement; import java.util.Objects;
+import java.sql.*;
+import java.util.Objects;
 
 public class CatalogueController {
+    public ScrollPane catalogueScrollPane;
     @FXML private GridPane catalogueGrid;
     @FXML private Button accountButton;
     @FXML private TextField searchField;
@@ -215,11 +211,13 @@ public class CatalogueController {
         switchPage(event, "Catalogue.fxml");
     }
     @FXML public void goToCurrentPromotions(ActionEvent event) {
-        switchPage(event, "CurrentPromotions.fxml");
+        switchPage(event, "PromotionsPage.fxml");
     }
     @FXML public void goToCheckout(ActionEvent event) {
-        switchPage(event, "Checkout.fxml");
+        switchPage(event, "Basket.fxml");
     }
+    @FXML public void goToCommercialRegister(ActionEvent event){switchPage(event, "CommercialRegister.fxml");}
+    @FXML public void goToNonCommercialRegister(ActionEvent event){switchPage(event, "NonCommercialRegister.fxml");}
 
     private void updateAccountButton() {
         if (Main.m != null && Main.m.isSignedIn()) {
@@ -229,8 +227,9 @@ public class CatalogueController {
         }
     }
 
-    @FXML public void handleAccountButton(ActionEvent event) {
-        if (Main.m != null && Main.m.isSignedIn()) {
+    @FXML
+    public void handleAccountButton(ActionEvent event) {
+        if (Main.m.isSignedIn()) {
             switchPage(event, "AccountSettings.fxml");
         } else {
             System.out.println("Going to login");
