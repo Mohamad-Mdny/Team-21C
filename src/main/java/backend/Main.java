@@ -28,8 +28,8 @@ public class Main extends Application {
 
     public static void main(String[] args) {
         //Report creation
-        List<ProductStats> stats = List.of(new ProductStats("123456","Widget A", 42, 23.45), new ProductStats("123454654","Widget B", 17, 34.34), new ProductStats("129989","Widget C", 89, 67.45));
-        SalesReport.generateReport(stats, "sales_report.pdf", "01/01/2026", "31/03/2026");
+//        List<ProductStats> stats = List.of(new ProductStats("123456","Widget A", 42, 23.45), new ProductStats("123454654","Widget B", 17, 34.34), new ProductStats("129989","Widget C", 89, 67.45));
+//        SalesReport.generateReport(stats, "sales_report.pdf", "01/01/2026", "31/03/2026");
        //List<ProductStats> stats = List.of(new ProductStats("Widget A", 42, 23.45), new ProductStats("Widget B", 17, 34.34), new ProductStats("Widget C", 89, 67.45));
         //SalesReport.generateReport(stats, "sales_report.pdf");
 

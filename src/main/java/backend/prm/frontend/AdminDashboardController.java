@@ -138,7 +138,7 @@ public class AdminDashboardController {
                     return;
                 }
                 setText("Item ID: " + item.getId()
-                        + "\nProduct ID: " + item.getProductId()
+                        + "\nProduct ID: " + item.getItemId()
                         + "\nDiscount: " + item.getDiscountPercent() + "%"
                         + "\nPromo price: £" + String.format("%.2f", item.getPromotionalPrice())
                         + "\nAdded: " + item.getAddedToOrderCount() + " | Purchased: " + item.getPurchasedCount());
@@ -147,7 +147,7 @@ public class AdminDashboardController {
         itemsListView.getSelectionModel().selectedItemProperty().addListener((obs, oldValue, newValue) -> {
             selectedItem = newValue;
             if (newValue != null) {
-                productIdField.setText(newValue.getProductId());
+                productIdField.setText(newValue.getItemId());
                 discountField.setText(String.valueOf(newValue.getDiscountPercent()));
             }
         });
@@ -363,7 +363,7 @@ public class AdminDashboardController {
     private void handleCancelItemChanges() {
         setItemEditMode(false);
         if (selectedItem != null) {
-            productIdField.setText(selectedItem.getProductId());
+            productIdField.setText(selectedItem.getItemId());
             discountField.setText(String.valueOf(selectedItem.getDiscountPercent()));
         }
     }

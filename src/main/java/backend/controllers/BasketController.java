@@ -111,7 +111,7 @@ public class BasketController {
             return;
         }
 
-        Map<Integer, BasketAccumulator> groupedItems = new LinkedHashMap<>();
+        Map<String, BasketAccumulator> groupedItems = new LinkedHashMap<>();
 
         for (Item item : Main.m.getBasket()) {
             if (item == null) {

@@ -52,9 +52,6 @@ public class PromotionController {
         promotionService.recordItemPurchased(campaignId, itemId, quantity, orderReference);
     }
 
-    public double getItemConversionRate(long campaignId, long itemId) {
-        return promotionService.getConversionRate(campaignId, itemId);
-    }
 
     public PromotionCampaign createCampaign(String title, String description, LocalDateTime startDateTime, LocalDateTime endDateTime) {
         return promotionService.createCampaign(title, description, startDateTime, endDateTime);
@@ -96,9 +93,9 @@ public class PromotionController {
         return promotionService.getCampaignById(campaignId);
     }
 
-    public Map<Long, Double> getCampaignConversionRates(long campaignId) {
-        return promotionService.getCampaignConversionRates(campaignId);
-    }
+
+    // deleted getter for conversion rate
+
 
     public List<SalesReportRow> getSalesReport(LocalDateTime from, LocalDateTime to) {
         return promotionService.getSalesReport(from, to);

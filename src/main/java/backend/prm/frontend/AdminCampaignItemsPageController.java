@@ -74,7 +74,7 @@ public class AdminCampaignItemsPageController {
                 }
 
                 String productInfo = "Unknown product";
-                Optional<backend.prm.model.Product> productOpt = productDAO.findById(item.getProductId());
+                Optional<backend.prm.model.Product> productOpt = productDAO.findById(item.getItemId());
                 if (productOpt.isPresent()) {
                     var product = productOpt.get();
                     productInfo = product.getDescription() + " | £" + product.getPackageCost();
@@ -82,7 +82,7 @@ public class AdminCampaignItemsPageController {
 
                 setText(
                         "Item ID: " + item.getId() +
-                                "\nProduct ID: " + item.getProductId() +
+                                "\nProduct ID: " + item.getItemId() +
                                 "\nProduct: " + productInfo +
                                 "\nDiscount: " + item.getDiscountPercent() + "%"
                 );
@@ -91,7 +91,7 @@ public class AdminCampaignItemsPageController {
 
         itemsListView.getSelectionModel().selectedItemProperty().addListener((obs, oldValue, selected) -> {
             if (selected != null) {
-                productIdField.setText(selected.getProductId());
+                productIdField.setText(selected.getItemId());
                 discountField.setText(String.valueOf(selected.getDiscountPercent()));
             }
         });

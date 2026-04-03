@@ -17,11 +17,14 @@ public class ProductDAO {
                 SELECT product_id, merchant_id, description, package_type, unit,
                        units_in_pack, package_cost, availability_packs,
                        stock_limit_packs, is_active
-                FROM products
+                FROM catalogue
                 WHERE product_id = ?
                 """;
+        DatabaseManager database = new DatabaseManager();
 
-        try (Connection connection = DatabaseManager.makeConnection();
+
+        try (
+            Connection connection = database.makeConnection();
              PreparedStatement ps = connection.prepareStatement(sql)) {
 
             ps.setString(1, productId);

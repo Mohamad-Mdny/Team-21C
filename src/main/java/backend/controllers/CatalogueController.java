@@ -41,7 +41,7 @@ public class CatalogueController {
     private Label memberSession;
 
     private final ObservableList<Item> masterData = FXCollections.observableArrayList();
-    private FilteredList<Item> filteredData; private Integer selectedItemId = null;
+    private FilteredList<Item> filteredData; private String selectedItemId = null;
 
     @FXML void initialize() {
         if(Main.member !=null) {

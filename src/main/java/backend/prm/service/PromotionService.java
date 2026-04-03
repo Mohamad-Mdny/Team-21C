@@ -91,7 +91,7 @@ public class PromotionService {
         validateCampaignIsActive(campaign);
         PromotionItem item = getItemOrThrow(campaignId, itemId);
         repository.incrementItemAddedCount(campaignId, itemId, quantity);
-        repository.savePromotionOrderEvent(campaignId, itemId, item.getProductId(), "ADDED", quantity,
+        repository.savePromotionOrderEvent(campaignId, itemId, item.getItemId(), "ADDED", quantity,
                 item.getPromotionalPrice(), orderReference, LocalDateTime.now());
     }
 
@@ -104,7 +104,7 @@ public class PromotionService {
         getCampaignOrThrow(campaignId);
         PromotionItem item = getItemOrThrow(campaignId, itemId);
         repository.incrementItemPurchasedCount(campaignId, itemId, quantity);
-        repository.savePromotionOrderEvent(campaignId, itemId, item.getProductId(), "PURCHASED", quantity,
+        repository.savePromotionOrderEvent(campaignId, itemId, item.getItemId(), "PURCHASED", quantity,
                 item.getPromotionalPrice(), orderReference, LocalDateTime.now());
     }
 
@@ -126,7 +126,7 @@ public class PromotionService {
         getCampaignOrThrow(campaignId);
         validateItemInput(productId, discountPercent);
         PromotionItem existingItem = getItemOrThrow(campaignId, itemId);
-        existingItem.setProductId(productId.trim());
+        existingItem.setItemId(productId.trim());
         existingItem.setDiscountPercent(discountPercent);
         return repository.updateItem(existingItem);
     }
@@ -140,19 +140,19 @@ public class PromotionService {
         repository.deleteItem(itemId);
     }
 
-    public double getConversionRate(long campaignId, long itemId) {
-        PromotionItem item = getItemOrThrow(campaignId, itemId);
-        return item.getConversionRate();
-    }
-
-    public Map<Long, Double> getCampaignConversionRates(long campaignId) {
-        List<PromotionItem> items = getItemsByCampaign(campaignId);
-        Map<Long, Double> rates = new HashMap<>();
-        for (PromotionItem item : items) {
-            rates.put(item.getId(), item.getConversionRate());
-        }
-        return rates;
-    }
+//    public double getConversionRate(long campaignId, long itemId) {
+//        PromotionItem item = getItemOrThrow(campaignId, itemId);
+//        return item.getConversionRate();
+//    }
+//
+//    public Map<Long, Double> getCampaignConversionRates(long campaignId) {
+//        List<PromotionItem> items = getItemsByCampaign(campaignId);
+//        Map<Long, Double> rates = new HashMap<>();
+//        for (PromotionItem item : items) {
+//            rates.put(item.getId(), item.getConversionRate());
+//        }
+//        return rates;
+//    }
 
     public List<SalesReportRow> getSalesReport(LocalDateTime from, LocalDateTime to) {
         validateRange(from, to);

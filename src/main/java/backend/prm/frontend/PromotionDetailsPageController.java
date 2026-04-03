@@ -99,13 +99,13 @@ public class PromotionDetailsPageController {
     }
 
     private PromotionProductView mapToProductView(PromotionItem item) {
-        var productOpt = productDAO.findById(item.getProductId());
+        var productOpt = productDAO.findById(item.getItemId());
         String productName = productOpt.map(p -> p.getDescription()).orElse("Unknown product");
         double originalPrice = productOpt.map(p -> p.getPackageCost()).orElse(0.0);
         return new PromotionProductView(
                 item.getId(),
                 item.getCampaignId(),
-                item.getProductId(),
+                item.getItemId(),
                 productName,
                 originalPrice,
                 item.getDiscountPercent(),

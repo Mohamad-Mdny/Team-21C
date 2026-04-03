@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Optional;
 
 public class PromotionRepository {
+    DatabaseManager database = new DatabaseManager();
 
     public PromotionCampaign saveCampaign(PromotionCampaign campaign) {
         String sql = """
@@ -23,7 +24,7 @@ public class PromotionRepository {
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """;
 
-        try (Connection connection = DatabaseManager.makeConnection();
+        try (Connection connection = database.makeConnection();
              PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
             ps.setInt(1, 1);
@@ -61,7 +62,7 @@ public class PromotionRepository {
                 FROM promotion_campaigns
                 WHERE campaign_id = ?
                 """;
-        try (Connection connection = DatabaseConnection.getConnection();
+        try (Connection connection = database.makeConnection();
              PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setLong(1, id);
             try (ResultSet rs = ps.executeQuery()) {
@@ -82,7 +83,7 @@ public class PromotionRepository {
                 ORDER BY start_datetime DESC
                 """;
         List<PromotionCampaign> campaigns = new ArrayList<>();
-        try (Connection connection = DatabaseConnection.getConnection();
+        try (Connection connection = database.makeConnection();
              PreparedStatement ps = connection.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
@@ -102,7 +103,7 @@ public class PromotionRepository {
                 ORDER BY start_datetime ASC
                 """;
         List<PromotionCampaign> campaigns = new ArrayList<>();
-        try (Connection connection = DatabaseConnection.getConnection();
+        try (Connection connection = database.makeConnection();
              PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setTimestamp(1, Timestamp.valueOf(now));
             try (ResultSet rs = ps.executeQuery()) {
@@ -128,7 +129,7 @@ public class PromotionRepository {
                     click_count = ?
                 WHERE campaign_id = ?
                 """;
-        try (Connection connection = DatabaseConnection.getConnection();
+        try (Connection connection = database.makeConnection();
              PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setString(1, campaign.getTitle());
             ps.setString(2, campaign.getDescription());
@@ -153,7 +154,7 @@ public class PromotionRepository {
 
     public void incrementCampaignClick(long campaignId) {
         String sql = "UPDATE promotion_campaigns SET click_count = click_count + 1 WHERE campaign_id = ?";
-        try (Connection connection = DatabaseConnection.getConnection();
+        try (Connection connection = database.makeConnection();
              PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setLong(1, campaignId);
             if (ps.executeUpdate() == 0) {
@@ -167,7 +168,7 @@ public class PromotionRepository {
     public void deleteCampaign(long campaignId) {
         String deleteItemsSql = "DELETE FROM promotion_campaign_items WHERE campaign_id = ?";
         String deleteCampaignSql = "DELETE FROM promotion_campaigns WHERE campaign_id = ?";
-        try (Connection connection = DatabaseConnection.getConnection()) {
+        try (Connection connection = database.makeConnection();) {
             connection.setAutoCommit(false);
             try (PreparedStatement ps1 = connection.prepareStatement(deleteItemsSql);
                  PreparedStatement ps2 = connection.prepareStatement(deleteCampaignSql)) {
@@ -192,7 +193,7 @@ public class PromotionRepository {
 
     public boolean campaignExists(long campaignId) {
         String sql = "SELECT 1 FROM promotion_campaigns WHERE campaign_id = ?";
-        try (Connection connection = DatabaseConnection.getConnection();
+        try (Connection connection = database.makeConnection();
              PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setLong(1, campaignId);
             try (ResultSet rs = ps.executeQuery()) {
@@ -210,12 +211,12 @@ public class PromotionRepository {
                 (campaign_id, product_id, discount_percent, promotional_price, added_to_order_count, purchased_count)
                 VALUES (?, ?, ?, ?, ?, ?)
                 """;
-        try (Connection connection = DatabaseConnection.getConnection()) {
-            double packageCost = readPackageCost(connection, item.getProductId(), productPriceSql);
+        try (Connection connection = database.makeConnection();) {
+            double packageCost = readPackageCost(connection, item.getItemId(), productPriceSql);
             double promotionalPrice = packageCost - (packageCost * item.getDiscountPercent() / 100.0);
             try (PreparedStatement ps = connection.prepareStatement(insertSql, Statement.RETURN_GENERATED_KEYS)) {
                 ps.setLong(1, item.getCampaignId());
-                ps.setString(2, item.getProductId());
+                ps.setString(2, item.getItemId());
                 ps.setDouble(3, item.getDiscountPercent());
                 ps.setDouble(4, promotionalPrice);
                 ps.setInt(5, item.getAddedToOrderCount());
@@ -245,11 +246,11 @@ public class PromotionRepository {
                     purchased_count = ?
                 WHERE campaign_item_id = ? AND campaign_id = ?
                 """;
-        try (Connection connection = DatabaseConnection.getConnection()) {
-            double packageCost = readPackageCost(connection, item.getProductId(), productPriceSql);
+        try (Connection connection = database.makeConnection();) {
+            double packageCost = readPackageCost(connection, item.getItemId(), productPriceSql);
             double promotionalPrice = packageCost - (packageCost * item.getDiscountPercent() / 100.0);
             try (PreparedStatement ps = connection.prepareStatement(sql)) {
-                ps.setString(1, item.getProductId());
+                ps.setString(1, item.getItemId());
                 ps.setDouble(2, item.getDiscountPercent());
                 ps.setDouble(3, promotionalPrice);
                 ps.setInt(4, item.getAddedToOrderCount());
@@ -273,7 +274,7 @@ public class PromotionRepository {
                 SET added_to_order_count = added_to_order_count + ?
                 WHERE campaign_item_id = ? AND campaign_id = ?
                 """;
-        try (Connection connection = DatabaseConnection.getConnection();
+        try (Connection connection = database.makeConnection();
              PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, quantity);
             ps.setLong(2, itemId);
@@ -292,7 +293,7 @@ public class PromotionRepository {
                 SET purchased_count = purchased_count + ?
                 WHERE campaign_item_id = ? AND campaign_id = ?
                 """;
-        try (Connection connection = DatabaseConnection.getConnection();
+        try (Connection connection = database.makeConnection();
              PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, quantity);
             ps.setLong(2, itemId);
@@ -318,7 +319,7 @@ public class PromotionRepository {
                 (campaign_id, campaign_item_id, product_id, event_type, quantity, unit_price, order_reference, event_time)
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?)
                 """;
-        try (Connection connection = DatabaseConnection.getConnection();
+        try (Connection connection = database.makeConnection();
              PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setLong(1, campaignId);
             ps.setLong(2, itemId);
@@ -341,7 +342,7 @@ public class PromotionRepository {
                 FROM promotion_campaign_items
                 WHERE campaign_item_id = ?
                 """;
-        try (Connection connection = DatabaseConnection.getConnection();
+        try (Connection connection = database.makeConnection();
              PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setLong(1, itemId);
             try (ResultSet rs = ps.executeQuery()) {
@@ -364,7 +365,7 @@ public class PromotionRepository {
                 ORDER BY campaign_item_id
                 """;
         List<PromotionItem> items = new ArrayList<>();
-        try (Connection connection = DatabaseConnection.getConnection();
+        try (Connection connection = database.makeConnection();
              PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setLong(1, campaignId);
             try (ResultSet rs = ps.executeQuery()) {
@@ -385,7 +386,7 @@ public class PromotionRepository {
                 FROM promotion_campaign_items
                 WHERE campaign_item_id = ? AND campaign_id = ?
                 """;
-        try (Connection connection = DatabaseConnection.getConnection();
+        try (Connection connection = database.makeConnection();
              PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setLong(1, itemId);
             ps.setLong(2, campaignId);
@@ -402,7 +403,7 @@ public class PromotionRepository {
 
     public boolean itemExistsInCampaign(long campaignId, String productId) {
         String sql = "SELECT 1 FROM promotion_campaign_items WHERE campaign_id = ? AND product_id = ?";
-        try (Connection connection = DatabaseConnection.getConnection();
+        try (Connection connection = database.makeConnection();
              PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setLong(1, campaignId);
             ps.setString(2, productId);
@@ -416,7 +417,7 @@ public class PromotionRepository {
 
     public void deleteItem(long itemId) {
         String sql = "DELETE FROM promotion_campaign_items WHERE campaign_item_id = ?";
-        try (Connection connection = DatabaseConnection.getConnection();
+        try (Connection connection = database.makeConnection();
              PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setLong(1, itemId);
             if (ps.executeUpdate() == 0) {
@@ -442,7 +443,7 @@ public class PromotionRepository {
                 ORDER BY e.product_id
                 """;
         List<SalesReportRow> rows = new ArrayList<>();
-        try (Connection connection = DatabaseConnection.getConnection();
+        try (Connection connection = database.makeConnection();
              PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setTimestamp(1, Timestamp.valueOf(from));
             ps.setTimestamp(2, Timestamp.valueOf(to));
@@ -482,7 +483,7 @@ public class PromotionRepository {
                 ORDER BY c.start_datetime
                 """;
         List<CampaignReportRow> rows = new ArrayList<>();
-        try (Connection connection = DatabaseConnection.getConnection();
+        try (Connection connection = database.makeConnection();
              PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setTimestamp(1, Timestamp.valueOf(to));
             ps.setTimestamp(2, Timestamp.valueOf(from));
@@ -527,7 +528,7 @@ public class PromotionRepository {
                 ORDER BY c.campaign_id, i.campaign_item_id
                 """;
         List<CampaignHitReportRow> rows = new ArrayList<>();
-        try (Connection connection = DatabaseConnection.getConnection();
+        try (Connection connection = database.makeConnection();
              PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setTimestamp(1, Timestamp.valueOf(to));
             ps.setTimestamp(2, Timestamp.valueOf(from));
