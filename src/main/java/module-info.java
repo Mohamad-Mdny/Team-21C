@@ -19,7 +19,6 @@ module org.example.merchapp {
     //requires org.example.merchapp;
 
 
-    requires javafx.graphics;
     requires javafx.base;
 
     //requires org.example.merchapp;

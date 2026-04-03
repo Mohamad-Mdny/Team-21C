@@ -1,7 +1,7 @@
 package backend.prm.repository;
 
 
-import backend.prm.database.DatabaseConnection;
+import backend.DatabaseManager;
 import backend.prm.model.Product;
 
 import java.sql.Connection;
@@ -21,7 +21,7 @@ public class ProductDAO {
                 WHERE product_id = ?
                 """;
 
-        try (Connection connection = DatabaseConnection.getConnection();
+        try (Connection connection = DatabaseManager.makeConnection();
              PreparedStatement ps = connection.prepareStatement(sql)) {
 
             ps.setString(1, productId);
