@@ -24,7 +24,7 @@
 
             <Region HBox.hgrow="ALWAYS" />
 
-            <Button mnemonicParsing="false" onAction="#goToCheckout" text="Checkout" />
+            <Button mnemonicParsing="false" onAction="#goToCheckout" text="Basket" />
             <Button fx:id="accountButton" mnemonicParsing="false" onAction="#handleAccountButton" text="Account Settings" />
          </HBox>
       </VBox>

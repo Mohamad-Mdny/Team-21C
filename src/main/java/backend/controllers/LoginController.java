@@ -122,7 +122,7 @@ public class LoginController {
         switchPage(event, "CurrentPromotions.fxml");
     }
     @FXML public void goToCheckout(ActionEvent event) {
-        switchPage(event, "Checkout.fxml");
+        switchPage(event, "Basket.fxml");
     }
 
 

@@ -208,7 +208,7 @@ public class AccountSettingsController {
 
     @FXML
     public void goToCheckout(ActionEvent event) {
-        switchPage(event, "Checkout.fxml");
+        switchPage(event, "Basket.fxml");
     }
 
 

@@ -32,7 +32,7 @@
 
                 <Region HBox.hgrow="ALWAYS" />
 
-                <Button mnemonicParsing="false" text="Checkout" onAction="#goToCheckout" />
+                <Button mnemonicParsing="false" text="Basket" onAction="#goToCheckout" />
                 <Button fx:id="SignIn" mnemonicParsing="false" text="Sign In" />
             </HBox>
         </VBox>
@@ -61,7 +61,7 @@
 
                 <VBox spacing="8.0">
                     <Label text="Password" style="-fx-font-weight: bold;" />
-                    <PasswordField fx:id="passwordInput" promptText="Enter Password" />
+                    <PasswordField fx:id="passwordInput" promptText="Enter Password" onAction="#login" />
                 </VBox>
 
                 <Button text="Login"

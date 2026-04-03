@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane prefHeight="700.0" prefWidth="1400.0"
+            xmlns="http://javafx.com/javafx/17.0.12"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="backend.controllers.BasketController">
+
+    <top>
+        <VBox spacing="12.0" style="-fx-background-color: #1f2937; -fx-padding: 16;">
+            <HBox>
+                <Label text="IPOS-PU"
+                       style="-fx-text-fill: white; -fx-font-size: 24px; -fx-font-weight: bold;"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Label text="Suriya did this asw"
+                       style="-fx-text-fill: #e5e7eb; -fx-font-size: 14px;"/>
+            </HBox>
+
+            <StackPane>
+                <TextField fx:id="searchField"
+                           maxWidth="420.0"
+                           prefWidth="420.0"
+                           promptText="Search catalogue..."
+                           onAction="#handleSearchEnter"/>
+            </StackPane>
+
+            <HBox spacing="10.0" alignment="CENTER_LEFT">
+                <Button mnemonicParsing="false" onAction="#goToCatalogue" text="Catalogue"/>
+                <Button mnemonicParsing="false" onAction="#goToCurrentPromotions" text="Current Promotions"/>
+
+                <Region HBox.hgrow="ALWAYS"/>
+
+                <Button mnemonicParsing="false" onAction="#goToCheckout" text="Checkout"/>
+                <Button fx:id="accountButton" mnemonicParsing="false" onAction="#handleAccountButton"
+                        text="Account Settings"/>
+            </HBox>
+        </VBox>
+    </top>
+
+    <left>
+        <VBox prefWidth="260.0"
+              spacing="12.0"
+              style="-fx-background-color: #f3f4f6; -fx-padding: 16; -fx-border-color: #d1d5db; -fx-border-width: 0 1 0 0;">
+            <Label text="Checkout Summary" style="-fx-font-size: 18px; -fx-font-weight: bold;"/>
+
+            <Label fx:id="itemCountLabel" text="Items in basket: 0"/>
+            <Label fx:id="subtotalSideLabel" text="Subtotal: £0.00"/>
+            <Label fx:id="vatSideLabel" text="VAT: £0.00"/>
+            <Label fx:id="totalSideLabel" text="Total: £0.00"/>
+
+            <Separator/>
+
+            <Button mnemonicParsing="false" onAction="#clearBasket" text="Clear Basket"/>
+        </VBox>
+    </left>
+
+    <center>
+        <BorderPane style="-fx-padding: 12;">
+            <top>
+                <Label text="Your Basket"
+                       style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-padding: 0 0 12 0;"/>
+            </top>
+
+            <center>
+                <TableView fx:id="basketTable">
+                    <columns>
+                        <TableColumn fx:id="itemColumn" prefWidth="220.0" text="Item"/>
+                        <TableColumn fx:id="packageColumn" prefWidth="140.0" text="Package Type"/>
+                        <TableColumn fx:id="unitColumn" prefWidth="120.0" text="Unit"/>
+                        <TableColumn fx:id="quantityColumn" prefWidth="120.0" text="Quantity"/>
+                        <TableColumn fx:id="priceColumn" prefWidth="120.0" text="Unit Price"/>
+                        <TableColumn fx:id="subtotalColumn" prefWidth="140.0" text="Subtotal"/>
+                    </columns>
+                </TableView>
+            </center>
+
+            <bottom>
+                <VBox spacing="8.0" style="-fx-padding: 12 0 0 0;">
+                    <HBox spacing="20.0">
+                        <Label fx:id="subtotalBottomLabel" text="Subtotal: £0.00"
+                               style="-fx-font-size: 14px; -fx-font-weight: bold;"/>
+                        <Label fx:id="vatBottomLabel" text="VAT: £0.00"
+                               style="-fx-font-size: 14px; -fx-font-weight: bold;"/>
+                        <Label fx:id="totalBottomLabel" text="Total: £0.00"
+                               style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
+                    </HBox>
+
+                    <TextArea fx:id="orderNotesArea"
+                              promptText="Order notes (Leave with neighbour etc.)"
+                              prefHeight="80.0"
+                              wrapText="true"/>
+                </VBox>
+            </bottom>
+        </BorderPane>
+    </center>
+    <right>
+        <VBox prefWidth="260.0"
+              spacing="12.0"
+              style="-fx-background-color: #f3f4f6; -fx-padding: 16; -fx-border-color: #d1d5db; -fx-border-width: 0 1 0 0;">
+
+            <HBox spacing="10.0" alignment="CENTER_LEFT">
+
+                <Region HBox.hgrow="ALWAYS"/>
+
+                <Button fx:id="Checkout" mnemonicParsing="false" onAction="#purchaseBasket"
+                        text="Checkout"/>
+            </HBox>
+
+
+        </VBox>
+
+    </right>
+</BorderPane>

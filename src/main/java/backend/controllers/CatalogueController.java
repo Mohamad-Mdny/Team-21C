@@ -215,7 +215,7 @@ public class CatalogueController {
         switchPage(event, "CurrentPromotions.fxml");
     }
     @FXML public void goToCheckout(ActionEvent event) {
-        switchPage(event, "Checkout.fxml");
+        switchPage(event, "Basket.fxml");
     }
 
     private void updateAccountButton() {
