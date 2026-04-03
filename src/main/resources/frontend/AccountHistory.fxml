@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane prefHeight="403.0" prefWidth="602.0" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="backend.controllers.AccountHistoryController">
+   <children>
+      <TableView fx:id="orderHistory" layoutX="29.0" layoutY="61.0" prefHeight="111.0" prefWidth="531.0">
+        <columns>
+          <TableColumn fx:id="OrderID" prefWidth="75.0" text="OrderID" />
+          <TableColumn fx:id="description" prefWidth="75.0" text="Description" />
+            <TableColumn fx:id="orderEmailAddress" prefWidth="91.20001220703125" text="EmailAddress" />
+        </columns>
+      </TableView>
+      <TableView fx:id="transactionHistory" layoutX="29.0" layoutY="235.0" prefHeight="123.0" prefWidth="551.0">
+        <columns>
+          <TableColumn fx:id="transactionID" prefWidth="92.20001602172852" text="TransactionID" />
+          <TableColumn fx:id="amount" prefWidth="58.20001220703125" text="Amount" />
+            <TableColumn fx:id="transactionEmailAddress" prefWidth="92.39994812011719" text="EmailAddress" />
+        </columns>
+      </TableView>
+      <Label layoutX="36.0" layoutY="6.0" prefHeight="18.0" prefWidth="115.0" text="Order History" />
+      <Label layoutX="32.0" layoutY="191.0" prefHeight="18.0" prefWidth="115.0" text="Transaction History" />
+   </children>
+</AnchorPane>

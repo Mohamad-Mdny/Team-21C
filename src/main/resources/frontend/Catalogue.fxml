@@ -23,6 +23,8 @@
             <Button mnemonicParsing="false" onAction="#goToCurrentPromotions" text="Current Promotions" />
 
             <Region HBox.hgrow="ALWAYS" />
+            <Button mnemonicParsing="false" onAction="#goToNonCommercialRegister" text="NC-Signup" />
+            <Button mnemonicParsing="false" onAction="#goToCommercialRegister" text="C-Signup" />
 
             <Button mnemonicParsing="false" onAction="#goToCheckout" text="Basket" />
             <Button fx:id="accountButton" mnemonicParsing="false" onAction="#handleAccountButton" text="Account Settings" />

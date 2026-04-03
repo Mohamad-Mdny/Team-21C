@@ -12,11 +12,11 @@
           <Region />
         </root>
       </SubScene>
-      <PasswordField fx:id="password" layoutX="225.0" layoutY="74.0" prefHeight="26.0" prefWidth="162.0" promptText="Enter Password" />
-      <TextField fx:id="email" layoutX="226.0" layoutY="34.0" prefHeight="26.0" prefWidth="162.0" promptText="Enter Email" />
+      <TextField fx:id="email" layoutX="226.0" layoutY="73.0" prefHeight="26.0" prefWidth="162.0" promptText="Enter Email" />
       <TextField fx:id="CompanyRegistration" layoutX="227.0" layoutY="113.0" prefHeight="26.0" prefWidth="162.0" promptText="Enter Company Registartion Number" />
       <TextField fx:id="CompanyDirector" layoutX="226.0" layoutY="153.0" prefHeight="26.0" prefWidth="162.0" promptText="Enter Company Director" />
       <TextField fx:id="typeOfBusiness" layoutX="228.0" layoutY="200.0" prefHeight="26.0" prefWidth="162.0" promptText="Enter type of business" />
       <TextField fx:id="businessAddress" layoutX="229.0" layoutY="245.0" prefHeight="26.0" prefWidth="162.0" promptText="enter business address" />
+      <Label fx:id="errorLabel" layoutX="176.0" layoutY="339.0" prefHeight="19.0" prefWidth="247.0" />
    </children>
 </AnchorPane>
