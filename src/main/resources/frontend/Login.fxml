@@ -61,7 +61,7 @@
 
                 <VBox spacing="8.0">
                     <Label text="Password" style="-fx-font-weight: bold;" />
-                    <PasswordField fx:id="passwordInput" promptText="Enter Password" onAction="#login" />
+                    <PasswordField fx:id="passwordInput" promptText="Enter Password"/>
                 </VBox>
 
                 <Button text="Login"
