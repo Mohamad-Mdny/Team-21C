@@ -18,10 +18,18 @@ module org.example.merchapp {
     requires mysql.connector.j;
     //requires org.example.merchapp;
 
+
+    requires javafx.graphics;
+    requires javafx.base;
+
+    //requires org.example.merchapp;
+
     exports backend;
     opens backend to javafx.fxml;
     exports backend.controllers;
     opens backend.controllers to javafx.fxml;
     exports backend.models;
     opens backend.models to javafx.fxml;
+    opens backend.prm.frontend to javafx.fxml;
+
 }
