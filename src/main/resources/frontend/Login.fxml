@@ -50,8 +50,10 @@
                 </VBox>
 
                 <Button maxWidth="Infinity" mnemonicParsing="false" onAction="#login" style="-fx-font-weight: bold; -fx-padding: 10 0 10 0;" text="Login" />
+                <Label fx:id="errorLabel" layoutX="176.0" layoutY="339.0" prefHeight="19.0" prefWidth="247.0" />
             </VBox>
         </StackPane>
+
     </center>
 
 </BorderPane>

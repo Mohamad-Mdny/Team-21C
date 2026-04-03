@@ -28,15 +28,16 @@ public class ForgetPasswordController {
         Connection connection = database.makeConnection();
 
         try{
-            PreparedStatement statement = connection.prepareStatement("Select * from users where email=?);");
+            PreparedStatement statement = connection.prepareStatement("Select * from member where emailAddress=?;");
             statement.setString(1,emailInput.getText());
             ResultSet resultSet = statement.executeQuery();
             if(resultSet.next()){
 
-                PreparedStatement statementTwo = connection.prepareStatement("UPDATE member SET password=? WHERE emailAddress=?");
+                PreparedStatement statementTwo = connection.prepareStatement("UPDATE member SET password=?, firstLogin=false WHERE emailAddress=?");
                 statementTwo.setString(1, newPasswordInput.getText());
                 statementTwo.setString(2, emailInput.getText());
                 statementTwo.execute();
+
 
             }
             else{

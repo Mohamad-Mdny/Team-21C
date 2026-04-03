@@ -1,6 +1,8 @@
 package backend.controllers;
 
 import backend.DatabaseManager;
+import backend.communication.EmailSendResult;
+import backend.communication.SendGmail;
 import backend.interfaces.IApplicationAPI;
 import backend.models.Member;
 import javafx.event.ActionEvent;
@@ -32,32 +34,33 @@ public class RegisterController {
     //creates a member object and calls the function to register a non-commercial member while passing the required arguments
     public void submitNonCommercialApplication(ActionEvent event){
         submitNonCommercialApplication(email.getText());
+
     };
 
     //creates a member object and calls the function to register a commercial member while passing the required arguments
     public void submitCommercialApplication(ActionEvent event) {
-        submitCommercialApplication(email.getText(), password.getText(),Integer.parseInt(CompanyRegistration.getText()), CompanyDirector.getText(), typeOfBusiness.getText(), businessAddress.getText());
+        submitCommercialApplication(email.getText(), Integer.parseInt(CompanyRegistration.getText()), CompanyDirector.getText(), typeOfBusiness.getText(), businessAddress.getText());
     }
 
-    public void submitCommercialApplication(String emailAddress, String password, int companyRegNumber, String CompanyDirector,String businessType, String businessAddress ) {
+    public void submitCommercialApplication(String emailAddress, int companyRegNumber, String CompanyDirector,String businessType, String businessAddress ) {
         DatabaseManager database = new DatabaseManager();
         Connection connection = database.makeConnection();
         if(emailCheck(emailAddress)){
             try {
-                PreparedStatement statement = connection.prepareStatement("INSERT INTO member(emailAddress,password,type,validityStatus,CompanyRegistration, CompanyDirector, typeOfBusiness,  businessAddress) VALUES (?,?,?,?,?,?,?,?)");
+                PreparedStatement statement = connection.prepareStatement("INSERT INTO member(emailAddress,type,validityStatus,CompanyRegistration, CompanyDirector, typeOfBusiness,  businessAddress) VALUES (?,?,?,?,?,?,?)");
                 statement.setString(1,emailAddress.toLowerCase());
-                statement.setString(2,password);
-                statement.setString(3,"nonCommercial");
-                statement.setString(4,"valid");
-                statement.setInt(5,companyRegNumber);
-                statement.setString(6,CompanyDirector);
-                statement.setString(7,businessType);
-                statement.setString(8, businessAddress);
+                statement.setString(2,"Commercial");
+                statement.setString(3,"invalid");
+                statement.setInt(4,companyRegNumber);
+                statement.setString(5,CompanyDirector);
+                statement.setString(6,businessType);
+                statement.setString(7, businessAddress);
                 statement.execute();
             }
             catch(SQLException e){
                 e.printStackTrace();
             }
+            EmailSendResult result = SendGmail.sendGmail("mateusz.niedbalski@city.ac.uk", "Account validation in progress", "Your account is getting validated. This may take a while.");
         }else{
             errorLabel.setText("Invalid Email Address");
         }
@@ -67,11 +70,12 @@ public class RegisterController {
     public void submitNonCommercialApplication(String emailAddress){
         DatabaseManager database = new DatabaseManager();
         Connection connection = database.makeConnection();
-        if(emailCheck(emailAddress)){}
+        String generatedPassword=generatePassword();
+        if(emailCheck(emailAddress)){
         try {
             PreparedStatement statement = connection.prepareStatement("INSERT INTO member(emailAddress,password,type,validityStatus,totalPurchases,firstLogin) VALUES (?,?,?,?,?,?)");
             statement.setString(1,emailAddress.toLowerCase());
-            statement.setString(2,generatePassword());
+            statement.setString(2,generatedPassword);
             statement.setString(3,"nonCommercial");
             statement.setString(4,"valid");
             statement.setInt(5,0);
@@ -80,7 +84,13 @@ public class RegisterController {
         }
         catch(SQLException e){
             e.printStackTrace();
-        }}
+        }
+            EmailSendResult result = SendGmail.sendGmail("mateusz.niedbalski@city.ac.uk", "AccountCreation", "Account Created!\n Your random generated password is:"+generatedPassword);
+        }
+        else{
+            errorLabel.setText("Invalid Email Address");
+        }
+    }
     public String generatePassword(){
         String password="";
         String character = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890!@#$%&*?";
@@ -93,9 +103,11 @@ public class RegisterController {
         return password;
     }
     public boolean emailCheck(String email){
-        if(email.contains("@") && email.contains(".com")){
+        if(email.contains("@")){
+            System.out.println("valid");
             return true;
         }
+        System.out.println("invalid");
         return false;
     }
 }

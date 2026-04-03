@@ -30,7 +30,7 @@ public class LoginController {
     @FXML
     TextField passwordInput;
     @FXML
-    Label ErrorLabel;
+    Label errorLabel;
 
     public void login(ActionEvent event){
         String email = emailInput.getText().toLowerCase();
@@ -57,7 +57,7 @@ public class LoginController {
 
                             if (resultSet.getBoolean("firstLogin")) {
                                 System.out.println("redirect to password change");
-                                try{System.out.println("TRYING TO SWITCH TO CATALOGUE");
+                                try{
                                     Parent root = FXMLLoader.load(getClass().getResource("/frontend/ForgetPassword.fxml"));
                                     Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
                                     stage.getScene().setRoot(root);
@@ -69,6 +69,7 @@ public class LoginController {
 
                                 // jsjfknq
                                 try{
+                                    System.out.println("TRYING TO SWITCH TO CATALOGUE");
                                     Main.m.setSignedIn();
                                     Main.member = new Member(email);
 
@@ -94,16 +95,19 @@ public class LoginController {
                                 } catch(Exception e) {e.printStackTrace();}
                             }
                             else{
-                                ErrorLabel.setText("Account has not been validated");
+                                errorLabel.setText("Account has not been validated");
                             }
 
                         }
+                    }
+                    else{
+                        errorLabel.setText("Incorrect password");
                     }
                 }
                 else{
                     System.out.println("username is not found");
                     //replace with pop up
-                    ErrorLabel.setText("Username not found");
+                    errorLabel.setText("Username not found");
                 }
             }
             catch (SQLException e){
