@@ -108,7 +108,7 @@ public class CheckoutAccountController {
             updateSummaryLabels(0, 0.0);
             return;
         }
-        Map<Integer, BasketAccumulator> grouped = new LinkedHashMap<>();
+        Map<String, BasketAccumulator> grouped = new LinkedHashMap<>();
         for (Item item : Main.m.getBasket()) {
             if (item == null) continue;
             BasketAccumulator acc = grouped.get(item.getItemID());
@@ -194,7 +194,7 @@ public class CheckoutAccountController {
 
     @FXML
     public void goToCurrentPromotions(ActionEvent event) {
-        switchPage(event, "CurrentPromotions.fxml");
+        switchPage(event, "PromotionsPage.fxml");
     }
 
     @FXML

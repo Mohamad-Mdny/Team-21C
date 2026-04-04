@@ -41,7 +41,7 @@ public class CatalogueController {
     private Label memberSession;
 
     private final ObservableList<Item> masterData = FXCollections.observableArrayList();
-    private FilteredList<Item> filteredData; private Integer selectedItemId = null;
+    private FilteredList<Item> filteredData; private String selectedItemId = null;
 
     @FXML void initialize() {
         if(Main.member !=null) {
@@ -210,9 +210,19 @@ public class CatalogueController {
     @FXML public void goToCatalogue(ActionEvent event) {
         switchPage(event, "Catalogue.fxml");
     }
-    @FXML public void goToCurrentPromotions(ActionEvent event) {
-        switchPage(event, "CurrentPromotions.fxml");
-    }
+    //@FXML public void goToCurrentPromotions(ActionEvent event) {switchPage(event, "PromotionsPage.fxml");}
+
+    /*
+    AdminCampaignItemsPage
+    AdminPromotionsPage - Error with getting the data from the database
+    AdminDashboard - Still have to integrate reports
+    PromotionsPage - Havent tested with actual campaigns
+    PromotionDetailsPage - 
+
+     */
+    @FXML public void goToCurrentPromotions(ActionEvent event) {switchPage(event, "PromotionDetailsPage.fxml");}
+
+
     @FXML public void goToCheckout(ActionEvent event) {
         switchPage(event, "Basket.fxml");
     }

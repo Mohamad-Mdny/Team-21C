@@ -111,7 +111,7 @@ public class BasketController {
             return;
         }
 
-        Map<Integer, BasketAccumulator> groupedItems = new LinkedHashMap<>();
+        Map<String, BasketAccumulator> groupedItems = new LinkedHashMap<>();
 
         for (Item item : Main.m.getBasket()) {
             if (item == null) {
@@ -211,7 +211,7 @@ public class BasketController {
 
     @FXML
     public void goToCurrentPromotions(ActionEvent event) {
-        switchPage(event, "CurrentPromotions.fxml");
+        switchPage(event, "PromotionsPage.fxml");
     }
 
     @FXML
