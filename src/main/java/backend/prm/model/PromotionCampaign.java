@@ -13,9 +13,6 @@ public class PromotionCampaign {
     private LocalDateTime cancelledAt;
     private int clickCount;
 
-    public PromotionCampaign() {
-    }
-
     public PromotionCampaign(long id,
                              String campaignCode,
                              String title,

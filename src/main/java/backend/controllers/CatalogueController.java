@@ -210,9 +210,19 @@ public class CatalogueController {
     @FXML public void goToCatalogue(ActionEvent event) {
         switchPage(event, "Catalogue.fxml");
     }
-    @FXML public void goToCurrentPromotions(ActionEvent event) {
-        switchPage(event, "PromotionsPage.fxml");
-    }
+    //@FXML public void goToCurrentPromotions(ActionEvent event) {switchPage(event, "PromotionsPage.fxml");}
+
+    /*
+    AdminCampaignItemsPage
+    AdminPromotionsPage - Error with getting the data from the database
+    AdminDashboard - Still have to integrate reports
+    PromotionsPage - Havent tested with actual campaigns
+    PromotionDetailsPage - 
+
+     */
+    @FXML public void goToCurrentPromotions(ActionEvent event) {switchPage(event, "PromotionDetailsPage.fxml");}
+
+
     @FXML public void goToCheckout(ActionEvent event) {
         switchPage(event, "Basket.fxml");
     }

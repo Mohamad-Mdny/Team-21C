@@ -71,6 +71,7 @@ public class PromotionRepository {
                 }
             }
         } catch (SQLException e) {
+            System.out.println("Promotions Repository could not find campaign by id: " + id);
             throw new RuntimeException("Failed to find campaign by id: " + id, e);
         }
         return Optional.empty();
