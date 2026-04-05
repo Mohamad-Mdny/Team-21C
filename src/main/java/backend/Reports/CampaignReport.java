@@ -36,7 +36,7 @@ public class CampaignReport {
                 activeCampaigns.append(campaigns.get(i).getCampaignId());
                 if (i < campaigns.size() - 1) activeCampaigns.append(" and ");
             }
-            leftCell.addElement(new Paragraph("Active campaigns: " + campaigns.size() + " (" + activeCampaigns + ")", metaFont));
+            leftCell.addElement(new Paragraph("campaigns: " + campaigns.size() + " (" + activeCampaigns + ")", metaFont));
             headerLayout.addCell(leftCell);
 
             PdfPCell rightCell = new PdfPCell();
@@ -49,7 +49,12 @@ public class CampaignReport {
             document.add(headerLayout);
             document.add(Chunk.NEWLINE);
 
-            //title
+            Font titleFont = new Font(Font.FontFamily.TIMES_ROMAN,  16, Font.BOLD | Font.ITALIC);
+            Paragraph title = new  Paragraph("Campaign Report", titleFont);
+            title.setAlignment(Element.ALIGN_CENTER);
+            document.add(title);
+            document.add(Chunk.NEWLINE);
+
             PdfPTable table = new PdfPTable(5);
             table.setWidthPercentage(100);
             table.setWidths(new float[]{2, 2, 2, 2, 2});
@@ -59,6 +64,7 @@ public class CampaignReport {
 
             for (String header : new String[]{"Campaign ID", "Start Date/Time", "End Date/Time", "Items included", "Discount, %"}) {
                 PdfPCell cell = new PdfPCell(new Phrase(header, boldFont));
+                cell.setBackgroundColor(BaseColor.LIGHT_GRAY);
                 cell.setPadding(6);
                 table.addCell(cell);
             }
@@ -84,6 +90,7 @@ public class CampaignReport {
 
                 for (String header : new String[]{"ID", "Description", "Discount", "Items Sold", "Total Sales, £"}) {
                     PdfPCell cell = new PdfPCell(new Phrase(header, boldFont));
+                    cell.setBackgroundColor(BaseColor.LIGHT_GRAY);
                     cell.setPadding(4);
                     table.addCell(cell);
                 }

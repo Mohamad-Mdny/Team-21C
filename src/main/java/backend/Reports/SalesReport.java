@@ -21,11 +21,11 @@ public class SalesReport {
             document.add(address);
 
             //Title
-        Font titleFont = new Font(Font.FontFamily.TIMES_ROMAN, 14, Font.BOLD);
-        Paragraph title = new Paragraph("Sales Report");
-        title.setAlignment(Element.ALIGN_RIGHT);
-        document.add(title);
-        document.add(Chunk.NEWLINE);
+            Font titleFont = new Font(Font.FontFamily.TIMES_ROMAN,  16, Font.BOLD | Font.ITALIC);
+            Paragraph title = new  Paragraph("Sales Report", titleFont);
+            title.setAlignment(Element.ALIGN_CENTER);
+            document.add(title);
+            document.add(Chunk.NEWLINE);
 
         PdfPTable table = new PdfPTable(5);
         table.setWidthPercentage(100);
