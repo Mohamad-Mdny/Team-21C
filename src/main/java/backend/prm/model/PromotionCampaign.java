@@ -8,6 +8,7 @@ public class PromotionCampaign {
     private String campaignCode;
     private String title;
     private String description;
+    private double discountPercent;
     private LocalDateTime startDateTime;
     private LocalDateTime endDateTime;
     private LocalDateTime cancelledAt;
@@ -18,13 +19,15 @@ public class PromotionCampaign {
                              String title,
                              String description,
                              LocalDateTime startDateTime,
-                             LocalDateTime endDateTime) {
+                             LocalDateTime endDateTime,
+                             double discountPercent) {
         this.id = id;
         this.campaignCode = campaignCode;
         this.title = title;
         this.description = description;
         this.startDateTime = startDateTime;
         this.endDateTime = endDateTime;
+        this.discountPercent = discountPercent;
         this.clickCount = 0;
     }
 
@@ -59,6 +62,10 @@ public class PromotionCampaign {
     public void setDescription(String description) {
         this.description = description;
     }
+
+    public double getDiscountPercent() { return discountPercent; }
+    public void setDiscountPercent(double discountPercent) { this.discountPercent = discountPercent; }
+
 
     public LocalDateTime getStartDateTime() {
         return startDateTime;

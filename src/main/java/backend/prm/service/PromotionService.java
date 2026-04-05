@@ -6,12 +6,11 @@ import backend.prm.model.PromotionStatus;
 import backend.prm.report.CampaignHitReportRow;
 import backend.prm.report.CampaignReportRow;
 import backend.prm.report.SalesReportRow;
+
 import backend.prm.repository.PromotionRepository;
 
 import java.time.LocalDateTime;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class PromotionService {
 
@@ -24,9 +23,18 @@ public class PromotionService {
     public PromotionCampaign createCampaign(String title,
                                             String description,
                                             LocalDateTime startDateTime,
-                                            LocalDateTime endDateTime) {
-        validateCampaignInput(title, startDateTime, endDateTime);
-        PromotionCampaign campaign = new PromotionCampaign(0, null, title.trim(), description, startDateTime, endDateTime);
+                                            LocalDateTime endDateTime,
+                                            double discountPercent) {
+        validateCampaignInput(title, startDateTime, endDateTime, discountPercent);
+        PromotionCampaign campaign = new PromotionCampaign(
+                0,
+                null,
+                title.trim(),
+                description,
+                startDateTime,
+                endDateTime,
+                discountPercent
+        );
         return repository.saveCampaign(campaign);
     }
 
@@ -60,13 +68,13 @@ public class PromotionService {
         repository.updateCampaign(campaign);
     }
 
-    public PromotionItem addItemToCampaign(long campaignId, String productId, double discountPercent) {
+    public PromotionItem addItemToCampaign(long campaignId, String productId) {
         getCampaignOrThrow(campaignId);
-        validateItemInput(productId, discountPercent);
-        if (repository.itemExistsInCampaign(campaignId, productId)) {
+        validateProductId(productId);
+        if (repository.itemExistsInCampaign(campaignId, productId.trim())) {
             throw new IllegalArgumentException("Product already exists in campaign: " + productId);
         }
-        PromotionItem item = new PromotionItem(0, campaignId, productId.trim(), discountPercent, 0.0);
+        PromotionItem item = new PromotionItem(0, campaignId, productId.trim(), 0.0);
         return repository.saveItem(item);
     }
 
@@ -91,8 +99,16 @@ public class PromotionService {
         validateCampaignIsActive(campaign);
         PromotionItem item = getItemOrThrow(campaignId, itemId);
         repository.incrementItemAddedCount(campaignId, itemId, quantity);
-        repository.savePromotionOrderEvent(campaignId, itemId, item.getItemId(), "ADDED", quantity,
-                item.getPromotionalPrice(), orderReference, LocalDateTime.now());
+        repository.savePromotionOrderEvent(
+                campaignId,
+                itemId,
+                item.getItemId(),
+                "ADDED",
+                quantity,
+                item.getPromotionalPrice(),
+                orderReference,
+                LocalDateTime.now()
+        );
     }
 
     public void recordItemPurchased(long campaignId, long itemId, int quantity) {
@@ -104,30 +120,39 @@ public class PromotionService {
         getCampaignOrThrow(campaignId);
         PromotionItem item = getItemOrThrow(campaignId, itemId);
         repository.incrementItemPurchasedCount(campaignId, itemId, quantity);
-        repository.savePromotionOrderEvent(campaignId, itemId, item.getItemId(), "PURCHASED", quantity,
-                item.getPromotionalPrice(), orderReference, LocalDateTime.now());
+        repository.savePromotionOrderEvent(
+                campaignId,
+                itemId,
+                item.getItemId(),
+                "PURCHASED",
+                quantity,
+                item.getPromotionalPrice(),
+                orderReference,
+                LocalDateTime.now()
+        );
     }
 
     public PromotionCampaign updateCampaign(long campaignId,
                                             String title,
                                             String description,
                                             LocalDateTime startDateTime,
-                                            LocalDateTime endDateTime) {
-        validateCampaignInput(title, startDateTime, endDateTime);
+                                            LocalDateTime endDateTime,
+                                            double discountPercent) {
+        validateCampaignInput(title, startDateTime, endDateTime, discountPercent);
         PromotionCampaign campaign = getCampaignOrThrow(campaignId);
         campaign.setTitle(title.trim());
         campaign.setDescription(description);
         campaign.setStartDateTime(startDateTime);
         campaign.setEndDateTime(endDateTime);
+        campaign.setDiscountPercent(discountPercent);
         return repository.updateCampaign(campaign);
     }
 
-    public PromotionItem updateItem(long campaignId, long itemId, String productId, double discountPercent) {
+    public PromotionItem updateItem(long campaignId, long itemId, String productId) {
         getCampaignOrThrow(campaignId);
-        validateItemInput(productId, discountPercent);
+        validateProductId(productId);
         PromotionItem existingItem = getItemOrThrow(campaignId, itemId);
         existingItem.setItemId(productId.trim());
-        existingItem.setDiscountPercent(discountPercent);
         return repository.updateItem(existingItem);
     }
 
@@ -139,20 +164,6 @@ public class PromotionService {
     public void deleteItem(long itemId) {
         repository.deleteItem(itemId);
     }
-
-//    public double getConversionRate(long campaignId, long itemId) {
-//        PromotionItem item = getItemOrThrow(campaignId, itemId);
-//        return item.getConversionRate();
-//    }
-//
-//    public Map<Long, Double> getCampaignConversionRates(long campaignId) {
-//        List<PromotionItem> items = getItemsByCampaign(campaignId);
-//        Map<Long, Double> rates = new HashMap<>();
-//        for (PromotionItem item : items) {
-//            rates.put(item.getId(), item.getConversionRate());
-//        }
-//        return rates;
-//    }
 
     public List<SalesReportRow> getSalesReport(LocalDateTime from, LocalDateTime to) {
         validateRange(from, to);
@@ -186,7 +197,10 @@ public class PromotionService {
         }
     }
 
-    private void validateCampaignInput(String title, LocalDateTime startDateTime, LocalDateTime endDateTime) {
+    private void validateCampaignInput(String title,
+                                       LocalDateTime startDateTime,
+                                       LocalDateTime endDateTime,
+                                       double discountPercent) {
         if (title == null || title.trim().isEmpty()) {
             throw new IllegalArgumentException("Campaign title must not be empty.");
         }
@@ -196,14 +210,14 @@ public class PromotionService {
         if (!endDateTime.isAfter(startDateTime)) {
             throw new IllegalArgumentException("End date/time must be after start date/time.");
         }
+        if (discountPercent < 0 || discountPercent > 100) {
+            throw new IllegalArgumentException("Campaign discount must be between 0 and 100.");
+        }
     }
 
-    private void validateItemInput(String productId, double discountPercent) {
+    private void validateProductId(String productId) {
         if (productId == null || productId.isBlank()) {
             throw new IllegalArgumentException("Product ID must not be empty.");
-        }
-        if (discountPercent < 0 || discountPercent > 100) {
-            throw new IllegalArgumentException("Discount percent must be between 0 and 100.");
         }
     }
 

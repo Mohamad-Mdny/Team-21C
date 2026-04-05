@@ -1,5 +1,7 @@
 package backend.prm.frontend;
 
+import backend.Main;
+import backend.models.Item;
 import backend.prm.controller.PromotionController;
 import backend.prm.model.PromotionCampaign;
 import backend.prm.model.PromotionItem;
@@ -101,14 +103,14 @@ public class PromotionDetailsPageController {
     private PromotionProductView mapToProductView(PromotionItem item) {
         var productOpt = productDAO.findById(item.getItemId());
         String productName = productOpt.map(p -> p.getDescription()).orElse("Unknown product");
-        double originalPrice = productOpt.map(p -> p.getPackageCost()).orElse(0.0);
+        float originalPrice = productOpt.map(p -> p.getPackageCost()).orElse(0.0f);
         return new PromotionProductView(
                 item.getId(),
                 item.getCampaignId(),
                 item.getItemId(),
                 productName,
                 originalPrice,
-                item.getDiscountPercent(),
+                campaign.getDiscountPercent(),
                 item.getAddedToOrderCount(),
                 item.getPurchasedCount()
         );
@@ -116,9 +118,36 @@ public class PromotionDetailsPageController {
 
     private void handleAddToOrder(PromotionProductView item, int quantity) {
         try {
+            var productOpt = productDAO.findById(item.getProductId());
+
+            if (productOpt.isEmpty()) {
+                showError("Product not found.");
+                return;
+            }
+
+            Item baseItem = productOpt.get();
+
+            Item promoItem = new Item(
+                    Integer.parseInt(baseItem.getItemID()),
+                    baseItem.getDescription(),
+                    baseItem.getPackageType(),
+                    baseItem.getUnit(),
+                    baseItem.getUnitsInAPack(),
+                    (float) item.getDiscountedPrice(),
+                    baseItem.getAvailability(),
+                    baseItem.getStockLimit()
+            );
+
+            for (int i = 0; i < quantity; i++) {
+                Main.m.getBasket().add(promoItem);
+            }
+
             promotionController.addItemToOrder(item.getCampaignId(), item.getItemId(), quantity);
+            PromotionBasketTracker.add(item.getCampaignId(), item.getItemId(), quantity);
+
             showInfo("Success", quantity + " x " + item.getProductName() + " added to order.");
             loadCampaignDetails();
+
         } catch (Exception e) {
             showError("Cannot add item to order: " + e.getMessage());
         }

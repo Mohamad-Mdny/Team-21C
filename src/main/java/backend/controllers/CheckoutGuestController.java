@@ -2,6 +2,10 @@ package backend.controllers;
 
 import backend.Main;
 import backend.models.Item;
+import backend.prm.controller.PromotionController;
+import backend.prm.frontend.PromotionBasketTracker;
+import backend.prm.repository.PromotionRepository;
+import backend.prm.service.PromotionService;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -173,6 +177,22 @@ public class CheckoutGuestController {
         String deliveryOption = "Standard Delivery";
         boolean success = Main.m.purchase(email, deliveryAddress, paymentMethod, deliveryOption, notes);
         if (success) {
+            PromotionRepository repository = new PromotionRepository();
+            PromotionService service = new PromotionService(repository);
+            PromotionController promotionController = new PromotionController(service);
+
+            String orderReference = "GST-" + System.currentTimeMillis();
+
+            for (PromotionBasketTracker.Entry entry : PromotionBasketTracker.getEntries()) {
+                promotionController.confirmOrderPayment(
+                        entry.getCampaignId(),
+                        entry.getItemId(),
+                        entry.getQuantity(),
+                        orderReference
+                );
+            }
+
+            PromotionBasketTracker.clear();
             purchaseStatusLabel.setText("Purchase completed successfully.");
             loadBasket();
         } else {

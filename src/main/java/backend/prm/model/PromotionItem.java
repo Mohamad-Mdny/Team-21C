@@ -6,16 +6,16 @@ public class PromotionItem {
 
     private String itemId;
 
-    private double discountPercent;
+    //private double discountPercent;
     private double promotionalPrice;
     private int addedToOrderCount;
     private int purchasedCount;
 
-    public PromotionItem(long id, long campaignId, String itemId, double discountPercent, double promotionalPrice) {
+    public PromotionItem(long id, long campaignId, String itemId, double promotionalPrice) {
         this.id = id;
         this.campaignId = campaignId;
         this.itemId = itemId;
-        this.discountPercent = discountPercent;
+        //this.discountPercent = discountPercent;
         this.promotionalPrice = promotionalPrice;
     }
 
@@ -23,8 +23,6 @@ public class PromotionItem {
         return itemId;
     }
     public void setItemId(String itemId) { this.itemId = itemId; }
-    public double getDiscountPercent() { return discountPercent; }
-    public void setDiscountPercent(double discountPercent) { this.discountPercent = discountPercent; }
     public double getPromotionalPrice() { return promotionalPrice; }
     public void setPromotionalPrice(double promotionalPrice) {
         this.promotionalPrice = promotionalPrice;

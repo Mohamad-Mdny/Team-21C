@@ -21,6 +21,7 @@
          <HBox alignment="CENTER_LEFT" spacing="10.0">
             <Button mnemonicParsing="false" onAction="#goToCatalogue" text="Catalogue" />
             <Button mnemonicParsing="false" onAction="#goToCurrentPromotions" text="Current Promotions" />
+             <Button text="Admin" onAction="#goToAdminDashboard" />
 
             <Region HBox.hgrow="ALWAYS" />
             <Button mnemonicParsing="false" onAction="#goToNonCommercialRegister" text="NC-Signup" />

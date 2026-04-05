@@ -212,6 +212,10 @@ public class CatalogueController {
     }
     //@FXML public void goToCurrentPromotions(ActionEvent event) {switchPage(event, "PromotionsPage.fxml");}
 
+    @FXML
+    public void goToAdminDashboard(ActionEvent event) {
+        switchPage(event, "AdminDashboard.fxml");
+    }
     /*
     AdminCampaignItemsPage
     AdminPromotionsPage - Error with getting the data from the database
@@ -220,7 +224,7 @@ public class CatalogueController {
     PromotionDetailsPage - 
 
      */
-    @FXML public void goToCurrentPromotions(ActionEvent event) {switchPage(event, "PromotionDetailsPage.fxml");}
+    @FXML public void goToCurrentPromotions(ActionEvent event) {switchPage(event, "PromotionsPage.fxml");}
 
 
     @FXML public void goToCheckout(ActionEvent event) {

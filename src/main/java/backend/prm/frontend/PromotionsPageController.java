@@ -6,13 +6,13 @@ import backend.prm.repository.PromotionRepository;
 import backend.prm.service.PromotionService;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Label;
-import javafx.scene.control.ListCell;
-import javafx.scene.control.ListView;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class PromotionsPageController {
@@ -29,6 +30,8 @@ public class PromotionsPageController {
 
     @FXML
     private Label campaignCountLabel;
+    @FXML
+    private Button accountButton;
 
     private PromotionController promotionController;
     private final ObservableList<PromotionCampaign> allCampaigns = FXCollections.observableArrayList();
@@ -103,7 +106,59 @@ public class PromotionsPageController {
             campaignCountLabel.setText(count + " active campaigns");
         }
     }
+    @FXML
+    private void goToCatalogue(javafx.event.ActionEvent event) {
+        switchPage(event, "Catalogue.fxml");
+    }
 
+    @FXML
+    private void goToCurrentPromotions(javafx.event.ActionEvent event) {
+        switchPage(event, "PromotionsPage.fxml");
+    }
+
+    @FXML
+    private void goToCheckout(javafx.event.ActionEvent event) {
+        switchPage(event, "Basket.fxml");
+    }
+
+    @FXML
+    private void goToCommercialRegister(javafx.event.ActionEvent event) {
+        switchPage(event, "CommercialRegister.fxml");
+    }
+
+    @FXML
+    private void goToNonCommercialRegister(javafx.event.ActionEvent event) {
+        switchPage(event, "NonCommercialRegister.fxml");
+    }
+
+    @FXML
+    private void goToAdminDashboard(javafx.event.ActionEvent event) {
+        switchPage(event, "AdminDashboard.fxml");
+    }
+
+    @FXML
+    private void switchPage(ActionEvent event, String fxmlFile) {
+        try {
+            Parent root = FXMLLoader.load(
+                    Objects.requireNonNull(getClass().getResource("/frontend/" + fxmlFile))
+            );
+
+            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+            stage.getScene().setRoot(root);
+            stage.show();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+    @FXML
+    private void handleAccountButton(javafx.event.ActionEvent event) {
+        if (backend.Main.m != null && backend.Main.m.isSignedIn()) {
+            switchPage(event, "AccountSettings.fxml");
+        } else {
+            switchPage(event, "Login.fxml");
+        }
+    }
     private void openCampaignDetails(PromotionCampaign campaign) {
         try {
             PromotionCampaign fullCampaign =

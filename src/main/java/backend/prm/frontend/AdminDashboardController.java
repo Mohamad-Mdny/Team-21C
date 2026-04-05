@@ -7,14 +7,20 @@ import backend.prm.model.PromotionStatus;
 import backend.prm.report.CampaignHitReportRow;
 import backend.prm.report.CampaignReportRow;
 import backend.prm.report.SalesReportRow;
+import backend.prm.repository.ProductDAO;
 import backend.prm.repository.PromotionRepository;
 import backend.prm.service.PromotionService;
+import javafx.animation.PauseTransition;
+import javafx.beans.property.ReadOnlyObjectWrapper;
+import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.*;
-import javafx.scene.layout.HBox;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.VBox;
+import javafx.util.Duration;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -25,67 +31,99 @@ import java.util.Optional;
 
 public class AdminDashboardController {
 
+    @FXML private VBox rootPane;
+
     @FXML private ListView<PromotionCampaign> campaignListView;
-    @FXML private ListView<PromotionItem> itemsListView;
-    @FXML private TabPane tabPane;
     @FXML private Label selectedCampaignLabel;
-    @FXML private Label itemsCampaignLabel;
     @FXML private Label statusLabel;
+
     @FXML private TextField titleField;
     @FXML private TextArea descriptionArea;
     @FXML private DatePicker startDatePicker;
     @FXML private DatePicker endDatePicker;
-    @FXML private TextField startTimeField;
-    @FXML private TextField endTimeField;
-    @FXML private HBox campaignMainActionsBox;
-    @FXML private HBox campaignEditActionsBox;
-    @FXML private Button reactivateCampaignButton;;
+
+    @FXML private TextField campaignDiscountField;
+
+    @FXML private Button createCampaignButton;
     @FXML private Button editCampaignButton;
-    @FXML private Button deleteCampaignButton;
+    @FXML private Button saveCampaignButton;
     @FXML private Button cancelCampaignButton;
-    @FXML private Button saveCampaignChangesButton;
-    @FXML private Button discardCampaignChangesButton;
-    @FXML private TextField productIdField;
-    @FXML private TextField discountField;
-    @FXML private HBox itemEditActionsBox;
-    @FXML private Button addItemButton;
-    @FXML private Button editItemButton;
+    @FXML private Button deleteCampaignButton;
+    @FXML private Button reactivateCampaignButton;
+    @FXML private Button stopCampaignButton;
+
+    @FXML private ListView<PromotionItem> itemsListView;
+    @FXML private Label itemsCampaignLabel;
+
+    @FXML private VBox itemDetailsBox;
+    @FXML private Label selectedItemIdLabel;
+    @FXML private Label selectedItemProductIdLabel;
+    @FXML private Label selectedItemPriceLabel;
+    @FXML private Label selectedItemStatsLabel;
     @FXML private Button deleteItemButton;
-    @FXML private Button saveItemChangesButton;
-    @FXML private Button cancelItemChangesButton;
+    @FXML private TextField editItemProductIdField;
+    @FXML private Button saveItemButton;
+    @FXML private Button cancelItemEditButton;
+
+    @FXML private Label toastLabel;
+
+    @FXML private TextField productSearchField;
+    @FXML private TableView<ProductDAO.ProductSummary> productsTable;
+    @FXML private TableColumn<ProductDAO.ProductSummary, String> productIdColumn;
+    @FXML private TableColumn<ProductDAO.ProductSummary, String> productDescriptionColumn;
+    @FXML private TableColumn<ProductDAO.ProductSummary, Double> productPriceColumn;
+    @FXML private Button addSelectedProductButton;
 
     @FXML private DatePicker reportStartDatePicker;
     @FXML private DatePicker reportEndDatePicker;
-    @FXML private TextField reportStartTimeField;
-    @FXML private TextField reportEndTimeField;
-    @FXML private TextArea reportOutputArea;
+
+    @FXML private Label reportTitleLabel;
+    @FXML private Label reportAddressLabel;
+    @FXML private VBox reportMetaBox;
+    @FXML private TextArea reportBodyArea;
+    @FXML private Label reportGeneratedLabel;
+    @FXML private Label reportGeneratedByLabel;
+
+    private static final String COMPANY_ADDRESS =
+            "Cosymed Ltd.\n" +
+                    "27 Sainsbury Close,\n" +
+                    "3, High Level Drive,\n" +
+                    "Sydenham,\n" +
+                    "SE26 3ET\n" +
+                    "Phone: 0208 778 0124\n" +
+                    "Fax: 0208 778 0125";
 
     private final ObservableList<PromotionCampaign> campaigns = FXCollections.observableArrayList();
     private final ObservableList<PromotionItem> items = FXCollections.observableArrayList();
-    private final DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
+    private final ObservableList<ProductDAO.ProductSummary> products = FXCollections.observableArrayList();
+
+    private final ProductDAO productDAO = new ProductDAO();
+    private final DateTimeFormatter reportDateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+    private final DateTimeFormatter reportDateTimeFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
 
     private PromotionController promotionController;
     private PromotionCampaign selectedCampaign;
     private PromotionItem selectedItem;
-    private boolean itemEditMode = false;
+
     private boolean createMode = false;
     private boolean editMode = false;
+
+    private PauseTransition toastTimer;
 
     @FXML
     public void initialize() {
         setupController();
         setupCampaignList();
         setupItemsList();
-        setCampaignEditMode(false);
-        setItemEditMode(false);
-        startTimeField.setText("00:00");
-        endTimeField.setText("23:59");
-        reportStartTimeField.setText("00:00");
-        reportEndTimeField.setText("23:59");
-        reportStartDatePicker.setValue(LocalDate.now().minusDays(30));
-        reportEndDatePicker.setValue(LocalDate.now());
+        setupProductsTable();
+        setupDefaults();
+
         loadCampaigns();
-        updateCampaignActionButtons();
+        loadProducts();
+
+        clearItemSelection();
+        setCampaignFormDisabled(true);
+        refreshUiState();
     }
 
     private void setupController() {
@@ -94,8 +132,31 @@ public class AdminDashboardController {
         this.promotionController = new PromotionController(service);
     }
 
+    private void setupDefaults() {
+        reportStartDatePicker.setValue(LocalDate.now().minusDays(30));
+        reportEndDatePicker.setValue(LocalDate.now());
+
+        itemDetailsBox.setVisible(false);
+        itemDetailsBox.setManaged(false);
+
+        if (toastLabel != null) {
+            toastLabel.setVisible(false);
+            toastLabel.setManaged(false);
+        }
+
+        if (reportAddressLabel != null) {
+            reportAddressLabel.setText(COMPANY_ADDRESS);
+        }
+        if (reportBodyArea != null) {
+            reportBodyArea.setEditable(false);
+            reportBodyArea.setWrapText(false);
+        }
+        renderEmptyReportState();
+    }
+
     private void setupCampaignList() {
         campaignListView.setItems(campaigns);
+
         campaignListView.setCellFactory(listView -> new ListCell<>() {
             @Override
             protected void updateItem(PromotionCampaign campaign, boolean empty) {
@@ -105,29 +166,47 @@ public class AdminDashboardController {
                     setGraphic(null);
                     return;
                 }
+
                 PromotionStatus status = campaign.getStatus(LocalDateTime.now());
-                setText(campaign.getCampaignCode() + " | " + campaign.getTitle()
-                        + "\nStatus: " + status
-                        + " | Clicks: " + campaign.getClickCount()
-                        + "\nStart: " + campaign.getStartDateTime()
-                        + "\nEnd: " + campaign.getEndDateTime());
+                setText(
+                        campaign.getCampaignCode() + " | " + campaign.getTitle()
+                                + "\nStatus: " + status
+                                + " | Discount: " + campaign.getDiscountPercent() + "%"
+                                + "\nStart: " + campaign.getStartDateTime()
+                                + "\nEnd: " + campaign.getEndDateTime()
+                );
             }
         });
-        campaignListView.getSelectionModel().selectedItemProperty().addListener((obs, oldValue, newValue) -> {
-            if (newValue != null) {
-                selectedCampaign = newValue;
-                populateCampaignDetails(newValue);
-                loadItemsForSelectedCampaign();
+
+        campaignListView.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
+            selectedCampaign = newVal;
+
+            if (newVal == null) {
                 createMode = false;
                 editMode = false;
-                setCampaignEditMode(false);
-                updateCampaignActionButtons();
+                clearCampaignForm();
+                items.clear();
+                itemsCampaignLabel.setText("No campaign selected");
+                selectedCampaignLabel.setText("No campaign selected");
+                setCampaignFormDisabled(true);
+                clearItemSelection();
+                refreshUiState();
+                return;
             }
+
+            createMode = false;
+            editMode = false;
+            populateCampaignDetails(newVal);
+            loadItemsForSelectedCampaign();
+            setCampaignFormDisabled(true);
+            clearItemSelection();
+            refreshUiState();
         });
     }
 
     private void setupItemsList() {
         itemsListView.setItems(items);
+
         itemsListView.setCellFactory(listView -> new ListCell<>() {
             @Override
             protected void updateItem(PromotionItem item, boolean empty) {
@@ -137,48 +216,50 @@ public class AdminDashboardController {
                     setGraphic(null);
                     return;
                 }
-                setText("Item ID: " + item.getId()
-                        + "\nProduct ID: " + item.getItemId()
-                        + "\nDiscount: " + item.getDiscountPercent() + "%"
-                        + "\nPromo price: £" + String.format("%.2f", item.getPromotionalPrice())
-                        + "\nAdded: " + item.getAddedToOrderCount() + " | Purchased: " + item.getPurchasedCount());
+
+                String discountInfo = selectedCampaign == null
+                        ? "-"
+                        : String.format("%.2f", selectedCampaign.getDiscountPercent());
+
+                setText(
+                        "Item ID: " + item.getId()
+                                + "\nProduct ID: " + item.getItemId()
+                                + "\nCampaign discount: " + discountInfo + "%"
+                                + "\nPromo price: £" + String.format("%.2f", item.getPromotionalPrice())
+                                + "\nAdded: " + item.getAddedToOrderCount()
+                                + " | Purchased: " + item.getPurchasedCount()
+                );
             }
         });
-        itemsListView.getSelectionModel().selectedItemProperty().addListener((obs, oldValue, newValue) -> {
-            selectedItem = newValue;
-            if (newValue != null) {
-                productIdField.setText(newValue.getItemId());
-                discountField.setText(String.valueOf(newValue.getDiscountPercent()));
+
+        itemsListView.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
+            selectedItem = newVal;
+            if (newVal == null) {
+                clearItemSelection();
+            } else {
+                showItemDetails(newVal);
             }
+            refreshUiState();
         });
     }
 
-    private void setCampaignEditMode(boolean enabled) {
-        campaignEditActionsBox.setVisible(enabled);
-        campaignEditActionsBox.setManaged(enabled);
-        campaignMainActionsBox.setVisible(!enabled);
-        campaignMainActionsBox.setManaged(!enabled);
-        setFormDisabled(!enabled);
-    }
+    private void setupProductsTable() {
+        productIdColumn.setCellValueFactory(data ->
+                new ReadOnlyStringWrapper(data.getValue().getProductId()));
+        productDescriptionColumn.setCellValueFactory(data ->
+                new ReadOnlyStringWrapper(data.getValue().getDescription()));
+        productPriceColumn.setCellValueFactory(data ->
+                new ReadOnlyObjectWrapper<>(data.getValue().getPackageCost()));
 
-    private void setFormDisabled(boolean disabled) {
-        titleField.setDisable(disabled);
-        descriptionArea.setDisable(disabled);
-        startDatePicker.setDisable(disabled);
-        endDatePicker.setDisable(disabled);
-        startTimeField.setDisable(disabled);
-        endTimeField.setDisable(disabled);
-    }
+        productsTable.setItems(products);
 
-    private void setItemEditMode(boolean enabled) {
-        itemEditMode = enabled;
-        itemEditActionsBox.setVisible(enabled);
-        itemEditActionsBox.setManaged(enabled);
-        addItemButton.setDisable(enabled);
-        editItemButton.setDisable(enabled);
-        deleteItemButton.setDisable(enabled);
-        productIdField.setDisable(!enabled && selectedCampaign != null);
-        discountField.setDisable(!enabled && selectedCampaign != null);
+        productSearchField.textProperty().addListener((obs, oldVal, newVal) -> {
+            if (newVal == null || newVal.isBlank()) {
+                loadProducts();
+            } else {
+                products.setAll(productDAO.searchActiveProducts(newVal));
+            }
+        });
     }
 
     private void loadCampaigns() {
@@ -186,15 +267,20 @@ public class AdminDashboardController {
         statusLabel.setText("Loaded campaigns: " + campaigns.size());
     }
 
+    private void loadProducts() {
+        products.setAll(productDAO.findAllActiveProducts());
+    }
+
     private void populateCampaignDetails(PromotionCampaign campaign) {
         selectedCampaignLabel.setText("Selected campaign: " + campaign.getTitle() + " (ID: " + campaign.getId() + ")");
-        itemsCampaignLabel.setText("Items for: " + campaign.getTitle());
+        itemsCampaignLabel.setText("Items in: " + campaign.getTitle());
+
         titleField.setText(campaign.getTitle());
         descriptionArea.setText(campaign.getDescription());
+        campaignDiscountField.setText(String.valueOf(campaign.getDiscountPercent()));
+
         startDatePicker.setValue(campaign.getStartDateTime() == null ? null : campaign.getStartDateTime().toLocalDate());
         endDatePicker.setValue(campaign.getEndDateTime() == null ? null : campaign.getEndDateTime().toLocalDate());
-        startTimeField.setText(campaign.getStartDateTime() == null ? "00:00" : campaign.getStartDateTime().toLocalTime().format(timeFormatter));
-        endTimeField.setText(campaign.getEndDateTime() == null ? "23:59" : campaign.getEndDateTime().toLocalTime().format(timeFormatter));
     }
 
     private void loadItemsForSelectedCampaign() {
@@ -207,170 +293,431 @@ public class AdminDashboardController {
 
     @FXML
     private void handleRefreshCampaigns() {
+        Long selectedCampaignId = selectedCampaign == null ? null : selectedCampaign.getId();
+
         loadCampaigns();
-        if (selectedCampaign != null) {
-            selectedCampaign = promotionController.getCampaignById(selectedCampaign.getId());
-            populateCampaignDetails(selectedCampaign);
-            loadItemsForSelectedCampaign();
+
+        if (selectedCampaignId != null) {
+            selectCampaignById(selectedCampaignId);
         }
+
+        refreshUiState();
+        showToast("Campaign list refreshed.", true);
     }
 
     @FXML
-    private void handleCreateNew() {
-        clearCampaignForm();
+    private void handleCreateNewCampaign() {
         selectedCampaign = null;
+        campaignListView.getSelectionModel().clearSelection();
+
         createMode = true;
         editMode = false;
+
+        clearCampaignForm();
+        items.clear();
+        clearItemSelection();
+
         selectedCampaignLabel.setText("Creating new campaign");
-        setCampaignEditMode(true);
-        updateCampaignActionButtons();
+        itemsCampaignLabel.setText("No campaign selected");
+
+        setCampaignFormDisabled(false);
+        statusLabel.setText("Create mode enabled.");
+        refreshUiState();
     }
 
     @FXML
-    private void handleEditMode() {
+    private void handleEditCampaign() {
         if (selectedCampaign == null) {
-            statusLabel.setText("Select a campaign first.");
+            showToast("Select a campaign first.", false);
             return;
         }
+
         createMode = false;
         editMode = true;
-        setCampaignEditMode(true);
-        updateCampaignActionButtons();
+        setCampaignFormDisabled(false);
+        statusLabel.setText("Edit mode enabled.");
+        refreshUiState();
     }
 
     @FXML
-    private void handleSaveChanges() {
+    private void handleSaveCampaign() {
         try {
-            LocalDateTime startDateTime = parseDateTime(startDatePicker.getValue(), startTimeField.getText(), "start");
-            LocalDateTime endDateTime = parseDateTime(endDatePicker.getValue(), endTimeField.getText(), "end");
+            LocalDateTime startDateTime = startOfDay(startDatePicker, "start");
+            LocalDateTime endDateTime = endOfDay(endDatePicker, "end");
+            double discount = parseDiscount();
+
             if (createMode) {
                 PromotionCampaign created = promotionController.createCampaign(
                         titleField.getText(),
                         descriptionArea.getText(),
                         startDateTime,
-                        endDateTime
+                        endDateTime,
+                        discount
                 );
-                statusLabel.setText("Campaign created: " + created.getCampaignCode());
+
+                createMode = false;
+                editMode = false;
+                setCampaignFormDisabled(true);
+
                 loadCampaigns();
-                selectedCampaign = created;
-                campaignListView.getSelectionModel().select(created);
-                populateCampaignDetails(created);
-            } else if (editMode && selectedCampaign != null) {
-                promotionController.updateCampaign(selectedCampaign.getId(), titleField.getText(), descriptionArea.getText(), startDateTime, endDateTime);
-                statusLabel.setText("Campaign updated.");
+                selectCampaignById(created.getId());
+                refreshUiState();
+
+                statusLabel.setText("Campaign created.");
+                showToast("Campaign created successfully.", true);
+                return;
             }
-            loadCampaigns();
-            setCampaignEditMode(false);
-            createMode = false;
-            editMode = false;
+
+            if (editMode && selectedCampaign != null) {
+                long campaignId = selectedCampaign.getId();
+
+                promotionController.updateCampaign(
+                        campaignId,
+                        titleField.getText(),
+                        descriptionArea.getText(),
+                        startDateTime,
+                        endDateTime,
+                        discount
+                );
+
+                createMode = false;
+                editMode = false;
+                setCampaignFormDisabled(true);
+
+                loadCampaigns();
+                selectCampaignById(campaignId);
+                loadItemsForSelectedCampaign();
+                refreshUiState();
+
+                statusLabel.setText("Campaign updated.");
+                showToast("Campaign updated successfully.", true);
+            }
         } catch (Exception e) {
             statusLabel.setText("Save failed: " + e.getMessage());
+            showToast("Save failed: " + e.getMessage(), false);
         }
     }
 
     @FXML
-    private void handleCancelChanges() {
+    private void handleCancelCampaignEdit() {
         createMode = false;
         editMode = false;
-        setCampaignEditMode(false);
+        setCampaignFormDisabled(true);
+
         if (selectedCampaign != null) {
             populateCampaignDetails(selectedCampaign);
         } else {
             clearCampaignForm();
+            selectedCampaignLabel.setText("No campaign selected");
         }
+
+        refreshUiState();
+        statusLabel.setText("Edit cancelled.");
+        showToast("Edit cancelled.", true);
     }
 
     @FXML
     private void handleDeleteCampaign() {
         if (selectedCampaign == null) {
-            statusLabel.setText("Select a campaign to delete.");
+            showToast("Select a campaign to delete.", false);
             return;
         }
+
         if (!confirm("Delete campaign", "Delete selected campaign and all its items?")) {
             return;
         }
+
         try {
             promotionController.deleteCampaign(selectedCampaign.getId());
+
             selectedCampaign = null;
+            createMode = false;
+            editMode = false;
+
             items.clear();
             clearCampaignForm();
+            clearItemSelection();
+            setCampaignFormDisabled(true);
+
             loadCampaigns();
+            refreshUiState();
+
             statusLabel.setText("Campaign deleted.");
+            showToast("Campaign deleted successfully.", true);
         } catch (Exception e) {
             statusLabel.setText("Delete failed: " + e.getMessage());
+            showToast("Delete failed: " + e.getMessage(), false);
         }
     }
 
     @FXML
-    private void handleCancelCampaign() {
+    private void handleStopCampaign() {
         if (selectedCampaign == null) {
-            statusLabel.setText("Select a campaign first.");
+            showToast("Select a campaign first.", false);
             return;
         }
+
         try {
-            promotionController.cancelCampaign(selectedCampaign.getId());
+            long campaignId = selectedCampaign.getId();
+
+            promotionController.cancelCampaign(campaignId);
+
             loadCampaigns();
-            selectedCampaign = promotionController.getCampaignById(selectedCampaign.getId());
-            populateCampaignDetails(selectedCampaign);
+            selectCampaignById(campaignId);
+            loadItemsForSelectedCampaign();
+            refreshUiState();
+
             statusLabel.setText("Campaign cancelled.");
+            showToast("Campaign cancelled successfully.", true);
         } catch (Exception e) {
             statusLabel.setText("Cancel failed: " + e.getMessage());
+            showToast("Cancel failed: " + e.getMessage(), false);
         }
     }
 
     @FXML
-    private void handleAddItem() {
+    private void handleReactivateCampaign() {
         if (selectedCampaign == null) {
-            statusLabel.setText("Select a campaign first.");
+            showToast("Select a campaign first.", false);
             return;
         }
+
         try {
-            promotionController.addItemToCampaign(selectedCampaign.getId(), productIdField.getText(), Double.parseDouble(discountField.getText()));
+            long campaignId = selectedCampaign.getId();
+
+            promotionController.reactivateCampaign(campaignId);
+
+            loadCampaigns();
+            selectCampaignById(campaignId);
             loadItemsForSelectedCampaign();
-            clearItemForm();
-            statusLabel.setText("Item added to campaign.");
+            refreshUiState();
+
+            statusLabel.setText("Campaign reactivated.");
+            showToast("Campaign reactivated successfully.", true);
+        } catch (Exception e) {
+            statusLabel.setText("Reactivate failed: " + e.getMessage());
+            showToast("Reactivate failed: " + e.getMessage(), false);
+        }
+    }
+
+    @FXML
+    private void handleAddSelectedProductToCampaign() {
+        if (selectedCampaign == null) {
+            showToast("Select a campaign first.", false);
+            return;
+        }
+
+        ProductDAO.ProductSummary product = productsTable.getSelectionModel().getSelectedItem();
+        if (product == null) {
+            showToast("Select a product from the list.", false);
+            return;
+        }
+
+        try {
+            promotionController.addItemToCampaign(selectedCampaign.getId(), product.getProductId());
+            loadItemsForSelectedCampaign();
+            refreshUiState();
+
+            statusLabel.setText("Product added to campaign: " + product.getProductId());
+            showToast("Product added to campaign.", true);
         } catch (Exception e) {
             statusLabel.setText("Add item failed: " + e.getMessage());
+            showToast("Add item failed: " + e.getMessage(), false);
         }
     }
 
     @FXML
-    private void handleEditItemMode() {
+    private void handleDeleteSelectedItem() {
         if (selectedItem == null) {
-            statusLabel.setText("Select an item first.");
+            showToast("Select an item to delete.", false);
             return;
         }
-        setItemEditMode(true);
+
+        if (!confirm("Delete item", "Delete selected campaign item?")) {
+            return;
+        }
+
+        try {
+            promotionController.deleteItem(selectedItem.getId());
+            loadItemsForSelectedCampaign();
+            closeItemDetails();
+            refreshUiState();
+
+            statusLabel.setText("Item deleted.");
+            showToast("Item deleted successfully.", true);
+        } catch (Exception e) {
+            statusLabel.setText("Delete item failed: " + e.getMessage());
+            showToast("Delete item failed: " + e.getMessage(), false);
+        }
     }
 
     @FXML
     private void handleSaveItemChanges() {
-        if (selectedCampaign == null || selectedItem == null) {
-            statusLabel.setText("Select a campaign item first.");
+        if (selectedCampaign == null) {
+            showToast("Select a campaign first.", false);
             return;
         }
+
+        if (selectedItem == null) {
+            showToast("Select an item first.", false);
+            return;
+        }
+
         try {
-            promotionController.updateItem(selectedCampaign.getId(), selectedItem.getId(), productIdField.getText(), Double.parseDouble(discountField.getText()));
+            String newProductId = editItemProductIdField.getText();
+
+            if (newProductId == null || newProductId.isBlank()) {
+                showToast("Enter product ID.", false);
+                return;
+            }
+
+            long itemId = selectedItem.getId();
+
+            promotionController.updateItem(
+                    selectedCampaign.getId(),
+                    itemId,
+                    newProductId
+            );
+
             loadItemsForSelectedCampaign();
-            setItemEditMode(false);
+
+            PromotionItem refreshedItem = findItemById(itemId);
+            if (refreshedItem != null) {
+                selectedItem = refreshedItem;
+                itemsListView.getSelectionModel().select(refreshedItem);
+                showItemDetails(refreshedItem);
+            } else {
+                closeItemDetails();
+            }
+
+            refreshUiState();
             statusLabel.setText("Item updated.");
+            showToast("Item updated successfully.", true);
         } catch (Exception e) {
             statusLabel.setText("Item update failed: " + e.getMessage());
+            showToast("Item update failed: " + e.getMessage(), false);
         }
     }
 
     @FXML
-    private void handleCancelItemChanges() {
-        setItemEditMode(false);
-        if (selectedItem != null) {
-            productIdField.setText(selectedItem.getItemId());
-            discountField.setText(String.valueOf(selectedItem.getDiscountPercent()));
+    private void handleCancelItemEdit() {
+        closeItemDetails();
+        statusLabel.setText("Item details closed.");
+        showToast("Item details closed.", true);
+    }
+
+    @FXML
+    private void handleRootClick(MouseEvent event) {
+        Node target = (Node) event.getTarget();
+
+        if (isChildOf(target, itemsListView) || isChildOf(target, itemDetailsBox)) {
+            return;
+        }
+
+        closeItemDetails();
+    }
+
+    private void showItemDetails(PromotionItem item) {
+        selectedItemIdLabel.setText(String.valueOf(item.getId()));
+        selectedItemProductIdLabel.setText(item.getItemId());
+        selectedItemPriceLabel.setText("£" + String.format("%.2f", item.getPromotionalPrice()));
+        selectedItemStatsLabel.setText(
+                "Added: " + item.getAddedToOrderCount() + " | Purchased: " + item.getPurchasedCount()
+        );
+
+        if (editItemProductIdField != null) {
+            editItemProductIdField.setText(item.getItemId());
+        }
+
+        itemDetailsBox.setVisible(true);
+        itemDetailsBox.setManaged(true);
+    }
+
+    private void clearItemSelection() {
+        closeItemDetails();
+    }
+
+    private void closeItemDetails() {
+        selectedItem = null;
+        itemsListView.getSelectionModel().clearSelection();
+
+        selectedItemIdLabel.setText("-");
+        selectedItemProductIdLabel.setText("-");
+        selectedItemPriceLabel.setText("-");
+        selectedItemStatsLabel.setText("-");
+
+        if (editItemProductIdField != null) {
+            editItemProductIdField.clear();
+        }
+
+        itemDetailsBox.setVisible(false);
+        itemDetailsBox.setManaged(false);
+    }
+
+    private boolean isChildOf(Node node, Node parent) {
+        Node current = node;
+        while (current != null) {
+            if (current == parent) {
+                return true;
+            }
+            current = current.getParent();
+        }
+        return false;
+    }
+
+    private void setCampaignFormDisabled(boolean disabled) {
+        titleField.setDisable(disabled);
+        descriptionArea.setDisable(disabled);
+        startDatePicker.setDisable(disabled);
+        endDatePicker.setDisable(disabled);
+        campaignDiscountField.setDisable(disabled);
+    }
+
+    private void refreshUiState() {
+        updateActionButtons();
+        updateCampaignButtonsVisibility();
+    }
+
+    private void updateActionButtons() {
+        boolean hasCampaign = selectedCampaign != null;
+        boolean hasItem = selectedItem != null;
+
+        editCampaignButton.setDisable(!hasCampaign);
+        deleteCampaignButton.setDisable(!hasCampaign);
+        stopCampaignButton.setDisable(!hasCampaign);
+        reactivateCampaignButton.setDisable(!hasCampaign);
+        addSelectedProductButton.setDisable(!hasCampaign);
+
+        deleteItemButton.setDisable(!hasItem);
+
+        if (saveItemButton != null) {
+            saveItemButton.setDisable(!hasItem);
+        }
+
+        if (cancelItemEditButton != null) {
+            cancelItemEditButton.setDisable(!hasItem);
         }
     }
-    private void updateCampaignActionButtons() {
-        if (selectedCampaign == null) {
-            cancelCampaignButton.setVisible(false);
-            cancelCampaignButton.setManaged(false);
+
+    private void updateCampaignButtonsVisibility() {
+        boolean hasCampaign = selectedCampaign != null;
+        boolean editing = createMode || editMode;
+
+        editCampaignButton.setVisible(!editing && hasCampaign);
+        editCampaignButton.setManaged(!editing && hasCampaign);
+
+        deleteCampaignButton.setVisible(!editing && hasCampaign);
+        deleteCampaignButton.setManaged(!editing && hasCampaign);
+
+        saveCampaignButton.setVisible(editing);
+        saveCampaignButton.setManaged(editing);
+
+        cancelCampaignButton.setVisible(editing);
+        cancelCampaignButton.setManaged(editing);
+
+        if (!editing || !hasCampaign) {
+            stopCampaignButton.setVisible(false);
+            stopCampaignButton.setManaged(false);
             reactivateCampaignButton.setVisible(false);
             reactivateCampaignButton.setManaged(false);
             return;
@@ -378,132 +725,343 @@ public class AdminDashboardController {
 
         PromotionStatus status = selectedCampaign.getStatus(LocalDateTime.now());
 
-        boolean canCancel = status == PromotionStatus.ACTIVE || status == PromotionStatus.SCHEDULED;
+        boolean canStop = status == PromotionStatus.ACTIVE || status == PromotionStatus.SCHEDULED;
         boolean canReactivate = status == PromotionStatus.CANCELLED;
 
-        cancelCampaignButton.setVisible(canCancel);
-        cancelCampaignButton.setManaged(canCancel);
+        stopCampaignButton.setVisible(canStop);
+        stopCampaignButton.setManaged(canStop);
 
         reactivateCampaignButton.setVisible(canReactivate);
         reactivateCampaignButton.setManaged(canReactivate);
     }
 
-    @FXML
-    private void handleReactivateCampaign() {
-        if (selectedCampaign == null) {
-            statusLabel.setText("Select a campaign first.");
+    private void showToast(String message, boolean success) {
+        if (toastLabel == null) {
             return;
         }
 
-        try {
-            promotionController.reactivateCampaign(selectedCampaign.getId());
-            loadCampaigns();
-            selectedCampaign = promotionController.getCampaignById(selectedCampaign.getId());
-            populateCampaignDetails(selectedCampaign);
-            updateCampaignActionButtons();
-            statusLabel.setText("Campaign reactivated.");
-        } catch (Exception e) {
-            statusLabel.setText("Reactivate failed: " + e.getMessage());
+        if (toastTimer != null) {
+            toastTimer.stop();
         }
-    }
-    @FXML
-    private void handleDeleteItem() {
-        if (selectedItem == null) {
-            statusLabel.setText("Select an item to delete.");
-            return;
+
+        toastLabel.setText(message);
+        toastLabel.setVisible(true);
+        toastLabel.setManaged(true);
+
+        if (success) {
+            toastLabel.setStyle(
+                    "-fx-padding: 8 12 8 12;" +
+                            "-fx-background-radius: 8;" +
+                            "-fx-font-weight: bold;" +
+                            "-fx-background-color: #dcfce7;" +
+                            "-fx-text-fill: #166534;" +
+                            "-fx-border-color: #86efac;" +
+                            "-fx-border-radius: 8;"
+            );
+        } else {
+            toastLabel.setStyle(
+                    "-fx-padding: 8 12 8 12;" +
+                            "-fx-background-radius: 8;" +
+                            "-fx-font-weight: bold;" +
+                            "-fx-background-color: #fee2e2;" +
+                            "-fx-text-fill: #991b1b;" +
+                            "-fx-border-color: #fca5a5;" +
+                            "-fx-border-radius: 8;"
+            );
         }
-        if (!confirm("Delete item", "Delete selected campaign item?")) {
-            return;
-        }
-        try {
-            promotionController.deleteItem(selectedItem.getId());
-            loadItemsForSelectedCampaign();
-            clearItemForm();
-            statusLabel.setText("Item deleted.");
-        } catch (Exception e) {
-            statusLabel.setText("Delete item failed: " + e.getMessage());
-        }
+
+        toastTimer = new PauseTransition(Duration.seconds(2.5));
+        toastTimer.setOnFinished(e -> {
+            toastLabel.setVisible(false);
+            toastLabel.setManaged(false);
+        });
+        toastTimer.play();
     }
 
-    @FXML
-    private void handleRefreshItems() {
-        loadItemsForSelectedCampaign();
+    private LocalDateTime startOfDay(DatePicker picker, String label) {
+        if (picker.getValue() == null) {
+            throw new IllegalArgumentException("Choose " + label + " date.");
+        }
+        return picker.getValue().atStartOfDay();
+    }
+
+    private LocalDateTime endOfDay(DatePicker picker, String label) {
+        if (picker.getValue() == null) {
+            throw new IllegalArgumentException("Choose " + label + " date.");
+        }
+        return picker.getValue().atTime(23, 59, 59);
     }
 
     @FXML
     private void handleGenerateSalesReport() {
         try {
-            LocalDateTime from = parseDateTime(reportStartDatePicker.getValue(), reportStartTimeField.getText(), "report start");
-            LocalDateTime to = parseDateTime(reportEndDatePicker.getValue(), reportEndTimeField.getText(), "report end");
+            LocalDateTime from = startOfDay(reportStartDatePicker, "report start");
+            LocalDateTime to = endOfDay(reportEndDatePicker, "report end");
             List<SalesReportRow> rows = promotionController.getSalesReport(from, to);
-            StringBuilder sb = new StringBuilder();
-            sb.append("SALES REPORT\nPeriod: ").append(from).append(" to ").append(to).append("\n\n");
-            sb.append(String.format("%-12s %-30s %-10s %-12s %-12s%n", "Product ID", "Description", "Qty Sold", "Unit Price", "Total"));
-            sb.append("-".repeat(84)).append("\n");
-            for (SalesReportRow row : rows) {
-                sb.append(String.format("%-12s %-30s %-10d %-12.2f %-12.2f%n",
-                        row.getProductId(), trim(row.getProductDescription(), 30), row.getQuantitySold(), row.getUnitPrice(), row.getTotalPrice()));
-            }
-            reportOutputArea.setText(sb.toString());
+
+            updateReportPreview(
+                    "IPOS-PU Sales Report",
+                    List.of(
+                            "Start Period: " + from.format(reportDateFormatter),
+                            "End Period: " + to.format(reportDateFormatter)
+                    ),
+                    buildSalesReportBody(rows)
+            );
+
+            showToast("Sales report generated.", true);
         } catch (Exception e) {
-            reportOutputArea.setText("Sales report failed: " + e.getMessage());
+            e.printStackTrace();
+            renderReportError("Sales report failed:\n" + e.getMessage());
+            showToast("Sales report failed.", false);
         }
     }
 
     @FXML
     private void handleGenerateCampaignReport() {
         try {
-            LocalDateTime from = parseDateTime(reportStartDatePicker.getValue(), reportStartTimeField.getText(), "report start");
-            LocalDateTime to = parseDateTime(reportEndDatePicker.getValue(), reportEndTimeField.getText(), "report end");
+            LocalDateTime from = startOfDay(reportStartDatePicker, "report start");
+            LocalDateTime to = endOfDay(reportEndDatePicker, "report end");
             List<CampaignReportRow> rows = promotionController.getCampaignReport(from, to);
-            StringBuilder sb = new StringBuilder();
-            sb.append("ADVERTISING CAMPAIGNS REPORT\nPeriod: ").append(from).append(" to ").append(to).append("\n\n");
-            for (CampaignReportRow row : rows) {
-                sb.append(row.getCampaignCode()).append(" | ").append(row.getCampaignTitle()).append("\n")
-                        .append("Start: ").append(row.getStartDateTime()).append(" | End: ").append(row.getEndDateTime()).append("\n")
-                        .append("Status: ").append(row.getStatus())
-                        .append(" | Clicks: ").append(row.getClickCount())
-                        .append(" | Added: ").append(row.getTotalAdded())
-                        .append(" | Purchased: ").append(row.getTotalPurchased())
-                        .append("\n\n");
-            }
-            reportOutputArea.setText(sb.toString());
+
+            updateReportPreview(
+                    "IPOS-PU Advert Campaigns Report",
+                    List.of(
+                            "Start Period: " + from.format(reportDateFormatter),
+                            "End Period: " + to.format(reportDateFormatter),
+                            "Active campaigns: " + rows.size()
+                    ),
+                    buildCampaignReportBody(rows)
+            );
+
+            showToast("Campaign report generated.", true);
         } catch (Exception e) {
-            reportOutputArea.setText("Campaign report failed: " + e.getMessage());
+            e.printStackTrace();
+            renderReportError("Campaign report failed:\n" + e.getMessage());
+            showToast("Campaign report failed.", false);
         }
     }
 
     @FXML
     private void handleGenerateHitsReport() {
         try {
-            LocalDateTime from = parseDateTime(reportStartDatePicker.getValue(), reportStartTimeField.getText(), "report start");
-            LocalDateTime to = parseDateTime(reportEndDatePicker.getValue(), reportEndTimeField.getText(), "report end");
+            LocalDateTime from = startOfDay(reportStartDatePicker, "report start");
+            LocalDateTime to = endOfDay(reportEndDatePicker, "report end");
             List<CampaignHitReportRow> rows = promotionController.getCampaignHitReport(from, to);
-            StringBuilder sb = new StringBuilder();
-            sb.append("CAMPAIGN HITS / CONVERSION REPORT\nPeriod: ").append(from).append(" to ").append(to).append("\n\n");
-            sb.append(String.format("%-12s %-18s %-12s %-24s %-8s %-8s %-10s %-12s%n",
-                    "Code", "Campaign", "Product ID", "Description", "Clicks", "Added", "Purchased", "Conversion"));
-            sb.append("-".repeat(120)).append("\n");
-            for (CampaignHitReportRow row : rows) {
-                sb.append(String.format("%-12s %-18s %-12s %-24s %-8d %-8d %-10d %-12.2f%n",
-                        row.getCampaignCode(), trim(row.getCampaignTitle(), 18), row.getProductId(), trim(row.getProductDescription(), 24),
-                        row.getCampaignClicks(), row.getAddedToOrder(), row.getPurchased(), row.getConversionRate()));
-            }
-            reportOutputArea.setText(sb.toString());
+
+            String campaignCode = rows.isEmpty() ? "-" : safe(rows.get(0).getCampaignCode());
+            String campaignTitle = rows.isEmpty() ? "-" : safe(rows.get(0).getCampaignTitle());
+
+            updateReportPreview(
+                    "Customer Campaign Engagement Report",
+                    List.of(
+                            "Campaign ID: " + campaignCode,
+                            "Campaign Description: " + campaignTitle,
+                            "Start Period: " + from.format(reportDateFormatter),
+                            "End Period: " + to.format(reportDateFormatter)
+                    ),
+                    buildHitsReportBody(rows)
+            );
+
+            showToast("Hits report generated.", true);
         } catch (Exception e) {
-            reportOutputArea.setText("Hits report failed: " + e.getMessage());
+            e.printStackTrace();
+            renderReportError("Hits report failed:\n" + e.getMessage());
+            showToast("Hits report failed.", false);
         }
     }
 
-    private LocalDateTime parseDateTime(LocalDate date, String timeText, String label) {
-        if (date == null) {
-            throw new IllegalArgumentException("Choose " + label + " date.");
+    private void renderEmptyReportState() {
+        if (reportTitleLabel != null) {
+            reportTitleLabel.setText("Report preview");
         }
+        if (reportMetaBox != null) {
+            reportMetaBox.getChildren().clear();
+            Label hint = new Label("Choose a period and click one of the report buttons.");
+            hint.setWrapText(true);
+            hint.setStyle("-fx-text-fill: #6b7280; -fx-font-size: 12px;");
+            reportMetaBox.getChildren().add(hint);
+        }
+        if (reportBodyArea != null) {
+            reportBodyArea.setText("");
+        }
+        if (reportGeneratedLabel != null) {
+            reportGeneratedLabel.setText("");
+        }
+        if (reportGeneratedByLabel != null) {
+            reportGeneratedByLabel.setText("");
+        }
+    }
+
+    private void renderReportError(String message) {
+        if (reportTitleLabel != null) {
+            reportTitleLabel.setText("Report preview");
+        }
+        if (reportMetaBox != null) {
+            reportMetaBox.getChildren().clear();
+        }
+        if (reportBodyArea != null) {
+            reportBodyArea.setText(message);
+        }
+        if (reportGeneratedLabel != null) {
+            reportGeneratedLabel.setText("");
+        }
+        if (reportGeneratedByLabel != null) {
+            reportGeneratedByLabel.setText("");
+        }
+    }
+
+    private void updateReportPreview(String title, List<String> metaLines, String body) {
+        reportTitleLabel.setText(title);
+        reportMetaBox.getChildren().clear();
+
+        for (String line : metaLines) {
+            Label label = new Label(line);
+            label.setWrapText(true);
+            label.setStyle("-fx-font-size: 13px; -fx-text-fill: #111827;");
+            reportMetaBox.getChildren().add(label);
+        }
+
+        reportBodyArea.setText(body);
+        reportGeneratedLabel.setText("Generated: " + LocalDate.now().format(reportDateFormatter));
+        reportGeneratedByLabel.setText("Generated by IPOS-PU Operations");
+    }
+
+    private String buildSalesReportBody(List<SalesReportRow> rows) {
+        if (rows.isEmpty()) {
+            return "No sales found for this period.";
+        }
+
+        StringBuilder sb = new StringBuilder();
+        sb.append(String.format("%-12s %-24s %12s %14s %12s%n",
+                "Item ID", "Description", "Sold, packs", "Unit price, £", "Total, £"));
+        sb.append("-".repeat(78)).append(System.lineSeparator());
+
+        int totalQuantity = 0;
+        double totalRevenue = 0.0;
+
+        for (SalesReportRow row : rows) {
+            totalQuantity += row.getQuantitySold();
+            totalRevenue += row.getTotalPrice();
+
+            sb.append(String.format("%-12s %-24s %12d %14.2f %12.2f%n",
+                    safe(row.getProductId()),
+                    truncate(row.getProductDescription(), 24),
+                    row.getQuantitySold(),
+                    row.getUnitPrice(),
+                    row.getTotalPrice()));
+        }
+
+        sb.append("-".repeat(78)).append(System.lineSeparator());
+        sb.append(String.format("%-37s %12d %14s %12.2f",
+                "Total online sales for period",
+                totalQuantity,
+                "",
+                totalRevenue));
+
+        return sb.toString();
+    }
+
+    private String buildCampaignReportBody(List<CampaignReportRow> rows) {
+        if (rows.isEmpty()) {
+            return "No campaign data found for this period.";
+        }
+
+        StringBuilder sb = new StringBuilder();
+
+        for (CampaignReportRow row : rows) {
+            sb.append(String.format("%-18s %s%n", "Campaign ID", safe(row.getCampaignCode())));
+            sb.append(String.format("%-18s %s%n", "Title", safe(row.getCampaignTitle())));
+            sb.append(String.format("%-18s %s%n", "Start Date/Time", formatDateTime(row.getStartDateTime())));
+            sb.append(String.format("%-18s %s%n", "End Date/Time", formatDateTime(row.getEndDateTime())));
+            sb.append(String.format("%-18s %s%n", "Status", safe(row.getStatus())));
+            sb.append(String.format("%-18s %d%n", "Campaign hits", row.getClickCount()));
+            sb.append(String.format("%-18s %d%n", "Added to order", row.getTotalAdded()));
+            sb.append(String.format("%-18s %d%n", "Purchased", row.getTotalPurchased()));
+
+            double conversion = row.getClickCount() == 0
+                    ? 0.0
+                    : (row.getTotalPurchased() * 100.0) / row.getClickCount();
+            sb.append(String.format("%-18s %.2f%%%n", "Conversion", conversion));
+            sb.append(System.lineSeparator());
+            sb.append("-".repeat(72)).append(System.lineSeparator()).append(System.lineSeparator());
+        }
+
+        return sb.toString().trim();
+    }
+
+    private String buildHitsReportBody(List<CampaignHitReportRow> rows) {
+        if (rows.isEmpty()) {
+            return "No engagement data found for this period.";
+        }
+
+        StringBuilder sb = new StringBuilder();
+        sb.append(String.format("%-12s %-24s %12s %12s %16s%n",
+                "Counter ID", "Counter description", "Hits count", "Purchases", "Conversion Rate"));
+        sb.append("-".repeat(84)).append(System.lineSeparator());
+
+        for (CampaignHitReportRow row : rows) {
+            sb.append(String.format("%-12s %-24s %12d %12d %15.2f%%%n",
+                    safe(row.getProductId()),
+                    truncate(row.getProductDescription() + " hits", 24),
+                    row.getCampaignClicks(),
+                    row.getPurchased(),
+                    row.getConversionRate()));
+        }
+
+        return sb.toString();
+    }
+
+    private String formatDateTime(LocalDateTime value) {
+        return value == null ? "-" : value.format(reportDateTimeFormatter);
+    }
+
+    private String truncate(String value, int maxLength) {
+        if (value == null || value.isBlank()) {
+            return "-";
+        }
+        if (value.length() <= maxLength) {
+            return value;
+        }
+        return value.substring(0, Math.max(0, maxLength - 3)) + "...";
+    }
+
+    private String safe(String value) {
+        return value == null || value.isBlank() ? "-" : value;
+    }
+
+    private void selectCampaignById(long campaignId) {
+        campaignListView.getSelectionModel().clearSelection();
+
+        for (PromotionCampaign campaign : campaigns) {
+            if (campaign.getId() == campaignId) {
+                campaignListView.getSelectionModel().select(campaign);
+                selectedCampaign = campaign;
+                populateCampaignDetails(campaign);
+                return;
+            }
+        }
+
+        selectedCampaign = null;
+    }
+
+    private PromotionItem findItemById(long itemId) {
+        for (PromotionItem item : items) {
+            if (item.getId() == itemId) {
+                return item;
+            }
+        }
+        return null;
+    }
+
+    private double parseDiscount() {
         try {
-            LocalTime time = LocalTime.parse(timeText == null || timeText.isBlank() ? "00:00" : timeText, timeFormatter);
-            return LocalDateTime.of(date, time);
-        } catch (Exception e) {
-            throw new IllegalArgumentException("Invalid " + label + " time. Use HH:mm.");
+            double value = Double.parseDouble(campaignDiscountField.getText());
+            if (value < 0 || value > 100) {
+                throw new IllegalArgumentException("Discount must be between 0 and 100.");
+            }
+            return value;
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("Invalid discount percent.");
         }
     }
 
@@ -521,20 +1079,7 @@ public class AdminDashboardController {
         descriptionArea.clear();
         startDatePicker.setValue(null);
         endDatePicker.setValue(null);
-        startTimeField.setText("00:00");
-        endTimeField.setText("23:59");
-    }
-
-    private void clearItemForm() {
-        productIdField.clear();
-        discountField.clear();
-        selectedItem = null;
-    }
-
-    private String trim(String value, int max) {
-        if (value == null) {
-            return "";
-        }
-        return value.length() <= max ? value : value.substring(0, max - 3) + "...";
+        campaignDiscountField.clear();
+        selectedCampaignLabel.setText("No campaign selected");
     }
 }

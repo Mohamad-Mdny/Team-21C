@@ -9,7 +9,6 @@ import backend.prm.service.PromotionService;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Map;
 
 public class PromotionController {
 
@@ -52,17 +51,25 @@ public class PromotionController {
         promotionService.recordItemPurchased(campaignId, itemId, quantity, orderReference);
     }
 
-
-    public PromotionCampaign createCampaign(String title, String description, LocalDateTime startDateTime, LocalDateTime endDateTime) {
-        return promotionService.createCampaign(title, description, startDateTime, endDateTime);
+    public PromotionCampaign createCampaign(String title,
+                                            String description,
+                                            LocalDateTime startDateTime,
+                                            LocalDateTime endDateTime,
+                                            double discountPercent) {
+        return promotionService.createCampaign(title, description, startDateTime, endDateTime, discountPercent);
     }
 
-    public PromotionCampaign updateCampaign(long id, String title, String description, LocalDateTime startDateTime, LocalDateTime endDateTime) {
-        return promotionService.updateCampaign(id, title, description, startDateTime, endDateTime);
+    public PromotionCampaign updateCampaign(long id,
+                                            String title,
+                                            String description,
+                                            LocalDateTime startDateTime,
+                                            LocalDateTime endDateTime,
+                                            double discountPercent) {
+        return promotionService.updateCampaign(id, title, description, startDateTime, endDateTime, discountPercent);
     }
 
-    public PromotionItem updateItem(long campaignId, long itemId, String productId, double discountPercent) {
-        return promotionService.updateItem(campaignId, itemId, productId, discountPercent);
+    public PromotionItem updateItem(long campaignId, long itemId, String productId) {
+        return promotionService.updateItem(campaignId, itemId, productId);
     }
 
     public void deleteCampaign(long campaignId) {
@@ -81,8 +88,8 @@ public class PromotionController {
         promotionService.reactivateCampaign(campaignId);
     }
 
-    public PromotionItem addItemToCampaign(long campaignId, String productId, double discountPercent) {
-        return promotionService.addItemToCampaign(campaignId, productId, discountPercent);
+    public PromotionItem addItemToCampaign(long campaignId, String productId) {
+        return promotionService.addItemToCampaign(campaignId, productId);
     }
 
     public List<PromotionCampaign> getAllCampaigns() {
@@ -92,10 +99,6 @@ public class PromotionController {
     public PromotionCampaign getCampaignById(long campaignId) {
         return promotionService.getCampaignById(campaignId);
     }
-
-
-    // deleted getter for conversion rate
-
 
     public List<SalesReportRow> getSalesReport(LocalDateTime from, LocalDateTime to) {
         return promotionService.getSalesReport(from, to);
