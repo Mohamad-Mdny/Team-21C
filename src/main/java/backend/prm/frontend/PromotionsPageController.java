@@ -1,5 +1,6 @@
 package backend.prm.frontend;
 
+import backend.Main;
 import backend.prm.controller.PromotionController;
 import backend.prm.model.PromotionCampaign;
 import backend.prm.repository.PromotionRepository;
@@ -153,10 +154,10 @@ public class PromotionsPageController {
     }
     @FXML
     private void handleAccountButton(javafx.event.ActionEvent event) {
-        if (backend.Main.m != null && backend.Main.m.isSignedIn()) {
-            switchPage(event, "AccountSettings.fxml");
-        } else {
-            switchPage(event, "Login.fxml");
+        switch (Main.user()) {
+            case "NonCommercial" : {switchPage(event, "AccountSettings.fxml");}
+            case "Admin" : {switchPage(event, "AdminDashboard.fxml");}
+            default: {switchPage(event, "Login.fxml");}
         }
     }
     private void openCampaignDetails(PromotionCampaign campaign) {

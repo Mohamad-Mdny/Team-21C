@@ -72,7 +72,7 @@ public class CheckoutAccountController {
         configureBasketTable();
         basketTable.setPlaceholder(new Label("Your basket is empty."));
         updateAccountButtonText();
-        if (Main.m == null || !Main.m.isSignedIn()) {
+        if (Main.m == null || Main.user().equals("User") ) { // idek what kind of safe checking this is
             purchaseStatusLabel.setText("You are not signed in. Please use Guest Checkout or Sign In.");
             switchPage(new ActionEvent(accountButton, null), "Login.fxml");
         }
@@ -92,7 +92,8 @@ public class CheckoutAccountController {
     private void configureCheckoutOptions() {
         deliveryOptionBox.getItems().setAll("Standard Delivery", "Next Day Delivery", "Click & Collect");
         deliveryOptionBox.setValue("Standard Delivery");
-        if (Main.m != null && Main.m.isSignedIn()) {
+
+        if (Main.m != null && Main.user().equals("NonCommercial") ) {
             try {
                 deliveryAddressBox.getItems().setAll(Main.member.getDeliveryAddress());
                 deliveryAddressBox.setValue(Main.member.getDeliveryAddress());
@@ -224,19 +225,23 @@ public class CheckoutAccountController {
 
     @FXML
     public void handleAccountButton(ActionEvent event) {
-        if (Main.m != null && Main.m.isSignedIn()) {
-            switchPage(event, "AccountSettings.fxml");
-        } else {
-            switchPage(event, "Login.fxml");
+        switch (Main.user()) {
+            case "NonCommercial" : {switchPage(event, "AccountSettings.fxml");}
+            case "Admin" : {switchPage(event, "AdminDashboard.fxml");}
+            default: {switchPage(event, "Login.fxml");}
         }
     }
 
     private void updateAccountButtonText() {
         if (accountButton == null) return;
-        if (Main.m != null && Main.m.isSignedIn()) {
-            accountButton.setText("Account Settings");
-        } else {
-            accountButton.setText("Sign In");
+        switch (Main.user()) {
+            case "NonCommercial" : {
+                accountButton.setText("Account Settings");
+            }
+            case "Admin" : {
+                accountButton.setText("Dashboard");
+            }
+            default: {accountButton.setText("Sign In");}
         }
     }
 

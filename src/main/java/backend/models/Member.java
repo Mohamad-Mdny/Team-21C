@@ -5,7 +5,7 @@ import backend.communication.EmailSendResult;
 import backend.communication.SendGmail;
 
 public class Member extends User{
-    private String emailAddress;
+    private String userName;
     private String password;
     private String type;
 
@@ -18,15 +18,15 @@ public class Member extends User{
 
     public Member(String emailAddress){
         super();
-        this.emailAddress = emailAddress;
+        this.userName = emailAddress;
         signedIn = true;
     }
 
-    public String getEmailAddress(){
-        return emailAddress;
+    public String getUserName(){
+        return userName;
     }
-    public void setEmailAddress(String emailAddress){
-        this.emailAddress = emailAddress;
+    public void setUserName(String userName){
+        this.userName = userName;
     }
 
     public String getPassword(){
@@ -112,7 +112,7 @@ public class Member extends User{
 
         body = body + "\n\nPayment Method: " + paymentMethod + "\n \n    Subtotal: £" + String.format("%.2f", getBasketSubtotal());
 
-        EmailSendResult result = SendGmail.sendGmail(getEmailAddress(), "Order ", body);
+        EmailSendResult result = SendGmail.sendGmail(getUserName(), "Order ", body);
 
         Basket.clear();
         return true;

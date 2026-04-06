@@ -45,8 +45,8 @@ public class CatalogueController {
 
     @FXML void initialize() {
         if(Main.member !=null) {
-            if (Main.member.isSignedIn())
-                memberSession.setText(Main.member.getEmailAddress());
+            if (Main.user().equals("NonCommercial") )
+                memberSession.setText(Main.member.getUserName());
         }
         loadData();
         filteredData = new FilteredList<>(masterData, item -> true);
@@ -64,6 +64,7 @@ public class CatalogueController {
             System.out.println("Database connection failed.");
             return;
         }
+
         String sql = "SELECT * FROM Catalogue";
         try (
                 connection;
@@ -191,7 +192,6 @@ public class CatalogueController {
     private void addItemToCart(Item item) {
         if (item == null) { return; }
         Main.m.addItem(item);
-        System.out.println(item.getDescription() + " added to cart.");
     }
 
     private String safeLower(String value) {
@@ -231,20 +231,23 @@ public class CatalogueController {
     @FXML public void goToNonCommercialRegister(ActionEvent event){switchPage(event, "NonCommercialRegister.fxml");}
 
     private void updateAccountButton() {
-        if (Main.m != null && Main.m.isSignedIn()) {
-            accountButton.setText("Account Settings");
-        } else {
-            accountButton.setText("Sign In");
+        switch (Main.user()) {
+            case "NonCommercial" : {
+                accountButton.setText("Account Settings");
+            }
+            case "Admin" : {
+                accountButton.setText("Dashboard");
+            }
+            default: {accountButton.setText("Sign In");}
         }
     }
 
     @FXML
     public void handleAccountButton(ActionEvent event) {
-        if (Main.m.isSignedIn()) {
-            switchPage(event, "AccountSettings.fxml");
-        } else {
-            System.out.println("Going to login");
-            switchPage(event, "Login.fxml");
+        switch (Main.user()) {
+            case "NonCommercial" : {switchPage(event, "AccountSettings.fxml");}
+            case "Admin" : {switchPage(event, "AdminDashboard.fxml");}
+            default: {switchPage(event, "Login.fxml");}
         }
     }
     private void switchPage(ActionEvent event, String fxmlFile) {

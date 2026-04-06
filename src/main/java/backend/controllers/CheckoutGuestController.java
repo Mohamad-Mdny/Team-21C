@@ -245,11 +245,16 @@ public class CheckoutGuestController {
 
     private void updateAccountButtonText() {
         if (accountButton == null) return;
-        if (Main.m != null && Main.m.isSignedIn()) {
-            accountButton.setText("Account Settings");
-        } else {
-            accountButton.setText("Sign In");
+        switch (Main.user()) {
+            case "NonCommercial" : {
+                accountButton.setText("Account Settings");
+            }
+            case "Admin" : {
+                accountButton.setText("Dashboard");
+            }
+            default: {accountButton.setText("Sign In");}
         }
+        // like yeah, itll always be Sign in, but yk, im too lazy 2 change it
     }
 
     private void switchPage(ActionEvent event, String fxmlFile) {

@@ -3,6 +3,7 @@ package backend.controllers;
 import backend.DatabaseManager;
 import backend.Main;
 import backend.models.Item;
+import eu.hansolo.tilesfx.addons.Switch;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -157,7 +158,7 @@ public class BasketController {
         double vat = subtotal * VAT_RATE;
         double total = subtotal + vat;
 
-        if(Main.m.isSignedIn()&& checkMemberDiscount(Main.member.getEmailAddress())){
+        if(Main.user().equals("NonCommercial") && checkMemberDiscount(Main.member.getUserName())){
             total*=0.9;
         }
 
@@ -190,7 +191,7 @@ public class BasketController {
 
     @FXML
     public void purchaseBasket(ActionEvent event) {
-        String targetFxml = (Main.m.isSignedIn()) ? "CheckoutAccount.fxml" : "CheckoutGuest.fxml";
+        String targetFxml = Main.user().equals("NonCommercial")  ? "CheckoutAccount.fxml" : "CheckoutGuest.fxml";
         switchPage(event, targetFxml);
     }
 
@@ -222,19 +223,23 @@ public class BasketController {
 
     @FXML
     public void handleAccountButton(ActionEvent event) {
-        if (Main.m.isSignedIn()) {
-            switchPage(event, "AccountSettings.fxml");
-        } else {
-            switchPage(event, "Login.fxml");
+        switch (Main.user()) {
+            case "NonCommercial" : {switchPage(event, "AccountSettings.fxml");}
+            case "Admin" : {switchPage(event, "AdminDashboard.fxml");}
+            default: {switchPage(event, "Login.fxml");}
         }
     }
 
     private void updateAccountButtonText() {
         if (accountButton == null) return;
-        if (Main.m != null && Main.m.isSignedIn()) {
-            accountButton.setText("Account Settings");
-        } else {
-            accountButton.setText("Sign In");
+        switch (Main.user()) {
+            case "NonCommercial" : {
+                accountButton.setText("Account Settings");
+            }
+            case "Admin" : {
+                accountButton.setText("Dashboard");
+            }
+            default: {accountButton.setText("Sign In");}
         }
     }
 

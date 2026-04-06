@@ -1,6 +1,7 @@
 package backend;
 
 import backend.Reports.*;
+import backend.models.Admin;
 import backend.models.Member;
 import backend.models.User;
 import javafx.application.Application;
@@ -14,6 +15,7 @@ import java.util.List;
 public class Main extends Application {
     public static User m = new User();
     public static Member member;
+    public static Admin admin;
 
     @Override
 
@@ -71,5 +73,18 @@ public class Main extends Application {
 
     }
 
+    public static String user(){
+        if (m.isSignedIn()) {
+            if (member.isSignedIn()) {
+                return "NonCommercial";
+            }
+            else if (admin.isSignedIn()) {
+                return "Admin";
+            }
+        } else {
+            return "User";
+        }
+        throw new RuntimeException("literally impossible");
+    }
 
 }

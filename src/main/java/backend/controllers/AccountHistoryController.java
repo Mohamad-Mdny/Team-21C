@@ -56,8 +56,8 @@ public class AccountHistoryController {
         Connection connection = database.makeConnection();
         try{
             PreparedStatement statement = connection.prepareStatement("SELECT * FROM ipospu.order WHERE EmailAddress = ?");
-            System.out.println(Main.member.getEmailAddress());
-            statement.setString(1, Main.member.getEmailAddress());
+            System.out.println(Main.member.getUserName());
+            statement.setString(1, Main.member.getUserName());
             ResultSet resultSet = statement.executeQuery();
             while(resultSet.next()){
                 orderHistory.getItems().add(new Order(resultSet.getInt("OrderID"),resultSet.getString("Description"),resultSet.getString("EmailAddress")));
@@ -76,7 +76,7 @@ public class AccountHistoryController {
         Connection connection = database.makeConnection();
         try{
             PreparedStatement statement = connection.prepareStatement("SELECT * FROM ipospu.transaction where EmailAddress = ?");
-            statement.setString(1, Main.member.getEmailAddress());
+            statement.setString(1, Main.member.getUserName());
             ResultSet resultSet = statement.executeQuery();
             while(resultSet.next()){
                 transactionHistory.getItems().add(new Transaction(resultSet.getInt("TransactionID"),resultSet.getInt("Amount"),resultSet.getString("EmailAddress")));

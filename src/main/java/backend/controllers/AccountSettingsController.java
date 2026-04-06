@@ -61,7 +61,7 @@ public class AccountSettingsController {
 
         setEditing(false);
 
-        statusLabel.setText("Signed in as: " + safe(member.getEmailAddress()));
+        statusLabel.setText("Signed in as: " + safe(member.getUserName()));
         updateTypeBox();
     }
 
@@ -106,7 +106,7 @@ public class AccountSettingsController {
             return;
         }
 
-        member.setEmailAddress(email);
+        member.setUserName(email);
         member.setDeliveryAddress(deliveryAddress);
         member.setCardNumber(cardNumber);
         member.setExpiryDate(expiryDate);
@@ -140,7 +140,7 @@ public class AccountSettingsController {
     }
 
     private void refreshFieldsFromMember() {
-        emailField.setText(safe(member.getEmailAddress()));
+        emailField.setText(safe(member.getUserName()));
         DeliveryAddress.setText(safe(member.getDeliveryAddress()));
         CardNumber.setText((member.getCardNumber()));
         BillingAddress.setText(safe(member.getBillingAddress()));
