@@ -124,6 +124,10 @@
             <PasswordField fx:id="cvvField"
                            promptText="123" />
 
+            <Label text="Expiry Date" />
+            <TextField fx:id="ExpiryDate"
+                       promptText="MM/YYYY" />
+
             <Separator />
 
             <Label text="Email Address" />

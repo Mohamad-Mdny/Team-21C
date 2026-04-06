@@ -24,6 +24,7 @@ public class AccountSettingsController {
     @FXML private TextField DeliveryAddress;
     @FXML private TextField CardNumber;
     @FXML private TextField CVV;
+    @FXML private TextField expDate;
     @FXML public TextArea PhoneNumber;
 
     @FXML private TextArea BillingAddress;
@@ -46,6 +47,7 @@ public class AccountSettingsController {
             String DeliveryAddress,
             String CardNumber,
             String CVV,
+            String expDate,
             String BillingAddress,
             String PhoneNumber
     ) {}
@@ -96,6 +98,8 @@ public class AccountSettingsController {
         String cardNumber = CardNumber.getText();
         String billingAddress = BillingAddress.getText();
         int cvv = Integer.parseInt(CVV.getText());
+        String expiryDate = expDate.getText();
+
         String phoneNumber = PhoneNumber.getText();
 
         if (email == null || email.isBlank()) {
@@ -105,6 +109,7 @@ public class AccountSettingsController {
         member.setEmailAddress(email);
         member.setDeliveryAddress(deliveryAddress);
         member.setCardNumber(cardNumber);
+        member.setExpiryDate(expiryDate);
         member.setBillingAddress(billingAddress);
         member.setCVV(cvv);
         member.setPhoneNumber(phoneNumber);
@@ -136,7 +141,6 @@ public class AccountSettingsController {
 
     private void refreshFieldsFromMember() {
         emailField.setText(safe(member.getEmailAddress()));
-        validityField.setText(safe(member.getValidityStatus()));
         DeliveryAddress.setText(safe(member.getDeliveryAddress()));
         CardNumber.setText((member.getCardNumber()));
         BillingAddress.setText(safe(member.getBillingAddress()));
@@ -152,6 +156,7 @@ public class AccountSettingsController {
                 DeliveryAddress.getText(),
                 CardNumber.getText(),
                 CVV.getText(),
+                expDate.getText(),
                 BillingAddress.getText(),
                 PhoneNumber.getText()
         );

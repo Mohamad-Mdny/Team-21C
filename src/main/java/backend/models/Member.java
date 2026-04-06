@@ -8,15 +8,11 @@ public class Member extends User{
     private String emailAddress;
     private String password;
     private String type;
-    private String validityStatus;
-    private String CompanyRegistration;
-    private String CompanyDirector;
-    private String typeOfBusiness;
-    private String businessAddress;
 
     private String DeliveryAddress;
     private String cardNumber = "123412341234";
     private int CVV;
+    private String expiryDate;
     private String BillingAddress;
     private String phoneNumber;
 
@@ -47,38 +43,8 @@ public class Member extends User{
         this.type = type;
     }
 
-    public String getValidityStatus(){
-        return validityStatus;
-    }
-    public void setValidityStatus(String validityStatus){
-        this.validityStatus = validityStatus;
-    }
-
-    public String getCompanyRegistration(){
-        return CompanyRegistration;
-    }
-    public void setCompanyRegistration(String companyRegistration){
-        CompanyRegistration = companyRegistration;
-    }
-    public String getCompanyDirector(){
-        return CompanyDirector;
-
-    }
-    public void setCompanyDirector(String companyDirector){
-        CompanyDirector = companyDirector;
-    }
-    public String getTypeOfBusiness(){
-        return typeOfBusiness;
-    }
-    public void setTypeOfBusiness(String typeOfBusiness){
-        this.typeOfBusiness = typeOfBusiness;
-    }
-    public String getBusinessAddress(){
-        return businessAddress;
-    }
-    public void setBusinessAddress(String businessAddress){
-        this.businessAddress = businessAddress;
-    }
+    public String getExpiryDate(){return expiryDate;}
+    public void setExpiryDate(String expiryDate){this.expiryDate = expiryDate;}
 
     public String getDeliveryAddress(){
         return DeliveryAddress;

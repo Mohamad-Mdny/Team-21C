@@ -101,6 +101,10 @@
                             <TextField fx:id="CVV" editable="false" promptText="123"
                                        GridPane.rowIndex="2" GridPane.columnIndex="1"/>
 
+                            <Label text="Expiry Date " style="-fx-font-weight: bold;" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+                            <TextField fx:id="expDate" editable="false" promptText="MM/YYYY"
+                                       GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+
                             <Label text="Billing Address" style="-fx-font-weight: bold;" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
                             <TextArea fx:id="BillingAddress" editable="false" wrapText="true" prefRowCount="3"
                                       promptText="123 Avery Road"

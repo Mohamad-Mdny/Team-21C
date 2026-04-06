@@ -27,6 +27,7 @@ public class CheckoutGuestController {
 
     @FXML
     public TextField emailField;
+    public TextField ExpiryDate;
     @FXML
     private TextField searchField;
     @FXML
@@ -148,6 +149,7 @@ public class CheckoutGuestController {
         String billingAddress = safe(billingAddressArea.getText());
         String cardNumberRaw = safe(cardNumberField.getText()).replaceAll("\\s", "");
         String cvvRaw = safe(cvvField.getText());
+        String expDate = safe(ExpiryDate.getText());
         String email = safe(emailField.getText());
 
         String notes = safe(orderNotesArea.getText());
@@ -160,8 +162,7 @@ public class CheckoutGuestController {
             return;
         }
         String cardDigits = cardNumberRaw.replaceAll("\\s+", "");
-        if (!cardDigits.matches("\\d{12,19}")) {
-            purchaseStatusLabel.setText("Card number must be 12–19 digits (numbers only).");
+        if (!safeCardNumber(cardNumberRaw)) {
             return;
         }
         if (!cvvRaw.matches("\\d{3,4}")) {
@@ -204,6 +205,22 @@ public class CheckoutGuestController {
         return s == null ? "" : s.trim();
     }
 
+    private boolean safeCardNumber(String cardNumber) {
+        if (!cardNumber.matches("\\d{12,19}")) {
+            purchaseStatusLabel.setText("Card number must be 12–19 digits (numbers only).");
+            return false;
+        }
+        if (cardNumber == null || cardNumber.isEmpty()) {
+            purchaseStatusLabel.setText("Card number must be 12–19 digits (numbers only).");
+
+            return false;
+        } else if (cardNumber.length() == 10) {
+
+        }
+
+        return true;
+    }
+
     @FXML
     public void handleSearchEnter(ActionEvent event) {
         String text = safe(searchField.getText());
@@ -213,23 +230,16 @@ public class CheckoutGuestController {
         }
     }
 
-    @FXML
-    public void goToCatalogue(ActionEvent event) {
+    @FXML public void goToCatalogue(ActionEvent event) {
         switchPage(event, "Catalogue.fxml");
     }
-
-    @FXML
-    public void goToCurrentPromotions(ActionEvent event) {
+    @FXML public void goToCurrentPromotions(ActionEvent event) {
         switchPage(event, "CurrentPromotions.fxml");
     }
-
-    @FXML
-    public void goToBasket(ActionEvent event) {
+    @FXML public void goToBasket(ActionEvent event) {
         switchPage(event, "Basket.fxml");
     }
-
-    @FXML
-    public void handleAccountButton(ActionEvent event) {
+    @FXML public void handleAccountButton(ActionEvent event) {
         switchPage(event, "Login.fxml");
     }
 
