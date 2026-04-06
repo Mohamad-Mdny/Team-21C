@@ -146,7 +146,7 @@ public class CheckoutGuestController {
         }
         String deliveryAddress = safe(deliveryAddressArea.getText());
         String billingAddress = safe(billingAddressArea.getText());
-        String cardNumberRaw = safe(cardNumberField.getText());
+        String cardNumberRaw = safe(cardNumberField.getText()).replaceAll("\\s", "");
         String cvvRaw = safe(cvvField.getText());
         String email = safe(emailField.getText());
 
