@@ -3,7 +3,6 @@ package backend.controllers;
 import backend.DatabaseManager;
 import backend.Main;
 import backend.models.Item;
-import eu.hansolo.tilesfx.addons.Switch;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -158,7 +157,7 @@ public class BasketController {
         double vat = subtotal * VAT_RATE;
         double total = subtotal + vat;
 
-        if(Main.user().equals("NonCommercial") && checkMemberDiscount(Main.member.getUserName())){
+        if(Main.userType().equals("NonCommercial") && checkMemberDiscount(Main.member.getUserName())){
             total*=0.9;
         }
 
@@ -191,7 +190,7 @@ public class BasketController {
 
     @FXML
     public void purchaseBasket(ActionEvent event) {
-        String targetFxml = Main.user().equals("NonCommercial")  ? "CheckoutAccount.fxml" : "CheckoutGuest.fxml";
+        String targetFxml = Main.userType().equals("NonCommercial")  ? "CheckoutAccount.fxml" : "CheckoutGuest.fxml";
         switchPage(event, targetFxml);
     }
 
@@ -223,21 +222,21 @@ public class BasketController {
 
     @FXML
     public void handleAccountButton(ActionEvent event) {
-        switch (Main.user()) {
-            case "NonCommercial" : {switchPage(event, "AccountSettings.fxml");}
-            case "Admin" : {switchPage(event, "AdminDashboard.fxml");}
+        switch (Main.userType()) {
+            case "NonCommercial" : {switchPage(event, "AccountSettings.fxml");break;}
+            case "Admin" : {switchPage(event, "AdminDashboard.fxml");break;}
             default: {switchPage(event, "Login.fxml");}
         }
     }
 
     private void updateAccountButtonText() {
         if (accountButton == null) return;
-        switch (Main.user()) {
+        switch (Main.userType()) {
             case "NonCommercial" : {
-                accountButton.setText("Account Settings");
+                accountButton.setText("Account Settings");break;
             }
             case "Admin" : {
-                accountButton.setText("Dashboard");
+                accountButton.setText("Dashboard");break;
             }
             default: {accountButton.setText("Sign In");}
         }

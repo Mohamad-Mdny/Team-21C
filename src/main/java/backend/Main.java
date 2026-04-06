@@ -1,6 +1,5 @@
 package backend;
 
-import backend.Reports.*;
 import backend.models.Admin;
 import backend.models.Member;
 import backend.models.User;
@@ -9,7 +8,6 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import java.io.IOException;
-import java.util.List;
 
 
 public class Main extends Application {
@@ -73,15 +71,17 @@ public class Main extends Application {
 
     }
 
-    public static String user(){
+    public static String userType(){
+        System.out.println();
         if (m.isSignedIn()) {
-            if (member.isSignedIn()) {
+            if (member!= null && member.isSignedIn()) {
                 return "NonCommercial";
             }
-            else if (admin.isSignedIn()) {
+            else if (admin !=null && admin.isSignedIn()) {
                 return "Admin";
             }
         } else {
+
             return "User";
         }
         throw new RuntimeException("literally impossible");

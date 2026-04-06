@@ -52,6 +52,7 @@ public class LoginController {
 
                         switch (resultSet.getString("type")) {
                             case "NonCommercial": {
+                                System.out.println("NonCommercial");
                                 if (resultSet.getBoolean("firstLogin")) {
                                     try {
                                         Parent root = FXMLLoader.load(getClass().getResource("/frontend/ForgetPassword.fxml"));
@@ -63,10 +64,8 @@ public class LoginController {
                                     }
 
                                 } else {
-
                                     try {
                                         Main.member = new Member(email);
-
                                         Main.m.signIn();
                                         Main.member.bringBasket(Main.m.getBasket());
 
@@ -74,16 +73,17 @@ public class LoginController {
                                         Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
                                         stage.getScene().setRoot(root);
                                         stage.show();
-                                    } catch (Exception e) {
+                                    }
+                                    catch (Exception e) {
                                         e.printStackTrace();
                                     }
-
                                 }
+                                return;
                             }
                             case "Administrator", "PU-Admin": {
+                                System.out.println("Administrator");
                                 try {
                                     Main.admin = new Admin(email);
-
                                     Main.m.signIn();
 
                                     Parent root = FXMLLoader.load(getClass().getResource("/frontend/Catalogue.fxml"));
@@ -93,14 +93,11 @@ public class LoginController {
                                 } catch (Exception e) {
                                     e.printStackTrace();
                                 }
+                                return;
                             }
                         }
-                    } else {
-                        errorLabel.setText("Incorrect password");
-                    }
-                } else {
-                    errorLabel.setText("Username not found");
-                }
+                    } else { errorLabel.setText("Incorrect password");}
+                } else {errorLabel.setText("Username not found");}
             } catch (SQLException e) {
                 e.printStackTrace();
             }

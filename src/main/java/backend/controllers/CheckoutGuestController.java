@@ -245,14 +245,14 @@ public class CheckoutGuestController {
 
     private void updateAccountButtonText() {
         if (accountButton == null) return;
-        switch (Main.user()) {
+        switch (Main.userType()) {
             case "NonCommercial" : {
-                accountButton.setText("Account Settings");
+                accountButton.setText("Account Settings");break;
             }
             case "Admin" : {
-                accountButton.setText("Dashboard");
+                accountButton.setText("Dashboard");break;
             }
-            default: {accountButton.setText("Sign In");}
+            default: {accountButton.setText("Sign In");break;}
         }
         // like yeah, itll always be Sign in, but yk, im too lazy 2 change it
     }

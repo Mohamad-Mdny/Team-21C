@@ -22,7 +22,6 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 public class PromotionsPageController {
 
@@ -44,6 +43,7 @@ public class PromotionsPageController {
         if(promotionController == null) {
             setupController();
         }
+        updateAccountButton();
         setupListView();
         loadActiveCampaigns();
     }
@@ -154,10 +154,22 @@ public class PromotionsPageController {
     }
     @FXML
     private void handleAccountButton(javafx.event.ActionEvent event) {
-        switch (Main.user()) {
-            case "NonCommercial" : {switchPage(event, "AccountSettings.fxml");}
-            case "Admin" : {switchPage(event, "AdminDashboard.fxml");}
-            default: {switchPage(event, "Login.fxml");}
+        switch (Main.userType()) {
+            case "NonCommercial" : {switchPage(event, "AccountSettings.fxml");break;}
+            case "Admin" : {switchPage(event, "AdminDashboard.fxml");break;}
+            default: {switchPage(event, "Login.fxml");break;}
+        }
+    }
+
+    private void updateAccountButton() {
+        switch (Main.userType()) {
+            case "NonCommercial" : {
+                accountButton.setText("Account Settings");break;
+            }
+            case "Admin" : {
+                accountButton.setText("Dashboard");break;
+            }
+            default: {accountButton.setText("Sign In");break;}
         }
     }
     private void openCampaignDetails(PromotionCampaign campaign) {

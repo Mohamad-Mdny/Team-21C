@@ -45,7 +45,7 @@ public class CatalogueController {
 
     @FXML void initialize() {
         if(Main.member !=null) {
-            if (Main.user().equals("NonCommercial") )
+            if (Main.userType().equals("NonCommercial") )
                 memberSession.setText(Main.member.getUserName());
         }
         loadData();
@@ -231,20 +231,20 @@ public class CatalogueController {
     @FXML public void goToNonCommercialRegister(ActionEvent event){switchPage(event, "NonCommercialRegister.fxml");}
 
     private void updateAccountButton() {
-        switch (Main.user()) {
+        switch (Main.userType()) {
             case "NonCommercial" : {
-                accountButton.setText("Account Settings");
+                accountButton.setText("Account Settings");break;
             }
             case "Admin" : {
-                accountButton.setText("Dashboard");
+                accountButton.setText("Dashboard");break;
             }
-            default: {accountButton.setText("Sign In");}
+            default: {accountButton.setText("Sign In");break;}
         }
     }
 
     @FXML
     public void handleAccountButton(ActionEvent event) {
-        switch (Main.user()) {
+        switch (Main.userType()) {
             case "NonCommercial" : {switchPage(event, "AccountSettings.fxml");}
             case "Admin" : {switchPage(event, "AdminDashboard.fxml");}
             default: {switchPage(event, "Login.fxml");}
