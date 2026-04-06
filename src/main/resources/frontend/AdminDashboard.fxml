@@ -114,61 +114,105 @@
                    text="No campaign selected"
                    style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
 
-            <SplitPane dividerPositions="0.55" VBox.vgrow="ALWAYS">
-                <VBox spacing="10"
-                      style="-fx-background-color: #fafafa; -fx-background-radius: 12; -fx-padding: 12;">
-                    <Label text="Campaign Items" style="-fx-font-size: 15px; -fx-font-weight: bold;"/>
-                    <ListView fx:id="itemsListView" VBox.vgrow="ALWAYS"/>
+        <SplitPane dividerPositions="0.55" VBox.vgrow="ALWAYS">
+            <VBox spacing="10"
+                  style="-fx-background-color: #fafafa; -fx-background-radius: 12; -fx-padding: 12;">
+                <Label text="Campaign Items" style="-fx-font-size: 15px; -fx-font-weight: bold;"/>
 
-                    <VBox fx:id="itemDetailsBox"
-                          spacing="6"
+                <ListView fx:id="itemsListView" VBox.vgrow="ALWAYS"/>
+
+                <VBox fx:id="itemDetailsContainer"
+                      spacing="8"
+                      visible="false"
+                      managed="false"
+                      VBox.vgrow="ALWAYS"
+                      style="-fx-background-color: white; -fx-border-color: #e5e7eb; -fx-border-radius: 10; -fx-background-radius: 10; -fx-padding: 12;">
+
+                    <ScrollPane fx:id="itemDetailsScrollPane"
+                                fitToWidth="true"
+                                pannable="true"
+                                VBox.vgrow="ALWAYS"
+                                style="-fx-background-color: transparent; -fx-border-color: transparent;">
+                        <content>
+                            <VBox fx:id="itemDetailsBox"
+                                  spacing="8"
+                                  style="-fx-background-color: white; -fx-padding: 0;">
+
+                                <Label text="Selected item details" style="-fx-font-size: 14px; -fx-font-weight: bold;"/>
+
+                                <Label text="Item ID:"/>
+                                <Label fx:id="selectedItemIdLabel" text="-"/>
+
+                                <Label text="Product ID:"/>
+                                <Label fx:id="selectedItemProductIdLabel" text="-"/>
+
+                                <Label text="Promo price:"/>
+                                <Label fx:id="selectedItemPriceLabel" text="-"/>
+
+                                <Label text="Stats:"/>
+                                <Label fx:id="selectedItemStatsLabel" text="-"/>
+
+                                <Label text="Discount:"/>
+                                <Label fx:id="selectedItemDiscountLabel" text="-"/>
+
+                                <VBox fx:id="itemEditFieldsBox"
+                                      spacing="6"
+                                      visible="false"
+                                      managed="false">
+                                    <Separator/>
+
+                                    <Label text="Edit product ID:"/>
+                                    <TextField fx:id="editItemProductIdField" promptText="Product ID"/>
+
+                                    <Label text="Override discount %:"/>
+                                    <TextField fx:id="editItemDiscountField"
+                                               promptText="Leave empty to use campaign discount"/>
+                                </VBox>
+                            </VBox>
+                        </content>
+                    </ScrollPane>
+
+                    <HBox fx:id="itemViewButtonsBox" spacing="8">
+                        <Button fx:id="editItemButton" text="Edit" onAction="#handleEditSelectedItem"/>
+                        <Button fx:id="deleteItemButton" text="Delete" onAction="#handleDeleteSelectedItem"/>
+                    </HBox>
+
+                    <HBox fx:id="itemEditButtonsBox"
+                          spacing="8"
                           visible="false"
-                          managed="false"
-                          style="-fx-background-color: white; -fx-border-color: #e5e7eb; -fx-border-radius: 10; -fx-background-radius: 10; -fx-padding: 12;">
-                        <Label text="Selected item details" style="-fx-font-size: 14px; -fx-font-weight: bold;"/>
+                          managed="false">
+                        <Button fx:id="saveItemButton" text="Save" onAction="#handleSaveItemChanges"/>
+                        <Button fx:id="cancelItemEditButton" text="Cancel" onAction="#handleCancelItemEdit"/>
+                    </HBox>
 
-                        <Label text="Item ID:"/>
-                        <Label fx:id="selectedItemIdLabel" text="-"/>
-
-                        <Label text="Product ID:"/>
-                        <Label fx:id="selectedItemProductIdLabel" text="-"/>
-
-                        <Label text="Promo price:"/>
-                        <Label fx:id="selectedItemPriceLabel" text="-"/>
-
-                        <Label text="Stats:"/>
-                        <Label fx:id="selectedItemStatsLabel" text="-"/>
-
-                        <Label text="Edit product ID:"/>
-                        <TextField fx:id="editItemProductIdField" promptText="Product ID"/>
-
-                        <HBox spacing="8">
-                            <Button fx:id="saveItemButton" text="Save" onAction="#handleSaveItemChanges"/>
-                            <Button fx:id="cancelItemEditButton" text="Cancel" onAction="#handleCancelItemEdit"/>
-                            <Button fx:id="deleteItemButton" text="Delete" onAction="#handleDeleteSelectedItem"/>
-                        </HBox>
-                    </VBox>
-                </VBox>
-
-                <VBox spacing="10"
-                      style="-fx-background-color: #fafafa; -fx-background-radius: 12; -fx-padding: 12;">
-                    <Label text="Add product to campaign" style="-fx-font-size: 15px; -fx-font-weight: bold;"/>
-                    <TextField fx:id="productSearchField" promptText="Search by ID or description"/>
-
-                    <TableView fx:id="productsTable" VBox.vgrow="ALWAYS">
-                        <columns>
-                            <TableColumn fx:id="productIdColumn" text="Product ID" prefWidth="120"/>
-                            <TableColumn fx:id="productDescriptionColumn" text="Description" prefWidth="260"/>
-                            <TableColumn fx:id="productPriceColumn" text="Price" prefWidth="100"/>
-                        </columns>
-                    </TableView>
-
-                    <Button fx:id="addSelectedProductButton"
-                            text="Add Selected Product"
-                            onAction="#handleAddSelectedProductToCampaign"
+                    <Button text="Close details"
+                            onAction="#closeItemDetails"
                             maxWidth="1.7976931348623157E308"/>
                 </VBox>
-            </SplitPane>
+            </VBox>
+
+            <VBox spacing="10"
+                  style="-fx-background-color: #fafafa; -fx-background-radius: 12; -fx-padding: 12;">
+                <Label text="Add product to campaign" style="-fx-font-size: 15px; -fx-font-weight: bold;"/>
+                <TextField fx:id="productSearchField" promptText="Search by ID or description"/>
+
+                <TableView fx:id="productsTable" VBox.vgrow="ALWAYS">
+                    <columns>
+                        <TableColumn fx:id="productIdColumn" text="Product ID" prefWidth="120"/>
+                        <TableColumn fx:id="productDescriptionColumn" text="Description" prefWidth="260"/>
+                        <TableColumn fx:id="productPriceColumn" text="Price" prefWidth="100"/>
+                    </columns>
+                </TableView>
+
+                <TextField fx:id="addItemDiscountField"
+                           promptText="Optional item discount %"/>
+
+                <Button fx:id="addSelectedProductButton"
+                        text="Add Selected Product"
+                        onAction="#handleAddSelectedProductToCampaign"
+                        maxWidth="1.7976931348623157E308"/>
+            </VBox>
+        </SplitPane>
         </VBox>
 
         <VBox spacing="12"

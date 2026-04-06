@@ -104,13 +104,18 @@ public class PromotionDetailsPageController {
         var productOpt = productDAO.findById(item.getItemId());
         String productName = productOpt.map(p -> p.getDescription()).orElse("Unknown product");
         float originalPrice = productOpt.map(p -> p.getPackageCost()).orElse(0.0f);
+
+        double effectiveDiscount = item.getOverrideDiscountPercent() != null
+                ? item.getOverrideDiscountPercent()
+                : campaign.getDiscountPercent();
+
         return new PromotionProductView(
                 item.getId(),
                 item.getCampaignId(),
                 item.getItemId(),
                 productName,
                 originalPrice,
-                campaign.getDiscountPercent(),
+                effectiveDiscount,
                 item.getAddedToOrderCount(),
                 item.getPurchasedCount()
         );

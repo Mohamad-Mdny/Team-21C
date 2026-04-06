@@ -76,25 +76,17 @@ public class PromotionService {
      * Adds a product (from catalogue) into a campaign.
      * New schema: campaign_items stores product_id and discount_percent, promotional_price computed by repository.
      */
-    public PromotionItem addItemToCampaign(long campaignId, String productId) {
-        PromotionCampaign campaign = getCampaignOrThrow(campaignId);
+    public PromotionItem addItemToCampaign(long campaignId, String productId, Double overrideDiscountPercent) {
+        getCampaignOrThrow(campaignId);
+        validateProductId(productId);
+        validateOptionalDiscount(overrideDiscountPercent);
 
-        String trimmedId = normalizeProductId(productId);
-        validateProductId(trimmedId);
-
-        Item product = productDAO.findById(trimmedId)
-                .orElseThrow(() -> new IllegalArgumentException("Product not found in catalogue: " + trimmedId));
-
-        if (repository.itemExistsInCampaign(campaignId, trimmedId)) {
-            throw new IllegalArgumentException("Product already exists in campaign: " + trimmedId);
+        if (repository.itemExistsInCampaign(campaignId, productId.trim())) {
+            throw new IllegalArgumentException("Product already exists in campaign: " + productId);
         }
 
-        double itemDiscount = campaign.getDiscountPercent();
-        if (itemDiscount < 0 || itemDiscount > 100) {
-            itemDiscount = 0.0;
-        }
-
-        PromotionItem item = new PromotionItem(0, campaignId, trimmedId, itemDiscount);
+        PromotionItem item = new PromotionItem(0, campaignId, productId.trim(), 0.0);
+        item.setOverrideDiscountPercent(overrideDiscountPercent);
 
         return repository.saveItem(item);
     }
@@ -175,28 +167,23 @@ public class PromotionService {
         campaign.setEndDateTime(endDateTime);
         campaign.setDiscountPercent(discountPercent);
 
-        return repository.updateCampaign(campaign);
+        PromotionCampaign updated = repository.updateCampaign(campaign);
+        repository.refreshPromotionalPricesForCampaignItemsWithoutOverride(campaignId);
+        return updated;
     }
 
-    public PromotionItem updateItem(long campaignId, long itemId, String productId) {
+    public PromotionItem updateItem(long campaignId, long itemId, String productId, Double overrideDiscountPercent) {
         getCampaignOrThrow(campaignId);
-
-        String trimmedId = normalizeProductId(productId);
-        validateProductId(trimmedId);
-
-        productDAO.findById(trimmedId)
-                .orElseThrow(() -> new IllegalArgumentException("Product not found in catalogue: " + trimmedId));
+        validateProductId(productId);
+        validateOptionalDiscount(overrideDiscountPercent);
 
         PromotionItem existingItem = getItemOrThrow(campaignId, itemId);
+        existingItem.setItemId(productId.trim());
+        existingItem.setOverrideDiscountPercent(overrideDiscountPercent);
 
-        if (!String.valueOf(existingItem.getItemId()).equals(trimmedId)
-                && repository.itemExistsInCampaign(campaignId, trimmedId)) {
-            throw new IllegalArgumentException("Product already exists in campaign: " + trimmedId);
-        }
-
-        existingItem.setItemId(trimmedId);
         return repository.updateItem(existingItem);
     }
+
 
     public void deleteCampaign(long campaignId) {
         getCampaignOrThrow(campaignId);
@@ -285,6 +272,11 @@ public class PromotionService {
         }
         if (to.isBefore(from)) {
             throw new IllegalArgumentException("Period end must be after period start.");
+        }
+    }
+    private void validateOptionalDiscount(Double discountPercent) {
+        if (discountPercent != null && (discountPercent < 0 || discountPercent > 100)) {
+            throw new IllegalArgumentException("Item discount must be between 0 and 100.");
         }
     }
 }

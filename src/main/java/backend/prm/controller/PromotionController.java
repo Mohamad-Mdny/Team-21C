@@ -68,10 +68,9 @@ public class PromotionController {
         return promotionService.updateCampaign(id, title, description, startDateTime, endDateTime, discountPercent);
     }
 
-    public PromotionItem updateItem(long campaignId, long itemId, String productId) {
-        return promotionService.updateItem(campaignId, itemId, productId);
+    public PromotionItem updateItem(long campaignId, long itemId, String productId, Double overrideDiscountPercent) {
+        return promotionService.updateItem(campaignId, itemId, productId, overrideDiscountPercent);
     }
-
     public void deleteCampaign(long campaignId) {
         promotionService.deleteCampaign(campaignId);
     }
@@ -88,8 +87,8 @@ public class PromotionController {
         promotionService.reactivateCampaign(campaignId);
     }
 
-    public PromotionItem addItemToCampaign(long campaignId, String productId) {
-        return promotionService.addItemToCampaign(campaignId, productId);
+    public PromotionItem addItemToCampaign(long campaignId, String productId, Double overrideDiscountPercent) {
+        return promotionService.addItemToCampaign(campaignId, productId, overrideDiscountPercent);
     }
 
     public List<PromotionCampaign> getAllCampaigns() {

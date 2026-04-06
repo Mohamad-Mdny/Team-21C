@@ -19,6 +19,7 @@ import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.util.Duration;
 
@@ -67,6 +68,8 @@ public class AdminDashboardController {
     private Button reactivateCampaignButton;
     @FXML
     private Button stopCampaignButton;
+    @FXML
+    private VBox itemDetailsContainer;
 
     @FXML
     private ListView<PromotionItem> itemsListView;
@@ -96,6 +99,8 @@ public class AdminDashboardController {
     private Label toastLabel;
 
     @FXML
+    private ScrollPane itemDetailsScrollPane;
+    @FXML
     private TextField productSearchField;
     @FXML
     private TableView<ProductDAO.ProductSummary> productsTable;
@@ -112,6 +117,14 @@ public class AdminDashboardController {
     private DatePicker reportStartDatePicker;
     @FXML
     private DatePicker reportEndDatePicker;
+
+    @FXML private TextField addItemDiscountField;
+    @FXML private TextField editItemDiscountField;
+    @FXML private Label selectedItemDiscountLabel;
+    @FXML private VBox itemEditFieldsBox;
+    @FXML private HBox itemViewButtonsBox;
+    @FXML private HBox itemEditButtonsBox;
+    @FXML private Button editItemButton;
 
     @FXML
     private Label reportTitleLabel;
@@ -149,6 +162,7 @@ public class AdminDashboardController {
 
     private boolean createMode = false;
     private boolean editMode = false;
+    private boolean itemEditMode = false;
 
     private PauseTransition toastTimer;
 
@@ -178,8 +192,11 @@ public class AdminDashboardController {
         reportStartDatePicker.setValue(LocalDate.now().minusDays(30));
         reportEndDatePicker.setValue(LocalDate.now());
 
-        itemDetailsBox.setVisible(false);
-        itemDetailsBox.setManaged(false);
+        setItemEditMode(false);
+        if (itemDetailsContainer != null) {
+            itemDetailsContainer.setVisible(false);
+            itemDetailsContainer.setManaged(false);
+        }
 
         if (toastLabel != null) {
             toastLabel.setVisible(false);
@@ -259,12 +276,19 @@ public class AdminDashboardController {
                     return;
                 }
 
-                String discountInfo = String.format("%.2f", selectedCampaign.getDiscountPercent());
+                String discountInfo;
+                if (item.getOverrideDiscountPercent() != null) {
+                    discountInfo = String.format("%.2f%% (override)", item.getOverrideDiscountPercent());
+                } else if (selectedCampaign != null) {
+                    discountInfo = String.format("%.2f%% (campaign default)", selectedCampaign.getDiscountPercent());
+                } else {
+                    discountInfo = "-";
+                }
 
                 setText(
                         "Item ID: " + item.getId()
                                 + "\nProduct ID: " + item.getItemId()
-                                + "\nCampaign discount: " + discountInfo + "%"
+                                + "\nDiscount: " + discountInfo
                                 + "\nPromo price: £" + String.format("%.2f", item.getPromotionalPrice())
                                 + "\nAdded: " + item.getAddedToOrderCount()
                                 + " | Purchased: " + item.getPurchasedCount()
@@ -283,6 +307,24 @@ public class AdminDashboardController {
         });
     }
 
+    private void setItemEditMode(boolean editing) {
+        itemEditMode = editing;
+
+        if (itemEditFieldsBox != null) {
+            itemEditFieldsBox.setVisible(editing);
+            itemEditFieldsBox.setManaged(editing);
+        }
+
+        if (itemEditButtonsBox != null) {
+            itemEditButtonsBox.setVisible(editing);
+            itemEditButtonsBox.setManaged(editing);
+        }
+
+        if (itemViewButtonsBox != null) {
+            itemViewButtonsBox.setVisible(!editing);
+            itemViewButtonsBox.setManaged(!editing);
+        }
+    }
     private void setupProductsTable() {
         productIdColumn.setCellValueFactory(data ->
                 new ReadOnlyStringWrapper(data.getValue().getProductId()));
@@ -565,16 +607,26 @@ public class AdminDashboardController {
         }
 
         try {
-            promotionController.addItemToCampaign(selectedCampaign.getId(), product.getProductId());
+            Double overrideDiscount = parseOptionalDiscount(addItemDiscountField);
+
+            promotionController.addItemToCampaign(
+                    selectedCampaign.getId(),
+                    product.getProductId(),
+                    overrideDiscount
+            );
+
             loadItemsForSelectedCampaign();
             refreshUiState();
+
+            if (addItemDiscountField != null) {
+                addItemDiscountField.clear();
+            }
 
             statusLabel.setText("Product added to campaign: " + product.getProductId());
             showToast("Product added to campaign.", true);
         } catch (Exception e) {
             statusLabel.setText("Add item failed: " + e.getMessage());
             showToast("Add item failed: " + e.getMessage(), false);
-            throw e;
         }
     }
 
@@ -623,12 +675,14 @@ public class AdminDashboardController {
                 return;
             }
 
+            Double overrideDiscount = parseOptionalDiscount(editItemDiscountField);
             long itemId = selectedItem.getId();
 
             promotionController.updateItem(
                     selectedCampaign.getId(),
                     itemId,
-                    newProductId
+                    newProductId,
+                    overrideDiscount
             );
 
             loadItemsForSelectedCampaign();
@@ -638,8 +692,9 @@ public class AdminDashboardController {
                 selectedItem = refreshedItem;
                 itemsListView.getSelectionModel().select(refreshedItem);
                 showItemDetails(refreshedItem);
+                setItemEditMode(false);
             } else {
-                closeItemDetails();
+                clearItemSelection();
             }
 
             refreshUiState();
@@ -656,13 +711,18 @@ public class AdminDashboardController {
         closeItemDetails();
         statusLabel.setText("Item details closed.");
         showToast("Item details closed.", true);
+        refreshUiState();
     }
 
     @FXML
     private void handleRootClick(MouseEvent event) {
         Node target = (Node) event.getTarget();
 
-        if (isChildOf(target, itemsListView) || isChildOf(target, itemDetailsBox)) {
+        if (isChildOf(target, itemsListView) || isChildOf(target, itemDetailsContainer)) {
+            return;
+        }
+
+        if (itemEditMode) {
             return;
         }
 
@@ -677,20 +737,54 @@ public class AdminDashboardController {
                 "Added: " + item.getAddedToOrderCount() + " | Purchased: " + item.getPurchasedCount()
         );
 
+        if (item.getOverrideDiscountPercent() != null) {
+            if (selectedItemDiscountLabel != null) {
+                selectedItemDiscountLabel.setText(
+                        String.format("%.2f%% (override)", item.getOverrideDiscountPercent())
+                );
+            }
+            if (editItemDiscountField != null) {
+                editItemDiscountField.setText(String.valueOf(item.getOverrideDiscountPercent()));
+            }
+        } else {
+            if (selectedItemDiscountLabel != null && selectedCampaign != null) {
+                selectedItemDiscountLabel.setText(
+                        String.format("%.2f%% (campaign default)", selectedCampaign.getDiscountPercent())
+                );
+            }
+            if (editItemDiscountField != null) {
+                editItemDiscountField.clear();
+            }
+        }
+
         if (editItemProductIdField != null) {
             editItemProductIdField.setText(item.getItemId());
         }
 
-        itemDetailsBox.setVisible(true);
-        itemDetailsBox.setManaged(true);
+        if (itemsListView != null) {
+            itemsListView.setVisible(false);
+            itemsListView.setManaged(false);
+        }
+
+        if (itemDetailsContainer != null) {
+            itemDetailsContainer.setVisible(true);
+            itemDetailsContainer.setManaged(true);
+        }
+
+        if (itemDetailsScrollPane != null) {
+            itemDetailsScrollPane.setVvalue(0);
+        }
+
+        setItemEditMode(false);
     }
 
-    private void clearItemSelection() {
-        closeItemDetails();
-    }
 
+
+    @FXML
     private void closeItemDetails() {
         selectedItem = null;
+        itemEditMode = false;
+
         itemsListView.getSelectionModel().clearSelection();
 
         selectedItemIdLabel.setText("-");
@@ -698,13 +792,67 @@ public class AdminDashboardController {
         selectedItemPriceLabel.setText("-");
         selectedItemStatsLabel.setText("-");
 
+        if (selectedItemDiscountLabel != null) {
+            selectedItemDiscountLabel.setText("-");
+        }
+
+        if (editItemDiscountField != null) {
+            editItemDiscountField.clear();
+        }
+
         if (editItemProductIdField != null) {
             editItemProductIdField.clear();
         }
 
-        itemDetailsBox.setVisible(false);
-        itemDetailsBox.setManaged(false);
+        setItemEditMode(false);
+
+        if (itemDetailsContainer != null) {
+            itemDetailsContainer.setVisible(false);
+            itemDetailsContainer.setManaged(false);
+        }
+
+        if (itemsListView != null) {
+            itemsListView.setVisible(true);
+            itemsListView.setManaged(true);
+        }
+
+        if (itemDetailsScrollPane != null) {
+            itemDetailsScrollPane.setVvalue(0);
+        }
     }
+    private void clearItemSelection() {
+        closeItemDetails();
+    }
+
+    @FXML
+    private void handleEditSelectedItem() {
+        if (selectedItem == null) {
+            showToast("Select an item first.", false);
+            return;
+        }
+
+        if (editItemProductIdField != null) {
+            editItemProductIdField.setText(selectedItem.getItemId());
+        }
+
+        if (editItemDiscountField != null) {
+            if (selectedItem.getOverrideDiscountPercent() != null) {
+                editItemDiscountField.setText(String.valueOf(selectedItem.getOverrideDiscountPercent()));
+            } else {
+                editItemDiscountField.clear();
+            }
+        }
+
+        setItemEditMode(true);
+
+        if (itemDetailsScrollPane != null) {
+            itemDetailsScrollPane.setVvalue(1.0);
+        }
+
+        statusLabel.setText("Item edit mode enabled.");
+        refreshUiState();
+    }
+
 
     private boolean isChildOf(Node node, Node parent) {
         Node current = node;
@@ -748,6 +896,21 @@ public class AdminDashboardController {
 
         if (cancelItemEditButton != null) {
             cancelItemEditButton.setDisable(!hasItem);
+        }
+        if (editItemButton != null) {
+            editItemButton.setDisable(!hasItem || itemEditMode);
+        }
+
+        if (deleteItemButton != null) {
+            deleteItemButton.setDisable(!hasItem);
+        }
+
+        if (saveItemButton != null) {
+            saveItemButton.setDisable(!hasItem || !itemEditMode);
+        }
+
+        if (cancelItemEditButton != null) {
+            cancelItemEditButton.setDisable(!hasItem || !itemEditMode);
         }
     }
 
@@ -843,7 +1006,6 @@ public class AdminDashboardController {
         }
         return picker.getValue().atTime(23, 59, 59);
     }
-
     @FXML
     private void handleGenerateSalesReport() {
         try {
@@ -1108,6 +1270,26 @@ public class AdminDashboardController {
     private double parseDiscount() {
         try {
             double value = Double.parseDouble(campaignDiscountField.getText());
+            if (value < 0 || value > 100) {
+                throw new IllegalArgumentException("Discount must be between 0 and 100.");
+            }
+            return value;
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("Invalid discount percent.");
+        }
+    }
+    private Double parseOptionalDiscount(TextField field) {
+        if (field == null) {
+            return null;
+        }
+
+        String text = field.getText();
+        if (text == null || text.isBlank()) {
+            return null;
+        }
+
+        try {
+            double value = Double.parseDouble(text.trim());
             if (value < 0 || value > 100) {
                 throw new IllegalArgumentException("Discount must be between 0 and 100.");
             }

@@ -169,6 +169,7 @@ public class PromotionRepository {
         }
     }
 
+
     public void incrementCampaignClick(long campaignId) {
         String sql = "UPDATE promotion_campaigns SET click_count = click_count + 1 WHERE campaign_id = ?";
         try (Connection connection = database.makeConnection();
@@ -228,22 +229,29 @@ public class PromotionRepository {
     public PromotionItem saveItem(PromotionItem item) {
         String productPriceSql = "SELECT PackageCost FROM catalogue WHERE ItemID = ?";
         String insertSql = """
-                INSERT INTO promotion_campaign_items
-                (campaign_id, product_id, promotional_price, added_to_order_count, purchased_count)
-                VALUES (?, ?, ?, ?, ?)
-                """;
+            INSERT INTO promotion_campaign_items
+            (campaign_id, product_id, discount_percent, promotional_price, added_to_order_count, purchased_count)
+            VALUES (?, ?, ?, ?, ?, ?)
+            """;
 
         try (Connection connection = database.makeConnection()) {
             double packageCost = readPackageCost(connection, item.getItemId(), productPriceSql);
-            double campaignDiscount = readCampaignDiscount(connection, item.getCampaignId());
-            double promotionalPrice = packageCost - (packageCost * campaignDiscount / 100.0);
+            double effectiveDiscount = resolveEffectiveDiscount(connection, item);
+            double promotionalPrice = packageCost - (packageCost * effectiveDiscount / 100.0);
 
             try (PreparedStatement ps = connection.prepareStatement(insertSql, Statement.RETURN_GENERATED_KEYS)) {
                 ps.setLong(1, item.getCampaignId());
                 ps.setString(2, item.getItemId());
-                ps.setDouble(3, promotionalPrice);
-                ps.setInt(4, item.getAddedToOrderCount());
-                ps.setInt(5, item.getPurchasedCount());
+
+                if (item.getOverrideDiscountPercent() != null) {
+                    ps.setDouble(3, item.getOverrideDiscountPercent());
+                } else {
+                    ps.setDouble(3, readCampaignDiscount(connection, item.getCampaignId()));
+                }
+
+                ps.setDouble(4, promotionalPrice);
+                ps.setInt(5, item.getAddedToOrderCount());
+                ps.setInt(6, item.getPurchasedCount());
                 ps.executeUpdate();
 
                 try (ResultSet keys = ps.getGeneratedKeys()) {
@@ -263,26 +271,34 @@ public class PromotionRepository {
     public PromotionItem updateItem(PromotionItem item) {
         String productPriceSql = "SELECT PackageCost FROM catalogue WHERE ItemID = ?";
         String sql = """
-                UPDATE promotion_campaign_items
-                SET product_id = ?,
-                    promotional_price = ?,
-                    added_to_order_count = ?,
-                    purchased_count = ?
-                WHERE campaign_item_id = ? AND campaign_id = ?
-                """;
+            UPDATE promotion_campaign_items
+            SET product_id = ?,
+                discount_percent = ?,
+                promotional_price = ?,
+                added_to_order_count = ?,
+                purchased_count = ?
+            WHERE campaign_item_id = ? AND campaign_id = ?
+            """;
 
         try (Connection connection = database.makeConnection()) {
             double packageCost = readPackageCost(connection, item.getItemId(), productPriceSql);
-            double campaignDiscount = readCampaignDiscount(connection, item.getCampaignId());
-            double promotionalPrice = packageCost - (packageCost * campaignDiscount / 100.0);
+            double effectiveDiscount = resolveEffectiveDiscount(connection, item);
+            double promotionalPrice = packageCost - (packageCost * effectiveDiscount / 100.0);
 
             try (PreparedStatement ps = connection.prepareStatement(sql)) {
                 ps.setString(1, item.getItemId());
-                ps.setDouble(2, promotionalPrice);
-                ps.setInt(3, item.getAddedToOrderCount());
-                ps.setInt(4, item.getPurchasedCount());
-                ps.setLong(5, item.getId());
-                ps.setLong(6, item.getCampaignId());
+
+                if (item.getOverrideDiscountPercent() != null) {
+                    ps.setDouble(2, item.getOverrideDiscountPercent());
+                } else {
+                    ps.setDouble(2, readCampaignDiscount(connection, item.getCampaignId()));
+                }
+
+                ps.setDouble(3, promotionalPrice);
+                ps.setInt(4, item.getAddedToOrderCount());
+                ps.setInt(5, item.getPurchasedCount());
+                ps.setLong(6, item.getId());
+                ps.setLong(7, item.getCampaignId());
 
                 if (ps.executeUpdate() == 0) {
                     throw new IllegalArgumentException("Item not found with ID: " + item.getId());
@@ -365,17 +381,17 @@ public class PromotionRepository {
 
     public Optional<PromotionItem> findItemById(long itemId) {
         String sql = """
-                SELECT campaign_item_id, campaign_id, product_id, promotional_price,
-                       added_to_order_count, purchased_count
-                FROM promotion_campaign_items
-                WHERE campaign_item_id = ?
-                """;
+            SELECT campaign_item_id, campaign_id, product_id, discount_percent, promotional_price,
+                   added_to_order_count, purchased_count
+            FROM promotion_campaign_items
+            WHERE campaign_item_id = ?
+            """;
         try (Connection connection = database.makeConnection();
              PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setLong(1, itemId);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
-                    return Optional.of(mapItem(rs));
+                    return Optional.of(mapItem(rs, connection));
                 }
             }
         } catch (SQLException e) {
@@ -386,45 +402,47 @@ public class PromotionRepository {
 
     public List<PromotionItem> findItemsByCampaignId(long campaignId) {
         String sql = """
-                SELECT campaign_item_id, campaign_id, product_id, promotional_price,
-                       added_to_order_count, purchased_count
-                FROM promotion_campaign_items
-                WHERE campaign_id = ?
-                ORDER BY campaign_item_id
-                """;
-        List<PromotionItem> items = new ArrayList<>();
+            SELECT campaign_item_id, campaign_id, product_id, discount_percent, promotional_price,
+                   added_to_order_count, purchased_count
+            FROM promotion_campaign_items
+            WHERE campaign_id = ?
+            ORDER BY campaign_item_id
+            """;
+
+        List<PromotionItem> result = new ArrayList<>();
         try (Connection connection = database.makeConnection();
              PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setLong(1, campaignId);
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
-                    items.add(mapItem(rs));
+                    result.add(mapItem(rs, connection));
                 }
             }
         } catch (SQLException e) {
             throw new RuntimeException("Failed to load items for campaign: " + campaignId, e);
         }
-        return items;
+        return result;
     }
 
     public Optional<PromotionItem> findItemByIdAndCampaignId(long itemId, long campaignId) {
         String sql = """
-                SELECT campaign_item_id, campaign_id, product_id, promotional_price,
-                       added_to_order_count, purchased_count
-                FROM promotion_campaign_items
-                WHERE campaign_item_id = ? AND campaign_id = ?
-                """;
+            SELECT campaign_item_id, campaign_id, product_id, discount_percent, promotional_price,
+                   added_to_order_count, purchased_count
+            FROM promotion_campaign_items
+            WHERE campaign_item_id = ? AND campaign_id = ?
+            """;
+
         try (Connection connection = database.makeConnection();
              PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setLong(1, itemId);
             ps.setLong(2, campaignId);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
-                    return Optional.of(mapItem(rs));
+                    return Optional.of(mapItem(rs, connection));
                 }
             }
         } catch (SQLException e) {
-            throw new RuntimeException("Failed to load item by id and campaign id", e);
+            throw new RuntimeException("Failed to load campaign item: " + itemId + " in campaign " + campaignId, e);
         }
         return Optional.empty();
     }
@@ -604,13 +622,23 @@ public class PromotionRepository {
         return campaign;
     }
 
-    private PromotionItem mapItem(ResultSet rs) throws SQLException {
+    private PromotionItem mapItem(ResultSet rs, Connection connection) throws SQLException {
         PromotionItem item = new PromotionItem(
                 rs.getLong("campaign_item_id"),
                 rs.getLong("campaign_id"),
                 rs.getString("product_id"),
                 rs.getDouble("promotional_price")
         );
+
+        double itemDiscount = rs.getDouble("discount_percent");
+        double campaignDiscount = readCampaignDiscount(connection, rs.getLong("campaign_id"));
+
+        if (Double.compare(itemDiscount, campaignDiscount) == 0) {
+            item.setOverrideDiscountPercent(null);
+        } else {
+            item.setOverrideDiscountPercent(itemDiscount);
+        }
+
         item.setAddedToOrderCount(rs.getInt("added_to_order_count"));
         item.setPurchasedCount(rs.getInt("purchased_count"));
         return item;
@@ -652,6 +680,42 @@ public class PromotionRepository {
                 }
                 return rs.getDouble("discount_percent");
             }
+        }
+    }
+    private double resolveEffectiveDiscount(Connection connection, PromotionItem item) throws SQLException {
+        if (item.getOverrideDiscountPercent() != null) {
+            return item.getOverrideDiscountPercent();
+        }
+        return readCampaignDiscount(connection, item.getCampaignId());
+    }
+    public void refreshPromotionalPricesForCampaignItemsWithoutOverride(long campaignId) {
+        String itemSql = """
+        SELECT campaign_item_id, campaign_id, product_id, discount_percent,
+               promotional_price, added_to_order_count, purchased_count
+        FROM promotion_campaign_items
+        WHERE campaign_id = ?
+        """;
+
+        try (Connection connection = database.makeConnection();
+             PreparedStatement ps = connection.prepareStatement(itemSql)) {
+
+            ps.setLong(1, campaignId);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                double campaignDiscount = readCampaignDiscount(connection, campaignId);
+
+                while (rs.next()) {
+                    PromotionItem item = mapItem(rs, connection);
+
+                    if (item.getOverrideDiscountPercent() == null) {
+                        item.setOverrideDiscountPercent(campaignDiscount);
+                        updateItem(item);
+                        item.setOverrideDiscountPercent(null);
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Failed to refresh item prices for campaign: " + campaignId, e);
         }
     }
 }

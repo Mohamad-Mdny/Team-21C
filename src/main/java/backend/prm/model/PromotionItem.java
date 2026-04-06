@@ -6,7 +6,7 @@ public class PromotionItem {
 
     private String itemId;
 
-    //private double discountPercent;
+    private Double overrideDiscountPercent;
     private double promotionalPrice;
     private int addedToOrderCount;
     private int purchasedCount;
@@ -15,7 +15,6 @@ public class PromotionItem {
         this.id = id;
         this.campaignId = campaignId;
         this.itemId = itemId;
-        //this.discountPercent = discountPercent;
         this.promotionalPrice = promotionalPrice;
     }
 
@@ -27,6 +26,8 @@ public class PromotionItem {
     public void setPromotionalPrice(double promotionalPrice) {
         this.promotionalPrice = promotionalPrice;
     }
+    public Double getOverrideDiscountPercent() {return overrideDiscountPercent;}
+    public void setOverrideDiscountPercent(Double overrideDiscountPercent) {this.overrideDiscountPercent = overrideDiscountPercent;}
     public int getAddedToOrderCount() { return addedToOrderCount; }
     public void setAddedToOrderCount(int addedToOrderCount) {
         this.addedToOrderCount = addedToOrderCount;
@@ -37,7 +38,7 @@ public class PromotionItem {
     public void setId(long id) { this.id = id; }
     public long getCampaignId() { return campaignId; }
     public void setCampaignId(long campaignId) { this.campaignId = campaignId; }
-
-
-    // keep other getters/setters as-is
+    public boolean hasOverrideDiscount() {
+        return overrideDiscountPercent != null;
+    }
 }
