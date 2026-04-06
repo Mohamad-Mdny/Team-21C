@@ -217,11 +217,8 @@ public class CatalogueController {
         switchPage(event, "AdminDashboard.fxml");
     }
     /*
-    AdminCampaignItemsPage
-    AdminPromotionsPage - Error with getting the data from the database
-    AdminDashboard - Still have to integrate reports
-    PromotionsPage - Havent tested with actual campaigns
-    PromotionDetailsPage - 
+
+
 
      */
     @FXML public void goToCurrentPromotions(ActionEvent event) {switchPage(event, "PromotionsPage.fxml");}

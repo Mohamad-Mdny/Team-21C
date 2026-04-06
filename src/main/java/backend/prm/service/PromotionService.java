@@ -1,12 +1,13 @@
 package backend.prm.service;
 
+import backend.models.Item;
 import backend.prm.model.PromotionCampaign;
 import backend.prm.model.PromotionItem;
 import backend.prm.model.PromotionStatus;
 import backend.prm.report.CampaignHitReportRow;
 import backend.prm.report.CampaignReportRow;
 import backend.prm.report.SalesReportRow;
-
+import backend.prm.repository.ProductDAO;
 import backend.prm.repository.PromotionRepository;
 
 import java.time.LocalDateTime;
@@ -15,6 +16,7 @@ import java.util.List;
 public class PromotionService {
 
     private final PromotionRepository repository;
+    private final ProductDAO productDAO = new ProductDAO();
 
     public PromotionService(PromotionRepository repository) {
         this.repository = repository;
@@ -26,6 +28,7 @@ public class PromotionService {
                                             LocalDateTime endDateTime,
                                             double discountPercent) {
         validateCampaignInput(title, startDateTime, endDateTime, discountPercent);
+
         PromotionCampaign campaign = new PromotionCampaign(
                 0,
                 null,
@@ -35,6 +38,7 @@ public class PromotionService {
                 endDateTime,
                 discountPercent
         );
+
         return repository.saveCampaign(campaign);
     }
 
@@ -68,13 +72,30 @@ public class PromotionService {
         repository.updateCampaign(campaign);
     }
 
+    /**
+     * Adds a product (from catalogue) into a campaign.
+     * New schema: campaign_items stores product_id and discount_percent, promotional_price computed by repository.
+     */
     public PromotionItem addItemToCampaign(long campaignId, String productId) {
-        getCampaignOrThrow(campaignId);
-        validateProductId(productId);
-        if (repository.itemExistsInCampaign(campaignId, productId.trim())) {
-            throw new IllegalArgumentException("Product already exists in campaign: " + productId);
+        PromotionCampaign campaign = getCampaignOrThrow(campaignId);
+
+        String trimmedId = normalizeProductId(productId);
+        validateProductId(trimmedId);
+
+        Item product = productDAO.findById(trimmedId)
+                .orElseThrow(() -> new IllegalArgumentException("Product not found in catalogue: " + trimmedId));
+
+        if (repository.itemExistsInCampaign(campaignId, trimmedId)) {
+            throw new IllegalArgumentException("Product already exists in campaign: " + trimmedId);
         }
-        PromotionItem item = new PromotionItem(0, campaignId, productId.trim(), 0.0);
+
+        double itemDiscount = campaign.getDiscountPercent();
+        if (itemDiscount < 0 || itemDiscount > 100) {
+            itemDiscount = 0.0;
+        }
+
+        PromotionItem item = new PromotionItem(0, campaignId, trimmedId, itemDiscount);
+
         return repository.saveItem(item);
     }
 
@@ -95,14 +116,17 @@ public class PromotionService {
 
     public void recordItemAddedToOrder(long campaignId, long itemId, int quantity, String orderReference) {
         validateQuantity(quantity);
+
         PromotionCampaign campaign = getCampaignOrThrow(campaignId);
         validateCampaignIsActive(campaign);
+
         PromotionItem item = getItemOrThrow(campaignId, itemId);
+
         repository.incrementItemAddedCount(campaignId, itemId, quantity);
         repository.savePromotionOrderEvent(
                 campaignId,
                 itemId,
-                item.getItemId(),
+                String.valueOf(item.getItemId()),
                 "ADDED",
                 quantity,
                 item.getPromotionalPrice(),
@@ -117,13 +141,17 @@ public class PromotionService {
 
     public void recordItemPurchased(long campaignId, long itemId, int quantity, String orderReference) {
         validateQuantity(quantity);
-        getCampaignOrThrow(campaignId);
+
+        PromotionCampaign campaign = getCampaignOrThrow(campaignId);
+        validateCampaignIsActive(campaign);
+
         PromotionItem item = getItemOrThrow(campaignId, itemId);
+
         repository.incrementItemPurchasedCount(campaignId, itemId, quantity);
         repository.savePromotionOrderEvent(
                 campaignId,
                 itemId,
-                item.getItemId(),
+                String.valueOf(item.getItemId()),
                 "PURCHASED",
                 quantity,
                 item.getPromotionalPrice(),
@@ -139,20 +167,34 @@ public class PromotionService {
                                             LocalDateTime endDateTime,
                                             double discountPercent) {
         validateCampaignInput(title, startDateTime, endDateTime, discountPercent);
+
         PromotionCampaign campaign = getCampaignOrThrow(campaignId);
         campaign.setTitle(title.trim());
         campaign.setDescription(description);
         campaign.setStartDateTime(startDateTime);
         campaign.setEndDateTime(endDateTime);
         campaign.setDiscountPercent(discountPercent);
+
         return repository.updateCampaign(campaign);
     }
 
     public PromotionItem updateItem(long campaignId, long itemId, String productId) {
         getCampaignOrThrow(campaignId);
-        validateProductId(productId);
+
+        String trimmedId = normalizeProductId(productId);
+        validateProductId(trimmedId);
+
+        productDAO.findById(trimmedId)
+                .orElseThrow(() -> new IllegalArgumentException("Product not found in catalogue: " + trimmedId));
+
         PromotionItem existingItem = getItemOrThrow(campaignId, itemId);
-        existingItem.setItemId(productId.trim());
+
+        if (!String.valueOf(existingItem.getItemId()).equals(trimmedId)
+                && repository.itemExistsInCampaign(campaignId, trimmedId)) {
+            throw new IllegalArgumentException("Product already exists in campaign: " + trimmedId);
+        }
+
+        existingItem.setItemId(trimmedId);
         return repository.updateItem(existingItem);
     }
 
@@ -179,6 +221,7 @@ public class PromotionService {
         validateRange(from, to);
         return repository.getCampaignHitReport(from, to);
     }
+
 
     private PromotionCampaign getCampaignOrThrow(long campaignId) {
         return repository.findCampaignById(campaignId)
@@ -219,6 +262,15 @@ public class PromotionService {
         if (productId == null || productId.isBlank()) {
             throw new IllegalArgumentException("Product ID must not be empty.");
         }
+
+
+        if (!productId.matches("\\d+")) {
+            throw new IllegalArgumentException("Product ID must be numeric (catalogue ItemID).");
+        }
+    }
+
+    private String normalizeProductId(String productId) {
+        return productId == null ? "" : productId.trim();
     }
 
     private void validateQuantity(int quantity) {

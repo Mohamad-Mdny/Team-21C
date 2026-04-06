@@ -28,7 +28,7 @@ public class PromotionCampaign {
         this.startDateTime = startDateTime;
         this.endDateTime = endDateTime;
         this.discountPercent = discountPercent;
-        this.clickCount = 0;
+        clickCount = 0;
     }
 
     public long getId() {

@@ -19,10 +19,10 @@ public class PromotionRepository {
     DatabaseManager database = new DatabaseManager();
     public PromotionCampaign saveCampaign(PromotionCampaign campaign) {
         String sql = """
-                INSERT INTO promotion_campaigns
-                (campaign_code, title, description, start_datetime, end_datetime, discount_percent, status, cancelled_at, click_count)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-                """;
+            INSERT INTO promotion_campaigns
+            (campaign_code, title, description, start_datetime, end_datetime, discount_percent, status, cancelled_at, click_count)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """;
 
         try (Connection connection = database.makeConnection();
              PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
@@ -34,15 +34,16 @@ public class PromotionRepository {
             ps.setTimestamp(5, Timestamp.valueOf(campaign.getEndDateTime()));
             ps.setDouble(6, campaign.getDiscountPercent());
             ps.setString(7, deriveStatus(campaign, LocalDateTime.now()).name());
-            ps.setTimestamp(8, Timestamp.valueOf(LocalDateTime.now()));
 
+            // cancelled_at (param 8)
             if (campaign.getCancelledAt() != null) {
-                ps.setTimestamp(9, Timestamp.valueOf(campaign.getCancelledAt()));
+                ps.setTimestamp(8, Timestamp.valueOf(campaign.getCancelledAt()));
             } else {
-                ps.setNull(9, Types.TIMESTAMP);
+                ps.setNull(8, Types.TIMESTAMP);
             }
 
-            ps.setInt(10, campaign.getClickCount());
+            // click_count (param 9)
+            ps.setInt(9, campaign.getClickCount());
 
             ps.executeUpdate();
 
@@ -57,6 +58,7 @@ public class PromotionRepository {
             throw new RuntimeException("Failed to save campaign", e);
         }
     }
+
 
     public Optional<PromotionCampaign> findCampaignById(long id) {
         String sql = """
@@ -224,7 +226,7 @@ public class PromotionRepository {
     }
 
     public PromotionItem saveItem(PromotionItem item) {
-        String productPriceSql = "SELECT package_cost FROM catalogue WHERE product_id = ?";
+        String productPriceSql = "SELECT PackageCost FROM catalogue WHERE ItemID = ?";
         String insertSql = """
                 INSERT INTO promotion_campaign_items
                 (campaign_id, product_id, promotional_price, added_to_order_count, purchased_count)
@@ -259,7 +261,7 @@ public class PromotionRepository {
     }
 
     public PromotionItem updateItem(PromotionItem item) {
-        String productPriceSql = "SELECT package_cost FROM catalogue WHERE product_id = ?";
+        String productPriceSql = "SELECT PackageCost FROM catalogue WHERE ItemID = ?";
         String sql = """
                 UPDATE promotion_campaign_items
                 SET product_id = ?,
@@ -635,7 +637,7 @@ public class PromotionRepository {
                 if (!rs.next()) {
                     throw new IllegalArgumentException("Product not found: " + productId);
                 }
-                return rs.getDouble("package_cost");
+                return rs.getDouble("PackageCost");
             }
         }
     }

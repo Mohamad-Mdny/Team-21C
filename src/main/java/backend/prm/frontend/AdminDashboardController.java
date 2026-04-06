@@ -443,8 +443,9 @@ public class AdminDashboardController {
                 showToast("Campaign updated successfully.", true);
             }
         } catch (Exception e) {
-            statusLabel.setText("Save failed: " + e.getMessage());
-            showToast("Save failed: " + e.getMessage(), false);
+            statusLabel.setText("Save failed (1): " + e.getMessage());
+            showToast("Save failed (2) : " + e.getMessage(), false);
+            throw e;
         }
     }
 
@@ -573,6 +574,7 @@ public class AdminDashboardController {
         } catch (Exception e) {
             statusLabel.setText("Add item failed: " + e.getMessage());
             showToast("Add item failed: " + e.getMessage(), false);
+            throw e;
         }
     }
 
