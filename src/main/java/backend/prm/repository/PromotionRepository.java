@@ -20,8 +20,8 @@ public class PromotionRepository {
     public PromotionCampaign saveCampaign(PromotionCampaign campaign) {
         String sql = """
                 INSERT INTO promotion_campaigns
-                (campaign_code, title, description, start_datetime, end_datetime, discount_percent, status, created_at, cancelled_at, click_count)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                (campaign_code, title, description, start_datetime, end_datetime, discount_percent, status, cancelled_at, click_count)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """;
 
         try (Connection connection = database.makeConnection();

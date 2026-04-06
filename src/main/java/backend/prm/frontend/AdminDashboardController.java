@@ -31,58 +31,100 @@ import java.util.Optional;
 
 public class AdminDashboardController {
 
-    @FXML private VBox rootPane;
+    @FXML
+    private VBox rootPane;
 
-    @FXML private ListView<PromotionCampaign> campaignListView;
-    @FXML private Label selectedCampaignLabel;
-    @FXML private Label statusLabel;
+    @FXML
+    private ListView<PromotionCampaign> campaignListView;
+    @FXML
+    private Label selectedCampaignLabel;
+    @FXML
+    private Label statusLabel;
 
-    @FXML private TextField titleField;
-    @FXML private TextArea descriptionArea;
-    @FXML private DatePicker startDatePicker;
-    @FXML private DatePicker endDatePicker;
+    @FXML
+    private TextField titleField;
+    @FXML
+    private TextArea descriptionArea;
+    @FXML
+    private DatePicker startDatePicker;
+    @FXML
+    private DatePicker endDatePicker;
 
-    @FXML private TextField campaignDiscountField;
+    @FXML
+    private TextField campaignDiscountField;
 
-    @FXML private Button createCampaignButton;
-    @FXML private Button editCampaignButton;
-    @FXML private Button saveCampaignButton;
-    @FXML private Button cancelCampaignButton;
-    @FXML private Button deleteCampaignButton;
-    @FXML private Button reactivateCampaignButton;
-    @FXML private Button stopCampaignButton;
+    @FXML
+    private Button createCampaignButton;
+    @FXML
+    private Button editCampaignButton;
+    @FXML
+    private Button saveCampaignButton;
+    @FXML
+    private Button cancelCampaignButton;
+    @FXML
+    private Button deleteCampaignButton;
+    @FXML
+    private Button reactivateCampaignButton;
+    @FXML
+    private Button stopCampaignButton;
 
-    @FXML private ListView<PromotionItem> itemsListView;
-    @FXML private Label itemsCampaignLabel;
+    @FXML
+    private ListView<PromotionItem> itemsListView;
+    @FXML
+    private Label itemsCampaignLabel;
 
-    @FXML private VBox itemDetailsBox;
-    @FXML private Label selectedItemIdLabel;
-    @FXML private Label selectedItemProductIdLabel;
-    @FXML private Label selectedItemPriceLabel;
-    @FXML private Label selectedItemStatsLabel;
-    @FXML private Button deleteItemButton;
-    @FXML private TextField editItemProductIdField;
-    @FXML private Button saveItemButton;
-    @FXML private Button cancelItemEditButton;
+    @FXML
+    private VBox itemDetailsBox;
+    @FXML
+    private Label selectedItemIdLabel;
+    @FXML
+    private Label selectedItemProductIdLabel;
+    @FXML
+    private Label selectedItemPriceLabel;
+    @FXML
+    private Label selectedItemStatsLabel;
+    @FXML
+    private Button deleteItemButton;
+    @FXML
+    private TextField editItemProductIdField;
+    @FXML
+    private Button saveItemButton;
+    @FXML
+    private Button cancelItemEditButton;
 
-    @FXML private Label toastLabel;
+    @FXML
+    private Label toastLabel;
 
-    @FXML private TextField productSearchField;
-    @FXML private TableView<ProductDAO.ProductSummary> productsTable;
-    @FXML private TableColumn<ProductDAO.ProductSummary, String> productIdColumn;
-    @FXML private TableColumn<ProductDAO.ProductSummary, String> productDescriptionColumn;
-    @FXML private TableColumn<ProductDAO.ProductSummary, Double> productPriceColumn;
-    @FXML private Button addSelectedProductButton;
+    @FXML
+    private TextField productSearchField;
+    @FXML
+    private TableView<ProductDAO.ProductSummary> productsTable;
+    @FXML
+    private TableColumn<ProductDAO.ProductSummary, String> productIdColumn;
+    @FXML
+    private TableColumn<ProductDAO.ProductSummary, String> productDescriptionColumn;
+    @FXML
+    private TableColumn<ProductDAO.ProductSummary, Double> productPriceColumn;
+    @FXML
+    private Button addSelectedProductButton;
 
-    @FXML private DatePicker reportStartDatePicker;
-    @FXML private DatePicker reportEndDatePicker;
+    @FXML
+    private DatePicker reportStartDatePicker;
+    @FXML
+    private DatePicker reportEndDatePicker;
 
-    @FXML private Label reportTitleLabel;
-    @FXML private Label reportAddressLabel;
-    @FXML private VBox reportMetaBox;
-    @FXML private TextArea reportBodyArea;
-    @FXML private Label reportGeneratedLabel;
-    @FXML private Label reportGeneratedByLabel;
+    @FXML
+    private Label reportTitleLabel;
+    @FXML
+    private Label reportAddressLabel;
+    @FXML
+    private VBox reportMetaBox;
+    @FXML
+    private TextArea reportBodyArea;
+    @FXML
+    private Label reportGeneratedLabel;
+    @FXML
+    private Label reportGeneratedByLabel;
 
     private static final String COMPANY_ADDRESS =
             "Cosymed Ltd.\n" +
@@ -217,9 +259,7 @@ public class AdminDashboardController {
                     return;
                 }
 
-                String discountInfo = selectedCampaign == null
-                        ? "-"
-                        : String.format("%.2f", selectedCampaign.getDiscountPercent());
+                String discountInfo = String.format("%.2f", selectedCampaign.getDiscountPercent());
 
                 setText(
                         "Item ID: " + item.getId()
@@ -342,13 +382,23 @@ public class AdminDashboardController {
     @FXML
     private void handleSaveCampaign() {
         try {
+            String title = titleField.getText() == null ? "" : titleField.getText().trim();
+            if (title.isBlank()) {
+                throw new IllegalArgumentException("Campaign title is required.");
+            }
+
             LocalDateTime startDateTime = startOfDay(startDatePicker, "start");
             LocalDateTime endDateTime = endOfDay(endDatePicker, "end");
-            double discount = parseDiscount();
+
+            if (startDateTime.isAfter(endDateTime)) {
+                throw new IllegalArgumentException("End date must be after start date.");
+            }
+
+            double discount = parseDiscountOrZero();
 
             if (createMode) {
                 PromotionCampaign created = promotionController.createCampaign(
-                        titleField.getText(),
+                        title,
                         descriptionArea.getText(),
                         startDateTime,
                         endDateTime,
@@ -373,7 +423,7 @@ public class AdminDashboardController {
 
                 promotionController.updateCampaign(
                         campaignId,
-                        titleField.getText(),
+                        title,
                         descriptionArea.getText(),
                         startDateTime,
                         endDateTime,
@@ -1081,5 +1131,24 @@ public class AdminDashboardController {
         endDatePicker.setValue(null);
         campaignDiscountField.clear();
         selectedCampaignLabel.setText("No campaign selected");
+    }
+
+    private double parseDiscountOrZero() {
+        String text = campaignDiscountField.getText();
+        if (text == null || text.isBlank()) {
+            return 0.0;
+        }
+        try {
+            double value = Double.parseDouble(text.trim());
+            if (value < 0 || value > 100) {
+                statusLabel.setText("Discount must be between 0 and 100.");
+                showToast("Discount must be between 0 and 100.", false);
+            }
+            return value;
+        } catch (NumberFormatException e) {
+            statusLabel.setText("Invalid Discount Percentage " + e.getMessage());
+            showToast("Invalid Discount Percentage" + e.getMessage(), false);
+            return 0;
+        }
     }
 }

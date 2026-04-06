@@ -47,11 +47,11 @@ public class ProductDAO {
 
     public Optional<Item> findById(String productId) {
         String sql = """
-                SELECT product_id, description, package_type, unit,
-                       units_in_pack, package_cost, availability_packs,
-                       stock_limit_packs, is_active
+                SELECT itemID, Description, PackageType, Unit,
+                       UnitsInAPack, PackageCost, Availability,
+                       StockLimit
                 FROM catalogue
-                WHERE product_id = ?
+                WHERE itemID = ?
                 """;
 
         try (
@@ -63,14 +63,14 @@ public class ProductDAO {
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     Item product = new Item(
-                            rs.getInt("product_id"),
-                            rs.getString("description"),
-                            rs.getString("package_type"),
-                            rs.getString("unit"),
-                            rs.getInt("units_in_pack"),
-                            (float) rs.getDouble("package_cost"),
-                            rs.getInt("availability_packs"),
-                            (float) rs.getDouble("stock_limit_packs")
+                            rs.getInt("itemID"),
+                            rs.getString("Description"),
+                            rs.getString("PackageType"),
+                            rs.getString("Unit"),
+                            rs.getInt("UnitsInAPack"),
+                            (float) rs.getDouble("PackageCost"),
+                            rs.getInt("Availability"),
+                            (float) rs.getDouble("StockLimit")
                     );
                     return Optional.of(product);
                 }
@@ -85,11 +85,13 @@ public class ProductDAO {
 
     public List<ProductSummary> findAllActiveProducts() {
         String sql = """
-                SELECT product_id, description, package_cost
-                FROM catalogue
-                WHERE is_active = true
-                ORDER BY description ASC, product_id ASC
-                """;
+        SELECT CAST(ItemID AS CHAR(20)) AS product_id,
+               Description AS description,
+               PackageCost AS package_cost
+        FROM catalogue
+        WHERE is_active = TRUE
+        ORDER BY Description ASC, ItemID ASC
+        """;
 
         List<ProductSummary> result = new ArrayList<>();
 
@@ -112,18 +114,20 @@ public class ProductDAO {
         return result;
     }
 
+
     public List<ProductSummary> searchActiveProducts(String queryText) {
         String sql = """
-            
-                SELECT product_id, description, package_cost
-            FROM catalogue
-            WHERE is_active = TRUE
-              AND (
-                  product_id LIKE ?
-                  OR description LIKE ?
-              )
-            ORDER BY description ASC, product_id ASC
-            """;
+        SELECT CAST(ItemID AS CHAR(20)) AS product_id,
+               Description AS description,
+               PackageCost AS package_cost
+        FROM catalogue
+        WHERE is_active = TRUE
+          AND (
+              CAST(ItemID AS CHAR(20)) LIKE ?
+              OR Description LIKE ?
+          )
+        ORDER BY Description ASC, ItemID ASC
+        """;
 
         String q = "%" + (queryText == null ? "" : queryText.trim()) + "%";
         List<ProductSummary> result = new ArrayList<>();
