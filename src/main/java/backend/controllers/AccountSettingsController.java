@@ -15,6 +15,7 @@ import java.util.Objects;
 
 public class AccountSettingsController {
 
+    @FXML public Button History;
     @FXML private TextField searchField;
     @FXML private Button accountSettingsButton;
     @FXML private TextField emailField;
@@ -196,19 +197,17 @@ public class AccountSettingsController {
         switchPage(event, "Login.fxml");
     }
 
-    @FXML
-    public void goToCatalogue(ActionEvent event) {
+    @FXML public void goToCatalogue(ActionEvent event) {
         switchPage(event, "Catalogue.fxml");
     }
-
-    @FXML
-    public void goToCurrentPromotions(ActionEvent event) {
+    @FXML public void goToCurrentPromotions(ActionEvent event) {
         switchPage(event, "CurrentPromotions.fxml");
     }
-
-    @FXML
-    public void goToCheckout(ActionEvent event) {
+    @FXML public void goToCheckout(ActionEvent event) {
         switchPage(event, "Basket.fxml");
+    }
+    @FXML public void goToHistory(ActionEvent event) {
+        switchPage(event, "AccountHistory.fxml");
     }
 
 

@@ -159,9 +159,5 @@ public class LoginController {
         }
     }
 
-    private void updateFunction() {
-
-    }
-
 
 }

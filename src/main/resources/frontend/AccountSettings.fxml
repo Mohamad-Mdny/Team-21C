@@ -132,4 +132,20 @@
         </ScrollPane>
     </center>
 
+    <right>
+        <VBox prefWidth="320.0"
+              spacing="12.0"
+              style="-fx-background-color: #f9fafb; -fx-padding: 16; -fx-border-color: #d1d5db; -fx-border-width: 0 0 0 1;">
+
+            <Button fx:id="History"
+                    mnemonicParsing="false"
+                    onAction="#goToHistory"
+                    text="Order History"
+                    maxWidth="Infinity"
+                    style="-fx-font-weight: bold; -fx-padding: 10 0 10 0;" />
+
+
+        </VBox>
+    </right>
+
 </BorderPane>
