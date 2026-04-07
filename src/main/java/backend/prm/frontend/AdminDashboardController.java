@@ -1,5 +1,7 @@
 package backend.prm.frontend;
 
+import backend.Reports.EngagementReport;
+import backend.Reports.EngagementStats;
 import backend.Reports.ProductStats;
 import backend.Reports.SalesReport;
 import backend.prm.controller.PromotionController;
@@ -24,6 +26,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.util.Duration;
+import java.util.Map;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -31,6 +34,7 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class AdminDashboardController {
 
@@ -780,8 +784,6 @@ public class AdminDashboardController {
         setItemEditMode(false);
     }
 
-
-
     @FXML
     private void closeItemDetails() {
         selectedItem = null;
@@ -855,7 +857,6 @@ public class AdminDashboardController {
         refreshUiState();
     }
 
-
     private boolean isChildOf(Node node, Node parent) {
         Node current = node;
         while (current != null) {
@@ -866,7 +867,6 @@ public class AdminDashboardController {
         }
         return false;
     }
-
     private void setCampaignFormDisabled(boolean disabled) {
         titleField.setDisable(disabled);
         descriptionArea.setDisable(disabled);
@@ -874,12 +874,10 @@ public class AdminDashboardController {
         endDatePicker.setDisable(disabled);
         campaignDiscountField.setDisable(disabled);
     }
-
     private void refreshUiState() {
         updateActionButtons();
         updateCampaignButtonsVisibility();
     }
-
     private void updateActionButtons() {
         boolean hasCampaign = selectedCampaign != null;
         boolean hasItem = selectedItem != null;
@@ -1079,16 +1077,63 @@ public class AdminDashboardController {
                     buildHitsReportBody(rows)
             );
 
+            generateHitsReportPdfs(rows, from, to);
+
             showToast("Hits report generated.", true);
-
-
-//            List<ProductStats> stats = List.of(new ProductStats("123456","Widget A", 42, 23.45));
-//            SalesReport.generateReport(stats, "sales_report.pdf", from.format(reportDateFormatter), to.format(reportDateFormatter));
 
         } catch (Exception e) {
             renderReportError("Hits report failed:\n" + e.getMessage());
-            showToast("Hits report failed.", false);
-            throw e;
+            showToast("Hits report failed: " + e.getMessage(), false);
+
+        }
+    }
+
+    private void generateHitsReportPdfs(List<CampaignHitReportRow> rows, LocalDateTime from, LocalDateTime to) {
+        if (rows == null || rows.isEmpty()) {
+            return;
+        }
+
+        try {
+
+            Map<String, List<CampaignHitReportRow>> byCampaign =
+                    rows.stream().collect(Collectors.groupingBy(CampaignHitReportRow::getCampaignCode));
+
+            String startPeriod = from.format(reportDateFormatter);
+            String endPeriod = to.format(reportDateFormatter);
+
+            for (Map.Entry<String, List<CampaignHitReportRow>> entry : byCampaign.entrySet()) {
+                String campCode = entry.getKey();
+                List<CampaignHitReportRow> campRows = entry.getValue();
+                String campTitle = campRows.isEmpty() ? "-" : safe(campRows.get(0).getCampaignTitle());
+
+                // Convert repo rows -> EngagementStats rows
+                List<EngagementStats> stats = campRows.stream()
+                        .map(r -> new EngagementStats(
+                                safe(r.getProductId()),
+                                safe(r.getProductDescription()) + " hits",
+                                r.getAddedToOrder(),     // ✅ "hit count" = added_to_order_count
+                                r.getPurchased()
+                        ))
+                        .toList();
+
+                // File name
+                String filename = "engagement_" + campCode + "_" + System.currentTimeMillis() + ".pdf";
+//                String outputPath = outDir.resolve(filename);
+
+                EngagementReport.generateReport(
+                        stats,
+                        campCode,
+                        campTitle,
+                        startPeriod,
+                        endPeriod,
+                        "engagement_reportSales.pdf"
+                );
+            }
+
+        } catch (Exception e) {
+            // Don’t break the UI just because PDF export failed
+            System.err.println("PDF export failed: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 
