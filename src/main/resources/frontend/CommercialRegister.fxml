@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?> <?import javafx.scene.control.*?> <?import javafx.scene.layout.*?>
 <BorderPane prefHeight="700.0" prefWidth="1400.0" xmlns="http://javafx.com/javafx/17.0.12"
             xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="backend.controllers.RegisterController"> <!-- TOP BAR (theme consistent) -->
+            fx:controller="backend.controllers.RegisterController">
     <top>
         <VBox spacing="12.0" style="-fx-background-color: #1f2937; -fx-padding: 16;">
             <HBox>
@@ -9,11 +9,11 @@
                 <Region HBox.hgrow="ALWAYS"/>
                 <Label text="Commercial Registration" style="-fx-text-fill: #e5e7eb; -fx-font-size: 14px;"/>
             </HBox>
-            <StackPane> <!-- Included for consistent layout -->
+            <StackPane>
                 <TextField fx:id="searchField" maxWidth="420.0" prefWidth="420.0" promptText="Search catalogue..."/>
             </StackPane>
             <HBox spacing="10.0"
-                  alignment="CENTER_LEFT"> <!-- If RegisterController doesn't have these, remove onAction attributes -->
+                  alignment="CENTER_LEFT">
                 <Button mnemonicParsing="false" text="Catalogue" onAction="#goToCatalogue"/>
                 <Button mnemonicParsing="false" text="Current Promotions" onAction="#goToCurrentPromotions"/>
                 <Region HBox.hgrow="ALWAYS"/>

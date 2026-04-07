@@ -212,15 +212,7 @@ public class CatalogueController {
     }
     //@FXML public void goToCurrentPromotions(ActionEvent event) {switchPage(event, "PromotionsPage.fxml");}
 
-    @FXML
-    public void goToAdminDashboard(ActionEvent event) {
-        switchPage(event, "AdminDashboard.fxml");
-    }
-    /*
 
-
-
-     */
     @FXML public void goToCurrentPromotions(ActionEvent event) {switchPage(event, "PromotionsPage.fxml");}
 
 
@@ -245,9 +237,9 @@ public class CatalogueController {
     @FXML
     public void handleAccountButton(ActionEvent event) {
         switch (Main.userType()) {
-            case "NonCommercial" : {switchPage(event, "AccountSettings.fxml");}
-            case "Admin" : {switchPage(event, "AdminDashboard.fxml");}
-            default: {switchPage(event, "Login.fxml");}
+            case "NonCommercial" : {switchPage(event, "AccountSettings.fxml"); break;}
+            case "Admin" : {switchPage(event, "AdminDashboard.fxml");break;}
+            default: {switchPage(event, "Login.fxml");break;}
         }
     }
     private void switchPage(ActionEvent event, String fxmlFile) {

@@ -83,7 +83,7 @@ public class Member extends User{
 
     public boolean purchase(String deliveryAddress, String paymentMethod, String deliveryOption, String notes) {
         if (Basket == null || Basket.isEmpty()) {
-            System.out.println("Basket is empty");
+//            System.out.println("Basket is empty");
             return false;
         }
 
@@ -93,12 +93,12 @@ public class Member extends User{
         }
 
         if (paymentMethod == null || paymentMethod.isBlank()) {
-            System.out.println("paymentMethod is empty");
+//            System.out.println("paymentMethod is empty");
             return false;
         }
 
         if (deliveryOption == null || deliveryOption.isBlank()) {
-            System.out.println("deliveryOption is empty");
+//            System.out.println("deliveryOption is empty");
             return false;
         }
         String body = "Thank you for your purchase. " +

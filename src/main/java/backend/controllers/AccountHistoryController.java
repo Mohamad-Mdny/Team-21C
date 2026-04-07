@@ -46,7 +46,6 @@ public class AccountHistoryController {
 
 
     public void initialize(){
-        System.out.println("Loading Tables");
         loadOrderHistory();
         loadTransactionHistory();
     }

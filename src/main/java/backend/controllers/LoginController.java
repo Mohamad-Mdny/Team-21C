@@ -52,7 +52,6 @@ public class LoginController {
 
                         switch (resultSet.getString("type")) {
                             case "NonCommercial": {
-                                System.out.println("NonCommercial");
                                 if (resultSet.getBoolean("firstLogin")) {
                                     try {
                                         Parent root = FXMLLoader.load(getClass().getResource("/frontend/ForgetPassword.fxml"));
@@ -81,7 +80,6 @@ public class LoginController {
                                 return;
                             }
                             case "Administrator", "PU-Admin": {
-                                System.out.println("Administrator");
                                 try {
                                     Main.admin = new Admin(email);
                                     Main.m.signIn();
