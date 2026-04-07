@@ -1,9 +1,6 @@
 package backend.prm.frontend;
 
-import backend.Reports.EngagementReport;
-import backend.Reports.EngagementStats;
-import backend.Reports.ProductStats;
-import backend.Reports.SalesReport;
+import backend.Reports.*;
 import backend.prm.controller.PromotionController;
 import backend.prm.model.PromotionCampaign;
 import backend.prm.model.PromotionItem;
@@ -1022,11 +1019,12 @@ public class AdminDashboardController {
                     buildSalesReportBody(rows)
             );
 
+            generateSalesReportPdf(rows, from, to);
+
             showToast("Sales report generated.", true);
         } catch (Exception e) {
             renderReportError("Sales report failed:\n" + e.getMessage());
-            showToast("Sales report failed.", false);
-            throw e;
+            showToast("Sales report failed: " + e.getMessage(), false);
         }
     }
 
@@ -1042,17 +1040,17 @@ public class AdminDashboardController {
                     List.of(
                             "Start Period: " + from.format(reportDateFormatter),
                             "End Period: " + to.format(reportDateFormatter),
-                            "Active campaigns: " + rows.size()
+                            "Campaigns found: " + rows.size()
                     ),
                     buildCampaignReportBody(rows)
             );
 
+            generateCampaignReportPdf(rows, from, to);
+
             showToast("Campaign report generated.", true);
         } catch (Exception e) {
             renderReportError("Campaign report failed:\n" + e.getMessage());
-            showToast("Campaign report failed.", false);
-            throw e;
-
+            showToast("Campaign report failed: " + e.getMessage(), false);
         }
     }
 
@@ -1106,19 +1104,16 @@ public class AdminDashboardController {
                 List<CampaignHitReportRow> campRows = entry.getValue();
                 String campTitle = campRows.isEmpty() ? "-" : safe(campRows.get(0).getCampaignTitle());
 
-                // Convert repo rows -> EngagementStats rows
                 List<EngagementStats> stats = campRows.stream()
                         .map(r -> new EngagementStats(
                                 safe(r.getProductId()),
                                 safe(r.getProductDescription()) + " hits",
-                                r.getAddedToOrder(),     // ✅ "hit count" = added_to_order_count
+                                r.getAddedToOrder(),
                                 r.getPurchased()
                         ))
                         .toList();
 
-                // File name
-                String filename = "engagement_" + campCode + "_" + System.currentTimeMillis() + ".pdf";
-//                String outputPath = outDir.resolve(filename);
+
 
                 EngagementReport.generateReport(
                         stats,
@@ -1131,8 +1126,60 @@ public class AdminDashboardController {
             }
 
         } catch (Exception e) {
-            // Don’t break the UI just because PDF export failed
             System.err.println("PDF export failed: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    private void generateCampaignReportPdf(List<CampaignReportRow> rows, LocalDateTime from, LocalDateTime to) {
+        if (rows == null || rows.isEmpty()) return;
+
+        try {
+
+
+            String startPeriod = from.format(reportDateFormatter);
+            String endPeriod = to.format(reportDateFormatter);
+
+            String filename = "campaigns_report_" + System.currentTimeMillis() + ".pdf";
+
+            CampaignReport.generateReport(rows, startPeriod, endPeriod, filename);
+
+            System.out.println("Campaign report saved to: " + filename);
+        } catch (Exception e) {
+
+            System.err.println("Campaign PDF export failed: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    private void generateSalesReportPdf(List<SalesReportRow> rows, LocalDateTime from, LocalDateTime to) {
+        if (rows == null || rows.isEmpty()) {
+            return;
+        }
+
+        try {
+
+
+            String startPeriod = from.format(reportDateFormatter);
+            String endPeriod = to.format(reportDateFormatter);
+
+            String filename = "sales_report_" + System.currentTimeMillis() + ".pdf";
+
+            List<ProductStats> stats = rows.stream()
+                    .map(r -> new ProductStats(
+                            safe(r.getProductId()),
+                            safe(r.getProductDescription()),
+                            r.getQuantitySold(),
+                            r.getUnitPrice(),
+                            r.getTotalPrice()
+                    ))
+                    .toList();
+
+            SalesReport.generateReport(stats, "sales_report.pdf", startPeriod, endPeriod);
+
+            System.out.println("Sales report saved to: " + "sales_report.pdf");
+        } catch (Exception e) {
+            System.err.println("Sales PDF export failed: " + e.getMessage());
             e.printStackTrace();
         }
     }

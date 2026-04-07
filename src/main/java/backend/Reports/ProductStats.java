@@ -5,12 +5,14 @@ public class ProductStats {
     private int quantitySold;
     private double unitPrice;
     private String itemId;
+    private double totalPrice;
 
-    public ProductStats(String itemId, String productName, int timesBought, double unitPrice) {
+    public ProductStats(String itemId, String productName, int timesBought, double unitPrice, double totalPrice) {
         this.itemId = itemId;
         this.productName = productName;
         this.quantitySold = timesBought;
         this.unitPrice = unitPrice;
+        this.totalPrice = totalPrice;
     }
 
     public String getItemId() {
@@ -24,4 +26,5 @@ public class ProductStats {
     }
     public double getUnitPrice() {return unitPrice;}
     public double getTotalRevenue() {return getQuantitySold()  * getUnitPrice();}
+    public double getTotalPrice() {return totalPrice;}
 }
