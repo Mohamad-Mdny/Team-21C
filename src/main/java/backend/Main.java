@@ -1,5 +1,7 @@
 package backend;
 
+import backend.Reports.ProductStats;
+import backend.Reports.SalesReport;
 import backend.models.Admin;
 import backend.models.Member;
 import backend.models.User;
@@ -8,6 +10,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import java.io.IOException;
+import java.util.List;
 
 
 public class Main extends Application {

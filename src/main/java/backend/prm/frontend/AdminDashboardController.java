@@ -1,5 +1,7 @@
 package backend.prm.frontend;
 
+import backend.Reports.ProductStats;
+import backend.Reports.SalesReport;
 import backend.prm.controller.PromotionController;
 import backend.prm.model.PromotionCampaign;
 import backend.prm.model.PromotionItem;
@@ -1024,9 +1026,9 @@ public class AdminDashboardController {
 
             showToast("Sales report generated.", true);
         } catch (Exception e) {
-            e.printStackTrace();
             renderReportError("Sales report failed:\n" + e.getMessage());
             showToast("Sales report failed.", false);
+            throw e;
         }
     }
 
@@ -1049,9 +1051,10 @@ public class AdminDashboardController {
 
             showToast("Campaign report generated.", true);
         } catch (Exception e) {
-            e.printStackTrace();
             renderReportError("Campaign report failed:\n" + e.getMessage());
             showToast("Campaign report failed.", false);
+            throw e;
+
         }
     }
 
@@ -1077,10 +1080,15 @@ public class AdminDashboardController {
             );
 
             showToast("Hits report generated.", true);
+
+
+//            List<ProductStats> stats = List.of(new ProductStats("123456","Widget A", 42, 23.45));
+//            SalesReport.generateReport(stats, "sales_report.pdf", from.format(reportDateFormatter), to.format(reportDateFormatter));
+
         } catch (Exception e) {
-            e.printStackTrace();
             renderReportError("Hits report failed:\n" + e.getMessage());
             showToast("Hits report failed.", false);
+            throw e;
         }
     }
 

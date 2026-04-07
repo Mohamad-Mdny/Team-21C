@@ -482,7 +482,7 @@ public class PromotionRepository {
                    e.unit_price,
                    SUM(e.quantity * e.unit_price) AS total_price
             FROM promotion_order_events e
-            LEFT JOIN catalogue c ON c.product_id = e.product_id
+            LEFT JOIN catalogue c ON c.ItemID = e.product_id
             WHERE e.event_type = 'PURCHASED'
               AND e.event_time BETWEEN ? AND ?
             GROUP BY e.product_id, c.description, e.unit_price
@@ -571,7 +571,7 @@ public class PromotionRepository {
                    END AS conversion_rate
             FROM promotion_campaigns c
             JOIN promotion_campaign_items i ON i.campaign_id = c.campaign_id
-            LEFT JOIN catalogue cat ON cat.product_id = i.product_id
+            LEFT JOIN catalogue cat ON cat.ItemID = i.product_id
             WHERE c.start_datetime <= ?
               AND c.end_datetime >= ?
             ORDER BY c.campaign_id, i.campaign_item_id
@@ -600,6 +600,8 @@ public class PromotionRepository {
             throw new RuntimeException("Failed to build campaign hit report", e);
         }
         return rows;
+
+
     }
 
     private PromotionCampaign mapCampaign(ResultSet rs) throws SQLException {
