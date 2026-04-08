@@ -1,5 +1,6 @@
 package backend.controllers;
 
+import backend.DatabaseManager;
 import backend.Main;
 import backend.models.Item;
 import backend.prm.controller.PromotionController;
@@ -18,6 +19,10 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -191,6 +196,8 @@ public class CheckoutAccountController {
 
             PromotionBasketTracker.clear();
             purchaseStatusLabel.setText("Purchase completed successfully.");
+            saveOrder(5,"Test", Main.member.getUserName());
+            saveTransaction(55, Main.member.getUserName());
             loadBasket();
             switchPage(event, "Catalogue.fxml");
         } else {
@@ -257,6 +264,33 @@ public class CheckoutAccountController {
             if (purchaseStatusLabel != null) {
                 purchaseStatusLabel.setText("Navigation failed: " + e.getMessage());
             }
+        }
+    }
+
+    private void saveOrder(int OrderID, String description, String emailAddress){
+        DatabaseManager databaseManager = new DatabaseManager();
+        Connection connection = databaseManager.makeConnection();
+        try {
+            PreparedStatement statement = connection.prepareStatement("INSERT INTO 'order'(OrderID, Description, EmailAddress) VALUES (?,?,?)");
+            statement.setInt(1, OrderID);
+            statement.setString(2, description);
+            statement.setString(3, emailAddress);
+
+            statement.execute();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+    private void saveTransaction(int amount, String emailAddress){
+        DatabaseManager databaseManager = new DatabaseManager();
+        Connection connection = databaseManager.makeConnection();
+        try {
+            PreparedStatement statement = connection.prepareStatement("INSERT INTO catalogue.transaction(Amount, EmailAddress) VALUES (?,?)");
+            statement.setInt(1, amount);
+            statement.setString(2, emailAddress);
+            statement.execute();
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
     }
 

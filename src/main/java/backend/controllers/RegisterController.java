@@ -53,7 +53,7 @@ public class RegisterController {
                 PreparedStatement statement = connection.prepareStatement("INSERT INTO member(emailAddress,password,type,validityStatus,totalPurchases,firstLogin) VALUES (?,?,?,?,?,?)");
                 statement.setString(1, emailAddress.toLowerCase());
                 statement.setString(2, generatedPassword);
-                statement.setString(3, "nonCommercial");
+                statement.setString(3, "NonCommercial");
                 statement.setString(4, "valid");
                 statement.setInt(5, 0);
                 statement.setBoolean(6, true);

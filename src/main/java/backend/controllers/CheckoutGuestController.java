@@ -1,5 +1,6 @@
 package backend.controllers;
 
+import backend.DatabaseManager;
 import backend.Main;
 import backend.models.Item;
 import backend.prm.controller.PromotionController;
@@ -18,6 +19,9 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -195,6 +199,9 @@ public class CheckoutGuestController {
 
             PromotionBasketTracker.clear();
             purchaseStatusLabel.setText("Purchase completed successfully.");
+            //dummy info
+            //saveOrder(8,"Paracetamol");
+            //saveTransaction(55);
             loadBasket();
         } else {
             purchaseStatusLabel.setText("Purchase failed. Please check your basket and details.");
@@ -268,6 +275,30 @@ public class CheckoutGuestController {
             if (purchaseStatusLabel != null) {
                 purchaseStatusLabel.setText("Navigation failed: " + e.getMessage());
             }
+        }
+    }
+    private void saveOrder(int OrderID, String description){
+        DatabaseManager databaseManager = new DatabaseManager();
+        Connection connection = databaseManager.makeConnection();
+        try {
+            PreparedStatement statement = connection.prepareStatement("INSERT INTO catalogue.order(OrderID, Description) VALUES (?,?)");
+            statement.setInt(1, OrderID);
+            statement.setString(2, description);
+
+            statement.execute();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+    private void saveTransaction(int amount){
+        DatabaseManager databaseManager = new DatabaseManager();
+        Connection connection = databaseManager.makeConnection();
+        try {
+            PreparedStatement statement = connection.prepareStatement("INSERT INTO catalogue.transaction(Amount) VALUES (?)");
+            statement.setInt(1, amount);
+            statement.execute();
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
     }
 
