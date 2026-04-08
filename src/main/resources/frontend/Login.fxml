@@ -3,10 +3,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<BorderPane prefHeight="700.0" prefWidth="1400.0"
-            xmlns="http://javafx.com/javafx/17.0.12"
-            xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="backend.controllers.LoginController">
+<BorderPane prefHeight="700.0" prefWidth="1400.0" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="backend.controllers.LoginController">
 
     <top>
         <VBox spacing="12.0" style="-fx-background-color: #1f2937; -fx-padding: 16;">
@@ -26,7 +23,7 @@
 
                 <Region HBox.hgrow="ALWAYS" />
 
-                <Button mnemonicParsing="false" text="Basket" onAction="#goToCheckout" />
+                <Button mnemonicParsing="false" onAction="#goToCheckout" text="Basket" />
                 <Button fx:id="SignIn" mnemonicParsing="false" text="Sign In" />
             </HBox>
         </VBox>
@@ -49,11 +46,14 @@
 
                 <VBox spacing="8.0">
                     <Label style="-fx-font-weight: bold;" text="Password" />
-                    <PasswordField fx:id="passwordInput" promptText="Enter Password" onAction="#login"/>
+                    <PasswordField fx:id="passwordInput" onAction="#login" promptText="Enter Password" />
                 </VBox>
 
                 <Button maxWidth="Infinity" mnemonicParsing="false" onAction="#login" style="-fx-font-weight: bold; -fx-padding: 10 0 10 0;" text="Login" />
                 <Label fx:id="errorLabel" layoutX="176.0" layoutY="339.0" prefHeight="19.0" prefWidth="247.0" />
+            <Label prefHeight="18.0" prefWidth="147.0" text="Don't have a membership?" />
+            <Button mnemonicParsing="false" onAction="#goToCommercialRegister" prefHeight="26.0" prefWidth="153.0" text="Commercial Sign up" />
+            <Button mnemonicParsing="false" onAction="#goToNonCommercialRegister" prefHeight="26.0" prefWidth="155.0" text="non-Commercial Sign up" />
             </VBox>
         </StackPane>
 

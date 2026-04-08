@@ -1,277 +1,201 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.Insets?>
+<?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<VBox xmlns="http://javafx.com/javafx/25"
-      xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="backend.prm.frontend.AdminDashboardController"
-      fx:id="rootPane"
-      onMouseClicked="#handleRootClick"
-      spacing="16"
-      style="-fx-background-color: #f5f7fb;">
+<VBox fx:id="rootPane" onMouseClicked="#handleRootClick" spacing="16" style="-fx-background-color: #f5f7fb;" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="backend.prm.frontend.AdminDashboardController">
 
     <padding>
-        <Insets top="18" right="18" bottom="18" left="18"/>
+        <Insets bottom="18" left="18" right="18" top="18" />
     </padding>
 
-    <HBox spacing="12" alignment="CENTER_LEFT">
-        <Label text="Promotion Admin Dashboard"
-               style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #1f2937;"/>
-        <Pane HBox.hgrow="ALWAYS"/>
-        <Label fx:id="statusLabel"
-               text="Ready"
-               style="-fx-text-fill: #4b5563; -fx-font-size: 13px;"/>
+    <HBox alignment="CENTER_LEFT" spacing="12">
+        <Label style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #1f2937;" text="Promotion Admin Dashboard" />
+        <Pane HBox.hgrow="ALWAYS" />
+        <Label fx:id="statusLabel" style="-fx-text-fill: #4b5563; -fx-font-size: 13px;" text="Ready" />
     </HBox>
 
-    <Label fx:id="toastLabel"
-           text=""
-           visible="false"
-           managed="false"
-           style="-fx-padding: 8 12 8 12; -fx-background-radius: 8; -fx-font-weight: bold;"/>
+    <Label fx:id="toastLabel" managed="false" style="-fx-padding: 8 12 8 12; -fx-background-radius: 8; -fx-font-weight: bold;" text="" visible="false" />
 
-    <SplitPane dividerPositions="0.22,0.68" VBox.vgrow="ALWAYS">
+    <SplitPane dividerPositions="0.22, 0.68" VBox.vgrow="ALWAYS">
 
-        <VBox spacing="12"
-              style="-fx-background-color: white; -fx-background-radius: 14; -fx-padding: 16;">
-            <HBox spacing="8" alignment="CENTER_LEFT">
-                <Label text="Campaigns" style="-fx-font-size: 18px; -fx-font-weight: bold;"/>
-                <Pane HBox.hgrow="ALWAYS"/>
-                <Button text="Refresh" onAction="#handleRefreshCampaigns"/>
+        <VBox spacing="12" style="-fx-background-color: white; -fx-background-radius: 14; -fx-padding: 16;">
+            <HBox alignment="CENTER_LEFT" spacing="8">
+                <Label style="-fx-font-size: 18px; -fx-font-weight: bold;" text="Campaigns" />
+                <Pane HBox.hgrow="ALWAYS" />
+                <Button onAction="#handleRefreshCampaigns" text="Refresh" />
             </HBox>
 
-            <ListView fx:id="campaignListView" VBox.vgrow="ALWAYS"/>
+            <ListView fx:id="campaignListView" VBox.vgrow="ALWAYS" />
 
-            <Button fx:id="createCampaignButton"
-                    text="Create New Campaign"
-                    onAction="#handleCreateNewCampaign"
-                    maxWidth="1.7976931348623157E308"/>
+            <Button fx:id="createCampaignButton" maxWidth="1.7976931348623157E308" onAction="#handleCreateNewCampaign" text="Create New Campaign" />
         </VBox>
 
-        <VBox spacing="14"
-              style="-fx-background-color: white; -fx-background-radius: 14; -fx-padding: 16;">
-            <Label fx:id="selectedCampaignLabel"
-                   text="No campaign selected"
-                   style="-fx-font-size: 18px; -fx-font-weight: bold;"/>
+        <VBox spacing="14" style="-fx-background-color: white; -fx-background-radius: 14; -fx-padding: 16;">
+            <Label fx:id="selectedCampaignLabel" style="-fx-font-size: 18px; -fx-font-weight: bold;" text="No campaign selected" />
 
             <GridPane hgap="12" vgap="10">
                 <columnConstraints>
-                    <ColumnConstraints percentWidth="25"/>
-                    <ColumnConstraints percentWidth="75"/>
+                    <ColumnConstraints percentWidth="25" />
+                    <ColumnConstraints percentWidth="75" />
                 </columnConstraints>
 
-                <Label text="Title" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
-                <TextField fx:id="titleField"
-                           promptText="Campaign title"
-                           GridPane.rowIndex="0"
-                           GridPane.columnIndex="1"/>
+                <Label text="Title" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+                <TextField fx:id="titleField" promptText="Campaign title" GridPane.columnIndex="1" GridPane.rowIndex="0" />
 
-                <Label text="Description" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
-                <TextArea fx:id="descriptionArea"
-                          prefRowCount="4"
-                          wrapText="true"
-                          GridPane.rowIndex="1"
-                          GridPane.columnIndex="1"/>
+                <Label text="Description" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+                <TextArea fx:id="descriptionArea" prefRowCount="4" wrapText="true" GridPane.columnIndex="1" GridPane.rowIndex="1" />
 
-                <Label text="Start date" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
-                <DatePicker fx:id="startDatePicker"
-                            GridPane.rowIndex="2"
-                            GridPane.columnIndex="1"/>
+                <Label text="Start date" GridPane.columnIndex="0" GridPane.rowIndex="2" />
+                <DatePicker fx:id="startDatePicker" GridPane.columnIndex="1" GridPane.rowIndex="2" />
 
-                <Label text="End date" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
-                <DatePicker fx:id="endDatePicker"
-                            GridPane.rowIndex="3"
-                            GridPane.columnIndex="1"/>
+                <Label text="End date" GridPane.columnIndex="0" GridPane.rowIndex="3" />
+                <DatePicker fx:id="endDatePicker" GridPane.columnIndex="1" GridPane.rowIndex="3" />
 
-                <Label text="Campaign discount %" GridPane.rowIndex="4" GridPane.columnIndex="0"/>
-                <TextField fx:id="campaignDiscountField"
-                           promptText="Example: 15"
-                           GridPane.rowIndex="4"
-                           GridPane.columnIndex="1"/>
+                <Label text="Campaign discount %" GridPane.columnIndex="0" GridPane.rowIndex="4" />
+                <TextField fx:id="campaignDiscountField" promptText="Example: 15" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+            <rowConstraints>
+               <RowConstraints />
+               <RowConstraints />
+               <RowConstraints />
+               <RowConstraints />
+               <RowConstraints />
+            </rowConstraints>
             </GridPane>
 
             <HBox spacing="10">
-                <Button fx:id="editCampaignButton" text="Edit" onAction="#handleEditCampaign"/>
-                <Button fx:id="saveCampaignButton" text="Save" onAction="#handleSaveCampaign"/>
-                <Button fx:id="cancelCampaignButton" text="Cancel Edit" onAction="#handleCancelCampaignEdit"/>
-                <Button fx:id="deleteCampaignButton" text="Delete" onAction="#handleDeleteCampaign"/>
-                <Button fx:id="stopCampaignButton"
-                        text="Cancel Campaign"
-                        onAction="#handleStopCampaign"
-                        visible="false"
-                        managed="false"/>
-                <Button fx:id="reactivateCampaignButton"
-                        text="Reactivate"
-                        onAction="#handleReactivateCampaign"
-                        visible="false"
-                        managed="false"/>
+                <Button fx:id="editCampaignButton" onAction="#handleEditCampaign" text="Edit" />
+                <Button fx:id="saveCampaignButton" onAction="#handleSaveCampaign" text="Save" />
+                <Button fx:id="cancelCampaignButton" onAction="#handleCancelCampaignEdit" text="Cancel Edit" />
+                <Button fx:id="deleteCampaignButton" onAction="#handleDeleteCampaign" text="Delete" />
+                <Button fx:id="stopCampaignButton" managed="false" onAction="#handleStopCampaign" text="Cancel Campaign" visible="false" />
+                <Button fx:id="reactivateCampaignButton" managed="false" onAction="#handleReactivateCampaign" text="Reactivate" visible="false" />
             </HBox>
 
-            <Separator/>
+            <Separator />
 
-            <Label fx:id="itemsCampaignLabel"
-                   text="No campaign selected"
-                   style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
+            <Label fx:id="itemsCampaignLabel" style="-fx-font-size: 16px; -fx-font-weight: bold;" text="No campaign selected" />
 
         <SplitPane dividerPositions="0.55" VBox.vgrow="ALWAYS">
-            <VBox spacing="10"
-                  style="-fx-background-color: #fafafa; -fx-background-radius: 12; -fx-padding: 12;">
-                <Label text="Campaign Items" style="-fx-font-size: 15px; -fx-font-weight: bold;"/>
+            <VBox spacing="10" style="-fx-background-color: #fafafa; -fx-background-radius: 12; -fx-padding: 12;">
+                <Label style="-fx-font-size: 15px; -fx-font-weight: bold;" text="Campaign Items" />
 
-                <ListView fx:id="itemsListView" VBox.vgrow="ALWAYS"/>
+                <ListView fx:id="itemsListView" VBox.vgrow="ALWAYS" />
 
-                <VBox fx:id="itemDetailsContainer"
-                      spacing="8"
-                      visible="false"
-                      managed="false"
-                      VBox.vgrow="ALWAYS"
-                      style="-fx-background-color: white; -fx-border-color: #e5e7eb; -fx-border-radius: 10; -fx-background-radius: 10; -fx-padding: 12;">
+                <VBox fx:id="itemDetailsContainer" managed="false" spacing="8" style="-fx-background-color: white; -fx-border-color: #e5e7eb; -fx-border-radius: 10; -fx-background-radius: 10; -fx-padding: 12;" visible="false" VBox.vgrow="ALWAYS">
 
-                    <ScrollPane fx:id="itemDetailsScrollPane"
-                                fitToWidth="true"
-                                pannable="true"
-                                VBox.vgrow="ALWAYS"
-                                style="-fx-background-color: transparent; -fx-border-color: transparent;">
+                    <ScrollPane fx:id="itemDetailsScrollPane" fitToWidth="true" pannable="true" style="-fx-background-color: transparent; -fx-border-color: transparent;" VBox.vgrow="ALWAYS">
                         <content>
-                            <VBox fx:id="itemDetailsBox"
-                                  spacing="8"
-                                  style="-fx-background-color: white; -fx-padding: 0;">
+                            <VBox fx:id="itemDetailsBox" spacing="8" style="-fx-background-color: white; -fx-padding: 0;">
 
-                                <Label text="Selected item details" style="-fx-font-size: 14px; -fx-font-weight: bold;"/>
+                                <Label style="-fx-font-size: 14px; -fx-font-weight: bold;" text="Selected item details" />
 
-                                <Label text="Item ID:"/>
-                                <Label fx:id="selectedItemIdLabel" text="-"/>
+                                <Label text="Item ID:" />
+                                <Label fx:id="selectedItemIdLabel" text="-" />
 
-                                <Label text="Product ID:"/>
-                                <Label fx:id="selectedItemProductIdLabel" text="-"/>
+                                <Label text="Product ID:" />
+                                <Label fx:id="selectedItemProductIdLabel" text="-" />
 
-                                <Label text="Promo price:"/>
-                                <Label fx:id="selectedItemPriceLabel" text="-"/>
+                                <Label text="Promo price:" />
+                                <Label fx:id="selectedItemPriceLabel" text="-" />
 
-                                <Label text="Stats:"/>
-                                <Label fx:id="selectedItemStatsLabel" text="-"/>
+                                <Label text="Stats:" />
+                                <Label fx:id="selectedItemStatsLabel" text="-" />
 
-                                <Label text="Discount:"/>
-                                <Label fx:id="selectedItemDiscountLabel" text="-"/>
+                                <Label text="Discount:" />
+                                <Label fx:id="selectedItemDiscountLabel" text="-" />
 
-                                <VBox fx:id="itemEditFieldsBox"
-                                      spacing="6"
-                                      visible="false"
-                                      managed="false">
-                                    <Separator/>
+                                <VBox fx:id="itemEditFieldsBox" managed="false" spacing="6" visible="false">
+                                    <Separator />
 
-                                    <Label text="Edit product ID:"/>
-                                    <TextField fx:id="editItemProductIdField" promptText="Product ID"/>
+                                    <Label text="Edit product ID:" />
+                                    <TextField fx:id="editItemProductIdField" promptText="Product ID" />
 
-                                    <Label text="Override discount %:"/>
-                                    <TextField fx:id="editItemDiscountField"
-                                               promptText="Leave empty to use campaign discount"/>
+                                    <Label text="Override discount %:" />
+                                    <TextField fx:id="editItemDiscountField" promptText="Leave empty to use campaign discount" />
                                 </VBox>
                             </VBox>
                         </content>
                     </ScrollPane>
 
                     <HBox fx:id="itemViewButtonsBox" spacing="8">
-                        <Button fx:id="editItemButton" text="Edit" onAction="#handleEditSelectedItem"/>
-                        <Button fx:id="deleteItemButton" text="Delete" onAction="#handleDeleteSelectedItem"/>
+                        <Button fx:id="editItemButton" onAction="#handleEditSelectedItem" text="Edit" />
+                        <Button fx:id="deleteItemButton" onAction="#handleDeleteSelectedItem" text="Delete" />
                     </HBox>
 
-                    <HBox fx:id="itemEditButtonsBox"
-                          spacing="8"
-                          visible="false"
-                          managed="false">
-                        <Button fx:id="saveItemButton" text="Save" onAction="#handleSaveItemChanges"/>
-                        <Button fx:id="cancelItemEditButton" text="Cancel" onAction="#handleCancelItemEdit"/>
+                    <HBox fx:id="itemEditButtonsBox" managed="false" spacing="8" visible="false">
+                        <Button fx:id="saveItemButton" onAction="#handleSaveItemChanges" text="Save" />
+                        <Button fx:id="cancelItemEditButton" onAction="#handleCancelItemEdit" text="Cancel" />
                     </HBox>
 
-                    <Button text="Close details"
-                            onAction="#closeItemDetails"
-                            maxWidth="1.7976931348623157E308"/>
+                    <Button maxWidth="1.7976931348623157E308" onAction="#closeItemDetails" text="Close details" />
                 </VBox>
             </VBox>
 
-            <VBox spacing="10"
-                  style="-fx-background-color: #fafafa; -fx-background-radius: 12; -fx-padding: 12;">
-                <Label text="Add product to campaign" style="-fx-font-size: 15px; -fx-font-weight: bold;"/>
-                <TextField fx:id="productSearchField" promptText="Search by ID or description"/>
+            <VBox spacing="10" style="-fx-background-color: #fafafa; -fx-background-radius: 12; -fx-padding: 12;">
+                <Label style="-fx-font-size: 15px; -fx-font-weight: bold;" text="Add product to campaign" />
+                <TextField fx:id="productSearchField" promptText="Search by ID or description" />
 
                 <TableView fx:id="productsTable" VBox.vgrow="ALWAYS">
                     <columns>
-                        <TableColumn fx:id="productIdColumn" text="Product ID" prefWidth="120"/>
-                        <TableColumn fx:id="productDescriptionColumn" text="Description" prefWidth="260"/>
-                        <TableColumn fx:id="productPriceColumn" text="Price" prefWidth="100"/>
+                        <TableColumn fx:id="productIdColumn" prefWidth="120" text="Product ID" />
+                        <TableColumn fx:id="productDescriptionColumn" prefWidth="260" text="Description" />
+                        <TableColumn fx:id="productPriceColumn" prefWidth="100" text="Price" />
                     </columns>
                 </TableView>
 
-                <TextField fx:id="addItemDiscountField"
-                           promptText="Optional item discount %"/>
+                <TextField fx:id="addItemDiscountField" promptText="Optional item discount %" />
 
-                <Button fx:id="addSelectedProductButton"
-                        text="Add Selected Product"
-                        onAction="#handleAddSelectedProductToCampaign"
-                        maxWidth="1.7976931348623157E308"/>
+                <Button fx:id="addSelectedProductButton" maxWidth="1.7976931348623157E308" onAction="#handleAddSelectedProductToCampaign" text="Add Selected Product" />
             </VBox>
         </SplitPane>
         </VBox>
 
-        <VBox spacing="12"
-              style="-fx-background-color: white; -fx-background-radius: 14; -fx-padding: 16;">
-            <Label text="Reports" style="-fx-font-size: 18px; -fx-font-weight: bold;"/>
+        <VBox spacing="12" style="-fx-background-color: white; -fx-background-radius: 14; -fx-padding: 16;">
+            <Label style="-fx-font-size: 18px; -fx-font-weight: bold;" text="Reports" />
 
-            <HBox spacing="8" alignment="CENTER_LEFT">
-                <Label text="Start date"/>
-                <DatePicker fx:id="reportStartDatePicker"/>
+            <HBox alignment="CENTER_LEFT" spacing="8">
+                <Label text="Start date" />
+                <DatePicker fx:id="reportStartDatePicker" />
             </HBox>
 
-            <HBox spacing="8" alignment="CENTER_LEFT">
-                <Label text="End date"/>
-                <DatePicker fx:id="reportEndDatePicker"/>
+            <HBox alignment="CENTER_LEFT" spacing="8">
+                <Label text="End date" />
+                <DatePicker fx:id="reportEndDatePicker" />
             </HBox>
 
             <HBox spacing="8">
-                <Button text="Sales Report" onAction="#handleGenerateSalesReport"/>
-                <Button text="Campaign Report" onAction="#handleGenerateCampaignReport"/>
-                <Button text="Hits Report" onAction="#handleGenerateHitsReport"/>
+                <Button onAction="#handleGenerateSalesReport" text="Sales Report" />
+                <Button onAction="#handleGenerateCampaignReport" text="Campaign Report" />
+                <Button onAction="#handleGenerateHitsReport" text="Hits Report" />
             </HBox>
 
-            <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS"
-                        style="-fx-background-color: transparent; -fx-border-color: #e5e7eb; -fx-border-radius: 12; -fx-background-radius: 12;">
+            <ScrollPane fitToWidth="true" style="-fx-background-color: transparent; -fx-border-color: #e5e7eb; -fx-border-radius: 12; -fx-background-radius: 12;" VBox.vgrow="ALWAYS">
                 <content>
-                    <VBox spacing="14"
-                          style="-fx-background-color: #fcfcfd; -fx-padding: 16; -fx-background-radius: 12;">
-                        <Label fx:id="reportTitleLabel"
-                               text="Report preview"
-                               maxWidth="1.7976931348623157E308"
-                               alignment="CENTER"
-                               style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-alignment: center;"/>
+                    <VBox spacing="14" style="-fx-background-color: #fcfcfd; -fx-padding: 16; -fx-background-radius: 12;">
+                        <Label fx:id="reportTitleLabel" alignment="CENTER" maxWidth="1.7976931348623157E308" style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-alignment: center;" text="Report preview" />
 
                         <HBox alignment="TOP_RIGHT">
-                            <VBox alignment="TOP_RIGHT"
-                                  style="-fx-padding: 2 0 0 0;">
-                                <Label fx:id="reportAddressLabel"
-                                       text=""
-                                       wrapText="true"
-                                       alignment="TOP_RIGHT"
-                                       maxWidth="220"
-                                       style="-fx-font-size: 13px; -fx-text-alignment: right;"/>
+                            <VBox alignment="TOP_RIGHT" style="-fx-padding: 2 0 0 0;">
+                                <Label fx:id="reportAddressLabel" alignment="TOP_RIGHT" maxWidth="220" style="-fx-font-size: 13px; -fx-text-alignment: right;" text="" wrapText="true" />
                             </VBox>
                         </HBox>
 
-                        <VBox fx:id="reportMetaBox"
-                              spacing="4"
-                              style="-fx-padding: 4 0 8 0;"/>
+                        <VBox fx:id="reportMetaBox" spacing="4" style="-fx-padding: 4 0 8 0;" />
 
-                        <TextArea fx:id="reportBodyArea"
-                                  prefRowCount="18"
-                                  editable="false"
-                                  wrapText="false"
-                                  style="-fx-font-family: 'Consolas'; -fx-font-size: 12px;"
-                                  VBox.vgrow="ALWAYS"/>
+                        <TextArea fx:id="reportBodyArea" editable="false" prefRowCount="18" style="-fx-font-family: 'Consolas'; -fx-font-size: 12px;" wrapText="false" VBox.vgrow="ALWAYS" />
 
                         <VBox spacing="2">
-                            <Label fx:id="reportGeneratedLabel" text="" style="-fx-font-size: 12px;"/>
-                            <Label fx:id="reportGeneratedByLabel" text="" style="-fx-font-size: 12px;"/>
+                            <Label fx:id="reportGeneratedLabel" style="-fx-font-size: 12px;" text="" />
+                            <Label fx:id="reportGeneratedByLabel" style="-fx-font-size: 12px;" text="" />
+                     <VBox prefHeight="200.0" prefWidth="100.0">
+                        <children>
+                           <Label alignment="CENTER" contentDisplay="CENTER" prefHeight="18.0" prefWidth="411.0" text="VAT Controller" />
+                           <TextField fx:id="VATInput" alignment="CENTER" prefHeight="26.0" prefWidth="213.0" promptText="Enter new VAT value (0-100)" />
+                           <Button onAction="#setVAT" mnemonicParsing="false" prefHeight="26.0" prefWidth="403.0" text="UpdateVAT" />
+                        </children>
+                     </VBox>
                         </VBox>
                     </VBox>
                 </content>
@@ -280,4 +204,3 @@
 
     </SplitPane>
 </VBox>
-

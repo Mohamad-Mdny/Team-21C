@@ -23,8 +23,6 @@
             <Button mnemonicParsing="false" onAction="#goToCurrentPromotions" text="Current Promotions" />
 
             <Region HBox.hgrow="ALWAYS" />
-            <Button mnemonicParsing="false" onAction="#goToNonCommercialRegister" text="NC-Signup" />
-            <Button mnemonicParsing="false" onAction="#goToCommercialRegister" text="C-Signup" />
 
             <Button mnemonicParsing="false" onAction="#goToCheckout" text="Basket" />
             <Button fx:id="accountButton" mnemonicParsing="false" onAction="#handleAccountButton" text="Account Settings" />
@@ -62,11 +60,10 @@
          </top>
 
          <center>
-            <ScrollPane fx:id="catalogueScrollPane" fitToWidth="true" hbarPolicy="NEVER" pannable="true"
-                        style="-fx-background-color: transparent;">
+            <ScrollPane fx:id="catalogueScrollPane" fitToWidth="true" hbarPolicy="NEVER" pannable="true" style="-fx-background-color: transparent;">
                <GridPane fx:id="catalogueGrid" hgap="16.0" style="-fx-background-color: white;" vgap="16.0">
                   <padding>
-                     <Insets bottom="4.0" left="4.0" right="4.0" top="4.0"/>
+                     <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
                   </padding>
                </GridPane>
             </ScrollPane>

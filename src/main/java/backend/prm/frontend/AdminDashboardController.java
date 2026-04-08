@@ -1,6 +1,8 @@
 package backend.prm.frontend;
 
 import backend.Reports.*;
+import backend.controllers.CheckoutAccountController;
+import backend.controllers.CheckoutGuestController;
 import backend.prm.controller.PromotionController;
 import backend.prm.model.PromotionCampaign;
 import backend.prm.model.PromotionItem;
@@ -16,6 +18,7 @@ import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.*;
@@ -141,6 +144,8 @@ public class AdminDashboardController {
     private Label reportGeneratedLabel;
     @FXML
     private Label reportGeneratedByLabel;
+    @FXML
+    private TextField VATInput;
 
     private static final String COMPANY_ADDRESS =
             "Cosymed Ltd.\n" +
@@ -1434,5 +1439,10 @@ public class AdminDashboardController {
             showToast("Invalid Discount Percentage" + e.getMessage(), false);
             return 0;
         }
+    }
+    public void setVAT(ActionEvent event){
+        float newVATRate= Float.parseFloat(VATInput.getText())/100;
+        CheckoutAccountController.VAT_RATE = newVATRate;
+        CheckoutGuestController.VAT_RATE = newVATRate;
     }
 }
