@@ -1,5 +1,6 @@
 package backend;
 
+import backend.APIs.*;
 import backend.Reports.*;
 import backend.models.Admin;
 import backend.models.Member;
@@ -18,7 +19,6 @@ public class Main extends Application {
     public static Admin admin;
 
     @Override
-
     public void start(Stage stage) throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(Main.class.getResource("/frontend/Catalogue.fxml"));
         Scene scene = new Scene(fxmlLoader.load(), 800, 500);
@@ -27,7 +27,7 @@ public class Main extends Application {
         stage.show();
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args)  {
 
         //SalesReport creation
 //        List<ProductStats> stats = List.of(new ProductStats("123456","Widget A", 42, 23.45), new ProductStats("123454654","Widget B", 17, 34.34), new ProductStats("129989","Widget C", 89, 67.45));
@@ -66,7 +66,13 @@ public class Main extends Application {
 //        );
 //
 //        EngagementReport.generateReport(engagement, "Campaign 1", "March Advertising Campaign, 3 items, Fixed Discount of 5%", "01/03/2025", "31/03/2025", "engagement_reportMain.pdf");
+        try {
+            new backend.APIs.EmailAPI(8085).start();
+            System.out.println("wre");
 
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
         //dont remove
         launch(args);

@@ -20,6 +20,7 @@ module org.example.merchapp {
 
 
     requires javafx.base;
+    requires jdk.httpserver;
 
     //requires org.example.merchapp;
 
