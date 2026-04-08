@@ -34,12 +34,16 @@ public class LoginController {
     Label errorLabel;
 
     public void login(ActionEvent event) {
+        System.out.println("Attempting to login");
         String email = emailInput.getText().toLowerCase();
+        System.out.println(email);
         String password = passwordInput.getText();
+        System.out.println(password);
 
         DatabaseManager databaseManager = new DatabaseManager();
         Connection connection = databaseManager.makeConnection();
         if (connection != null) {
+            System.out.println("connect success");
             try {
                 PreparedStatement statement = connection.prepareStatement("SELECT emailAddress,password,firstLogin,type from member where emailAddress =?");
                 statement.setString(1, email);
@@ -91,7 +95,6 @@ public class LoginController {
                                 } catch (Exception e) {
                                     e.printStackTrace();
                                 }
-                                return;
                             }
                         }
                     } else { errorLabel.setText("Incorrect password");}

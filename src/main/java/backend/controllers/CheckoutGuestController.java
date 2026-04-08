@@ -23,7 +23,7 @@ import java.util.Map;
 import java.util.Objects;
 
 public class CheckoutGuestController {
-    private static final double VAT_RATE = 0.00;
+    public static double VAT_RATE = 0.00;
 
     @FXML
     public TextField emailField;
