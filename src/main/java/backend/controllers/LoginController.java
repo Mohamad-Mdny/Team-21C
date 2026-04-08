@@ -130,6 +130,9 @@ public class LoginController {
         switchPage(event, "Basket.fxml");
     }
 
+    @FXML public void goToCommercialRegister(ActionEvent event){switchPage(event, "CommercialRegister.fxml");}
+    @FXML public void goToNonCommercialRegister(ActionEvent event){switchPage(event, "NonCommercialRegister.fxml");}
+
     @FXML
     public void goToForgetPassword(ActionEvent event) {
         switchPage(event, "ForgetPassword.fxml");
