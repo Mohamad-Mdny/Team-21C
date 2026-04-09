@@ -1,8 +1,14 @@
 package backend.models;
 
 
+import backend.DatabaseManager;
 import backend.communication.EmailSendResult;
 import backend.communication.SendGmail;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 public class Member extends User{
     private String userName;
@@ -116,6 +122,56 @@ public class Member extends User{
 
         Basket.clear();
         return true;
+    }
+
+    //gathers the number of purchases made by the member that is logged in
+    //if the number of purchases is divisible by 10 then it will return true else false
+    public boolean checkMemberDiscount(String emailAddress){
+        DatabaseManager database = new DatabaseManager();
+        Connection connection= database.makeConnection();
+        int currentPurchaseCount;
+        int nextPurchaseCount;
+        try{
+            PreparedStatement statement = connection.prepareStatement("SELECT totalPurchases FROM member WHERE emailAddress=?");
+            statement.setString(1,emailAddress);
+            ResultSet resultSet = statement.executeQuery();
+            if(resultSet.next()){
+                currentPurchaseCount = resultSet.getInt("totalPurchases");
+                nextPurchaseCount = currentPurchaseCount + 1;
+                if (nextPurchaseCount % 10 == 0){
+                    System.out.println("Discount Active");
+                    return true;
+                }
+            }
+
+        }catch(SQLException e){
+            e.printStackTrace();
+        }
+        return false;
+    }
+    //this finds the number of purchases made by the member
+    //updates the table to increments total purchases by 1
+    public void incrementMemberPurchases(String emailAddress){
+        int totalPurchases=0;
+        DatabaseManager database = new DatabaseManager();
+        Connection connection= database.makeConnection();
+        try{
+            PreparedStatement statement = connection.prepareStatement("SELECT totalPurchases FROM member WHERE emailAddress=?");
+            statement.setString(1,emailAddress);
+            ResultSet resultSet = statement.executeQuery();
+            if(resultSet.next()){
+                totalPurchases=resultSet.getInt("totalPurchases");
+            }
+            PreparedStatement statementTwo = connection.prepareStatement("UPDATE member SET totalPurchases=? WHERE emailAddress=?");
+            statementTwo.setInt(1,totalPurchases+1);
+            statementTwo.setString(2,emailAddress);
+            statementTwo.execute();
+
+
+        }catch(SQLException e){
+            e.printStackTrace();
+        }
+
     }
 
 
