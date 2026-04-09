@@ -14,27 +14,28 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
-public class EmailAPI {
+public class PaymentAPI {
 
     private final HttpServer server;
 
-    public EmailAPI(int port) throws IOException {
+
+    public PaymentAPI(int port) throws IOException {
         server = HttpServer.create(new InetSocketAddress(port), 0);
-        server.createContext("/api/email/send", new SendEmailHandler());
+        server.createContext("/api/payment/store", new PaymentAPI.SavePaymentHandler());
         server.setExecutor(null);
     }
 
+
     public void start() {
         server.start();
-        System.out.println("Email API running at http://localhost:" + server.getAddress().getPort() + "/api/email/send");
+        System.out.println("Payment API running at http://localhost:" + server.getAddress().getPort() + "/api/email/send");
     }
 
     public void stop(int delaySeconds) {
         server.stop(delaySeconds);
     }
 
-
-    private static class SendEmailHandler implements HttpHandler {
+    private static class SavePaymentHandler implements HttpHandler {
         @Override
         public void handle(HttpExchange exchange) throws IOException {
             if (!"POST".equalsIgnoreCase(exchange.getRequestMethod())) {

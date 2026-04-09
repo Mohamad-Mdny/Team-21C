@@ -1,6 +1,7 @@
 package backend.prm.frontend;
 
 import backend.Main;
+import backend.controllers.CatalogueController;
 import backend.prm.controller.PromotionController;
 import backend.prm.model.PromotionCampaign;
 import backend.prm.repository.PromotionRepository;
@@ -27,6 +28,8 @@ public class PromotionsPageController {
 
     @FXML
     private ListView<PromotionCampaign> campaignListView;
+    @FXML private TextField searchField;
+
 
     @FXML
     private Label campaignCountLabel;
@@ -122,20 +125,6 @@ public class PromotionsPageController {
         switchPage(event, "Basket.fxml");
     }
 
-    @FXML
-    private void goToCommercialRegister(javafx.event.ActionEvent event) {
-        switchPage(event, "CommercialRegister.fxml");
-    }
-
-    @FXML
-    private void goToNonCommercialRegister(javafx.event.ActionEvent event) {
-        switchPage(event, "NonCommercialRegister.fxml");
-    }
-
-    @FXML
-    private void goToAdminDashboard(javafx.event.ActionEvent event) {
-        switchPage(event, "AdminDashboard.fxml");
-    }
 
     @FXML
     private void switchPage(ActionEvent event, String fxmlFile) {
@@ -172,6 +161,18 @@ public class PromotionsPageController {
             default: {accountButton.setText("Sign In");break;}
         }
     }
+
+    @FXML
+    public void handleSearchEnter(ActionEvent event) {
+        String text = searchField.getText();
+
+        if (text != null && !text.isBlank()) {
+            CatalogueController.pendingSearchText = text.trim();
+            switchPage(event, "Catalogue.fxml");
+        }
+    }
+
+
     private void openCampaignDetails(PromotionCampaign campaign) {
         try {
             PromotionCampaign fullCampaign =

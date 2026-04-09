@@ -199,6 +199,8 @@ public class AccountSettingsController {
     @FXML
     public void signOut(ActionEvent event) {
         Main.m.signOut();
+        Main.member = null;
+        Main.admin = null;
         switchPage(event, "Login.fxml");
     }
 

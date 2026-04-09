@@ -20,12 +20,17 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
+import javafx.scene.Parent;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
 import javafx.util.Duration;
+
+import java.io.IOException;
 import java.util.Map;
 
 import java.time.LocalDate;
@@ -33,6 +38,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -1444,5 +1450,25 @@ public class AdminDashboardController {
         float newVATRate= Float.parseFloat(VATInput.getText())/100;
         CheckoutAccountController.VAT_RATE = newVATRate;
         CheckoutGuestController.VAT_RATE = newVATRate;
+    }
+
+    @FXML
+    private void goToCurrentPromotions(javafx.event.ActionEvent event) {
+        switchPage(event, "PromotionsPage.fxml");
+    }
+    @FXML
+    private void switchPage(ActionEvent event, String fxmlFile) {
+        try {
+            Parent root = FXMLLoader.load(
+                    Objects.requireNonNull(getClass().getResource("/frontend/" + fxmlFile))
+            );
+
+            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+            stage.getScene().setRoot(root);
+            stage.show();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
