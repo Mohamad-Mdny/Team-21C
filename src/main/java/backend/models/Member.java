@@ -5,32 +5,28 @@ import backend.communication.EmailSendResult;
 import backend.communication.SendGmail;
 
 public class Member extends User{
-    private String emailAddress;
+    private String userName;
     private String password;
     private String type;
-    private String validityStatus;
-    private String CompanyRegistration;
-    private String CompanyDirector;
-    private String typeOfBusiness;
-    private String businessAddress;
 
     private String DeliveryAddress;
     private String cardNumber = "123412341234";
     private int CVV;
+    private String expiryDate;
     private String BillingAddress;
     private String phoneNumber;
 
     public Member(String emailAddress){
         super();
-        this.emailAddress = emailAddress;
+        this.userName = emailAddress;
         signedIn = true;
     }
 
-    public String getEmailAddress(){
-        return emailAddress;
+    public String getUserName(){
+        return userName;
     }
-    public void setEmailAddress(String emailAddress){
-        this.emailAddress = emailAddress;
+    public void setUserName(String userName){
+        this.userName = userName;
     }
 
     public String getPassword(){
@@ -47,38 +43,8 @@ public class Member extends User{
         this.type = type;
     }
 
-    public String getValidityStatus(){
-        return validityStatus;
-    }
-    public void setValidityStatus(String validityStatus){
-        this.validityStatus = validityStatus;
-    }
-
-    public String getCompanyRegistration(){
-        return CompanyRegistration;
-    }
-    public void setCompanyRegistration(String companyRegistration){
-        CompanyRegistration = companyRegistration;
-    }
-    public String getCompanyDirector(){
-        return CompanyDirector;
-
-    }
-    public void setCompanyDirector(String companyDirector){
-        CompanyDirector = companyDirector;
-    }
-    public String getTypeOfBusiness(){
-        return typeOfBusiness;
-    }
-    public void setTypeOfBusiness(String typeOfBusiness){
-        this.typeOfBusiness = typeOfBusiness;
-    }
-    public String getBusinessAddress(){
-        return businessAddress;
-    }
-    public void setBusinessAddress(String businessAddress){
-        this.businessAddress = businessAddress;
-    }
+    public String getExpiryDate(){return expiryDate;}
+    public void setExpiryDate(String expiryDate){this.expiryDate = expiryDate;}
 
     public String getDeliveryAddress(){
         return DeliveryAddress;
@@ -117,18 +83,22 @@ public class Member extends User{
 
     public boolean purchase(String deliveryAddress, String paymentMethod, String deliveryOption, String notes) {
         if (Basket == null || Basket.isEmpty()) {
+//            System.out.println("Basket is empty");
             return false;
         }
 
         if (deliveryAddress == null || deliveryAddress.isBlank()) {
+            System.out.println("deliveryAddress is empty");
             return false;
         }
 
         if (paymentMethod == null || paymentMethod.isBlank()) {
+//            System.out.println("paymentMethod is empty");
             return false;
         }
 
         if (deliveryOption == null || deliveryOption.isBlank()) {
+//            System.out.println("deliveryOption is empty");
             return false;
         }
         String body = "Thank you for your purchase. " +
@@ -142,7 +112,7 @@ public class Member extends User{
 
         body = body + "\n\nPayment Method: " + paymentMethod + "\n \n    Subtotal: £" + String.format("%.2f", getBasketSubtotal());
 
-        EmailSendResult result = SendGmail.sendGmail(getEmailAddress(), "Order ", body);
+        EmailSendResult result = SendGmail.sendGmail(getUserName(), "Order ", body);
 
         Basket.clear();
         return true;

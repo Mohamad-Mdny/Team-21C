@@ -15,6 +15,7 @@ import java.util.Objects;
 
 public class AccountSettingsController {
 
+    @FXML public Button History;
     @FXML private TextField searchField;
     @FXML private Button accountSettingsButton;
     @FXML private TextField emailField;
@@ -23,6 +24,7 @@ public class AccountSettingsController {
     @FXML private TextField DeliveryAddress;
     @FXML private TextField CardNumber;
     @FXML private TextField CVV;
+    @FXML private TextField expDate;
     @FXML public TextArea PhoneNumber;
 
     @FXML private TextArea BillingAddress;
@@ -45,6 +47,7 @@ public class AccountSettingsController {
             String DeliveryAddress,
             String CardNumber,
             String CVV,
+            String expDate,
             String BillingAddress,
             String PhoneNumber
     ) {}
@@ -58,7 +61,7 @@ public class AccountSettingsController {
 
         setEditing(false);
 
-        statusLabel.setText("Signed in as: " + safe(member.getEmailAddress()));
+        statusLabel.setText("Signed in as: " + safe(member.getUserName()));
         updateTypeBox();
     }
 
@@ -95,15 +98,18 @@ public class AccountSettingsController {
         String cardNumber = CardNumber.getText();
         String billingAddress = BillingAddress.getText();
         int cvv = Integer.parseInt(CVV.getText());
+        String expiryDate = expDate.getText();
+
         String phoneNumber = PhoneNumber.getText();
 
         if (email == null || email.isBlank()) {
             return;
         }
 
-        member.setEmailAddress(email);
+        member.setUserName(email);
         member.setDeliveryAddress(deliveryAddress);
         member.setCardNumber(cardNumber);
+        member.setExpiryDate(expiryDate);
         member.setBillingAddress(billingAddress);
         member.setCVV(cvv);
         member.setPhoneNumber(phoneNumber);
@@ -134,8 +140,7 @@ public class AccountSettingsController {
     }
 
     private void refreshFieldsFromMember() {
-        emailField.setText(safe(member.getEmailAddress()));
-        validityField.setText(safe(member.getValidityStatus()));
+        emailField.setText(safe(member.getUserName()));
         DeliveryAddress.setText(safe(member.getDeliveryAddress()));
         CardNumber.setText((member.getCardNumber()));
         BillingAddress.setText(safe(member.getBillingAddress()));
@@ -151,6 +156,7 @@ public class AccountSettingsController {
                 DeliveryAddress.getText(),
                 CardNumber.getText(),
                 CVV.getText(),
+                expDate.getText(),
                 BillingAddress.getText(),
                 PhoneNumber.getText()
         );
@@ -196,19 +202,17 @@ public class AccountSettingsController {
         switchPage(event, "Login.fxml");
     }
 
-    @FXML
-    public void goToCatalogue(ActionEvent event) {
+    @FXML public void goToCatalogue(ActionEvent event) {
         switchPage(event, "Catalogue.fxml");
     }
-
-    @FXML
-    public void goToCurrentPromotions(ActionEvent event) {
+    @FXML public void goToCurrentPromotions(ActionEvent event) {
         switchPage(event, "CurrentPromotions.fxml");
     }
-
-    @FXML
-    public void goToCheckout(ActionEvent event) {
+    @FXML public void goToCheckout(ActionEvent event) {
         switchPage(event, "Basket.fxml");
+    }
+    @FXML public void goToHistory(ActionEvent event) {
+        switchPage(event, "AccountHistory.fxml");
     }
 
 

@@ -2,6 +2,10 @@ package backend.controllers;
 
 import backend.Main;
 import backend.models.Item;
+import backend.prm.controller.PromotionController;
+import backend.prm.frontend.PromotionBasketTracker;
+import backend.prm.repository.PromotionRepository;
+import backend.prm.service.PromotionService;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -19,7 +23,7 @@ import java.util.Map;
 import java.util.Objects;
 
 public class CheckoutAccountController {
-    private static final double VAT_RATE = 0.00;
+    public static double VAT_RATE = 0.00;
     @FXML
     private TextField searchField;
     @FXML
@@ -68,7 +72,7 @@ public class CheckoutAccountController {
         configureBasketTable();
         basketTable.setPlaceholder(new Label("Your basket is empty."));
         updateAccountButtonText();
-        if (Main.m == null || !Main.m.isSignedIn()) {
+        if (Main.m == null || Main.userType().equals("User") ) { // idek what kind of safe checking this is
             purchaseStatusLabel.setText("You are not signed in. Please use Guest Checkout or Sign In.");
             switchPage(new ActionEvent(accountButton, null), "Login.fxml");
         }
@@ -88,7 +92,8 @@ public class CheckoutAccountController {
     private void configureCheckoutOptions() {
         deliveryOptionBox.getItems().setAll("Standard Delivery", "Next Day Delivery", "Click & Collect");
         deliveryOptionBox.setValue("Standard Delivery");
-        if (Main.m != null && Main.m.isSignedIn()) {
+
+        if (Main.m != null && Main.userType().equals("NonCommercial") ) {
             try {
                 deliveryAddressBox.getItems().setAll(Main.member.getDeliveryAddress());
                 deliveryAddressBox.setValue(Main.member.getDeliveryAddress());
@@ -108,7 +113,7 @@ public class CheckoutAccountController {
             updateSummaryLabels(0, 0.0);
             return;
         }
-        Map<Integer, BasketAccumulator> grouped = new LinkedHashMap<>();
+        Map<String, BasketAccumulator> grouped = new LinkedHashMap<>();
         for (Item item : Main.m.getBasket()) {
             if (item == null) continue;
             BasketAccumulator acc = grouped.get(item.getItemID());
@@ -169,6 +174,22 @@ public class CheckoutAccountController {
         }
         boolean success = Main.member.purchase(address, paymentMethod, deliveryOption, notes);
         if (success) {
+            PromotionRepository repository = new PromotionRepository();
+            PromotionService service = new PromotionService(repository);
+            PromotionController promotionController = new PromotionController(service);
+
+            String orderReference = "ACC-" + System.currentTimeMillis();
+
+            for (PromotionBasketTracker.Entry entry : PromotionBasketTracker.getEntries()) {
+                promotionController.confirmOrderPayment(
+                        entry.getCampaignId(),
+                        entry.getItemId(),
+                        entry.getQuantity(),
+                        orderReference
+                );
+            }
+
+            PromotionBasketTracker.clear();
             purchaseStatusLabel.setText("Purchase completed successfully.");
             loadBasket();
             switchPage(event, "Catalogue.fxml");
@@ -194,7 +215,7 @@ public class CheckoutAccountController {
 
     @FXML
     public void goToCurrentPromotions(ActionEvent event) {
-        switchPage(event, "CurrentPromotions.fxml");
+        switchPage(event, "PromotionsPage.fxml");
     }
 
     @FXML
@@ -204,19 +225,24 @@ public class CheckoutAccountController {
 
     @FXML
     public void handleAccountButton(ActionEvent event) {
-        if (Main.m != null && Main.m.isSignedIn()) {
-            switchPage(event, "AccountSettings.fxml");
-        } else {
-            switchPage(event, "Login.fxml");
+        switch (Main.userType()) {
+            case "NonCommercial" : {switchPage(event, "AccountSettings.fxml"); break;}
+            case "Admin" : {switchPage(event, "AdminDashboard.fxml");break;}
+            default: {switchPage(event, "Login.fxml");break;}
         }
     }
 
     private void updateAccountButtonText() {
         if (accountButton == null) return;
-        if (Main.m != null && Main.m.isSignedIn()) {
-            accountButton.setText("Account Settings");
-        } else {
-            accountButton.setText("Sign In");
+        switch (Main.userType()) {
+            case "NonCommercial" : {
+                accountButton.setText("Account Settings"); break;
+            }
+            case "Admin" : {
+                accountButton.setText("Dashboard");break;
+            }
+            default: {accountButton.setText("Sign In");break;
+            }
         }
     }
 

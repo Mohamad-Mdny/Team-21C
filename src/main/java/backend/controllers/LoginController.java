@@ -2,6 +2,7 @@ package backend.controllers;
 
 import backend.DatabaseManager;
 import backend.Main;
+import backend.models.Admin;
 import backend.models.Member;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -32,85 +33,73 @@ public class LoginController {
     @FXML
     Label errorLabel;
 
-    public void login(ActionEvent event){
+    public void login(ActionEvent event) {
+        System.out.println("Attempting to login");
         String email = emailInput.getText().toLowerCase();
+        System.out.println(email);
         String password = passwordInput.getText();
+        System.out.println(password);
 
         DatabaseManager databaseManager = new DatabaseManager();
         Connection connection = databaseManager.makeConnection();
-        if (connection != null){
-            System.out.println("Connection Successful");
+        if (connection != null) {
+            System.out.println("connect success");
             try {
-                PreparedStatement statement = connection.prepareStatement("SELECT emailAddress,password,firstLogin,type,validityStatus from member where emailAddress =?");
+                PreparedStatement statement = connection.prepareStatement("SELECT emailAddress,password,firstLogin,type from member where emailAddress =?");
                 statement.setString(1, email);
                 ResultSet resultSet = statement.executeQuery();
 
-                if (resultSet.next()){
+                if (resultSet.next()) {
 
-                    if(resultSet.getString("password").equals(password)){
-
-                        System.out.println("successful password");
+                    if (resultSet.getString("password").equals(password)) {
 
 
-                        if(resultSet.getString("type").equals("nonCommercial")) {
+                        switch (resultSet.getString("type")) {
+                            case "NonCommercial": {
+                                if (resultSet.getBoolean("firstLogin")) {
+                                    try {
+                                        Parent root = FXMLLoader.load(getClass().getResource("/frontend/ForgetPassword.fxml"));
+                                        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+                                        stage.getScene().setRoot(root);
+                                        stage.show();
+                                    } catch (Exception e) {
+                                        e.printStackTrace();
+                                    }
 
+                                } else {
+                                    try {
+                                        Main.member = new Member(email);
+                                        Main.m.signIn();
+                                        Main.member.bringBasket(Main.m.getBasket());
 
-                            if (resultSet.getBoolean("firstLogin")) {
-                                System.out.println("redirect to password change");
-                                try{
-                                    Parent root = FXMLLoader.load(getClass().getResource("/frontend/ForgetPassword.fxml"));
-                                    Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-                                    stage.getScene().setRoot(root);
-                                    stage.show();
+                                        Parent root = FXMLLoader.load(getClass().getResource("/frontend/Catalogue.fxml"));
+                                        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+                                        stage.getScene().setRoot(root);
+                                        stage.show();
+                                    }
+                                    catch (Exception e) {
+                                        e.printStackTrace();
+                                    }
                                 }
-                                catch(Exception e) {e.printStackTrace();}
-
-                            } else {
-
-                                // jsjfknq
-                                try{
-                                    System.out.println("TRYING TO SWITCH TO CATALOGUE");
-
-                                    Main.member = new Member(email);
+                                return;
+                            }
+                            case "Administrator", "PU-Admin": {
+                                try {
+                                    Main.admin = new Admin(email);
+                                    Main.m.signIn();
 
                                     Parent root = FXMLLoader.load(getClass().getResource("/frontend/Catalogue.fxml"));
                                     Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
                                     stage.getScene().setRoot(root);
                                     stage.show();
-                                } catch(Exception e) {e.printStackTrace();}
-
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }
                             }
                         }
-                        else {
-                            System.out.println("Wait for your account to get validated.");
-                            //replace with pop up
-                            if (resultSet.getString("validityStatus").equals("valid")){
-                                try{
-
-                                    Main.member = new Member(email);
-                                    Parent root = FXMLLoader.load(getClass().getResource("/frontend/Catalogue.fxml"));
-                                    Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-                                    stage.getScene().setRoot(root);
-                                    stage.show();
-                                } catch(Exception e) {e.printStackTrace();}
-                            }
-                            else{
-                                errorLabel.setText("Account has not been validated");
-                            }
-
-                        }
-                    }
-                    else{
-                        errorLabel.setText("Incorrect password");
-                    }
-                }
-                else{
-                    System.out.println("username is not found");
-                    //replace with pop up
-                    errorLabel.setText("Username not found");
-                }
-            }
-            catch (SQLException e){
+                    } else { errorLabel.setText("Incorrect password");}
+                } else {errorLabel.setText("Username not found");}
+            } catch (SQLException e) {
                 e.printStackTrace();
             }
 
@@ -118,6 +107,7 @@ public class LoginController {
         }
 
     }
+
     @FXML
     public void handleSearchEnter(ActionEvent event) {
         String text = searchField.getText();
@@ -128,17 +118,28 @@ public class LoginController {
         }
     }
 
-    @FXML public void goToCatalogue(ActionEvent event) {
+    @FXML
+    public void goToCatalogue(ActionEvent event) {
         switchPage(event, "Catalogue.fxml");
     }
-    @FXML public void goToCurrentPromotions(ActionEvent event) {
+
+    @FXML
+    public void goToCurrentPromotions(ActionEvent event) {
         switchPage(event, "CurrentPromotions.fxml");
     }
-    @FXML public void goToCheckout(ActionEvent event) {
+
+    @FXML
+    public void goToCheckout(ActionEvent event) {
         switchPage(event, "Basket.fxml");
     }
-    @FXML public void goToForgetPassword(ActionEvent event){switchPage(event, "ForgetPassword.fxml");}
 
+    @FXML public void goToCommercialRegister(ActionEvent event){switchPage(event, "CommercialRegister.fxml");}
+    @FXML public void goToNonCommercialRegister(ActionEvent event){switchPage(event, "NonCommercialRegister.fxml");}
+
+    @FXML
+    public void goToForgetPassword(ActionEvent event) {
+        switchPage(event, "ForgetPassword.fxml");
+    }
 
 
     private void switchPage(ActionEvent event, String fxmlFile) {
@@ -154,10 +155,6 @@ public class LoginController {
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
-
-    private void updateFunction() {
-
     }
 
 

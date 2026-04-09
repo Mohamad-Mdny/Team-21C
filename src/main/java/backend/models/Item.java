@@ -9,6 +9,8 @@ public class Item {
     private float PackCost;
     private int Availability;
     private float StockLimit;
+
+
     //constructor for item class
     public Item(int ItemID,String Description,String PackageType,String Unit, int UnitsInAPack, float PackCost, int Availability, float StockLimit){
         this.ItemID = ItemID;
@@ -21,8 +23,8 @@ public class Item {
         this.StockLimit = StockLimit;
     }
     //getters for the item class
-    public int getItemID(){
-        return ItemID;
+    public String getItemID(){
+        return Integer.toString(ItemID);
     }
     public String getDescription(){
         return Description;

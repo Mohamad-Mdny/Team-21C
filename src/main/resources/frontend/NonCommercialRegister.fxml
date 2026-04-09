@@ -1,12 +1,46 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?> <?import javafx.scene.control.*?> <?import javafx.scene.layout.*?>
+<BorderPane prefHeight="700.0" prefWidth="1400.0" xmlns="http://javafx.com/javafx/17.0.12"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="backend.controllers.RegisterController">
+    <top>
+        <VBox spacing="12.0" style="-fx-background-color: #1f2937; -fx-padding: 16;">
+            <HBox>
+                <Label text="IPOS-PU" style="-fx-text-fill: white; -fx-font-size: 24px; -fx-font-weight: bold;"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Label text="Non-Commercial Registration" style="-fx-text-fill: #e5e7eb; -fx-font-size: 14px;"/>
+            </HBox>
+            <StackPane>
+                <TextField fx:id="searchField" maxWidth="420.0" prefWidth="420.0" promptText="Search catalogue..."/>
+            </StackPane>
+            <HBox spacing="10.0"
+                  alignment="CENTER_LEFT">
+                <Button mnemonicParsing="false" text="Catalogue" onAction="#goToCatalogue"/>
+                <Button mnemonicParsing="false" text="Current Promotions" onAction="#goToCurrentPromotions"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Button mnemonicParsing="false" text="Basket" onAction="#goToBasket"/>
+                <Button fx:id="Login"  mnemonicParsing="false" text="Sign In" onAction="#goToLogin"/>
+            </HBox>
+        </VBox>
+    </top>
 
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
 
-<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="backend.controllers.RegisterController">
-   <children>
-      <TextField fx:id="email" layoutX="226.0" layoutY="109.0" promptText="Enter Email" />
-      <Button layoutX="274.0" layoutY="213.0" mnemonicParsing="false" onAction="#submitNonCommercialApplication" text="Submit" />
-       <Label fx:id="errorLabel" layoutX="176.0" layoutY="271.0" prefHeight="26.0" prefWidth="247.0" />
-   </children>
-</AnchorPane>
+    <center>
+        <StackPane style="-fx-padding: 40;">
+            <VBox spacing="14.0" alignment="CENTER" maxWidth="520.0"
+                  style="-fx-background-color: white; -fx-padding: 28; -fx-border-color: #d1d5db; -fx-border-radius: 12; -fx-background-radius: 12;">
+                <Label text="Create a non-commercial account" style="-fx-font-size: 22px; -fx-font-weight: bold;"/>
+                <Label text="Enter your email address to register. You will receive login details by email."
+                       wrapText="true" style="-fx-text-fill: #4b5563;"/>
+                <Separator/>
+                <VBox spacing="8.0" maxWidth="420.0">
+                    <Label text="Email" style="-fx-font-weight: bold;"/>
+                    <TextField fx:id="email" promptText="Enter Email" maxWidth="Infinity"/>
+                </VBox>
+                <Button text="Submit" mnemonicParsing="false" maxWidth="Infinity"
+                        onAction="#submitNonCommercialApplication"
+                        style="-fx-font-weight: bold; -fx-padding: 10 0 10 0;"/>
+                <Label fx:id="errorLabel" text="" wrapText="true" style="-fx-text-fill: #b91c1c; -fx-font-size: 13px;"/>
+            </VBox>
+        </StackPane>
+    </center>
+</BorderPane>

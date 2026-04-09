@@ -111,7 +111,7 @@ public class BasketController {
             return;
         }
 
-        Map<Integer, BasketAccumulator> groupedItems = new LinkedHashMap<>();
+        Map<String, BasketAccumulator> groupedItems = new LinkedHashMap<>();
 
         for (Item item : Main.m.getBasket()) {
             if (item == null) {
@@ -157,7 +157,7 @@ public class BasketController {
         double vat = subtotal * VAT_RATE;
         double total = subtotal + vat;
 
-        if(Main.m.isSignedIn()&& checkMemberDiscount(Main.member.getEmailAddress())){
+        if(Main.userType().equals("NonCommercial") && checkMemberDiscount(Main.member.getUserName())){
             total*=0.9;
         }
 
@@ -190,7 +190,7 @@ public class BasketController {
 
     @FXML
     public void purchaseBasket(ActionEvent event) {
-        String targetFxml = (Main.m.isSignedIn()) ? "CheckoutAccount.fxml" : "CheckoutGuest.fxml";
+        String targetFxml = Main.userType().equals("NonCommercial")  ? "CheckoutAccount.fxml" : "CheckoutGuest.fxml";
         switchPage(event, targetFxml);
     }
 
@@ -211,7 +211,7 @@ public class BasketController {
 
     @FXML
     public void goToCurrentPromotions(ActionEvent event) {
-        switchPage(event, "CurrentPromotions.fxml");
+        switchPage(event, "PromotionsPage.fxml");
     }
 
     @FXML
@@ -222,19 +222,23 @@ public class BasketController {
 
     @FXML
     public void handleAccountButton(ActionEvent event) {
-        if (Main.m.isSignedIn()) {
-            switchPage(event, "AccountSettings.fxml");
-        } else {
-            switchPage(event, "Login.fxml");
+        switch (Main.userType()) {
+            case "NonCommercial" : {switchPage(event, "AccountSettings.fxml");break;}
+            case "Admin" : {switchPage(event, "AdminDashboard.fxml");break;}
+            default: {switchPage(event, "Login.fxml");}
         }
     }
 
     private void updateAccountButtonText() {
         if (accountButton == null) return;
-        if (Main.m != null && Main.m.isSignedIn()) {
-            accountButton.setText("Account Settings");
-        } else {
-            accountButton.setText("Sign In");
+        switch (Main.userType()) {
+            case "NonCommercial" : {
+                accountButton.setText("Account Settings");break;
+            }
+            case "Admin" : {
+                accountButton.setText("Dashboard");break;
+            }
+            default: {accountButton.setText("Sign In");}
         }
     }
 

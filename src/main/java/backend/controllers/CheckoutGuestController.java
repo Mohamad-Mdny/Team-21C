@@ -2,6 +2,10 @@ package backend.controllers;
 
 import backend.Main;
 import backend.models.Item;
+import backend.prm.controller.PromotionController;
+import backend.prm.frontend.PromotionBasketTracker;
+import backend.prm.repository.PromotionRepository;
+import backend.prm.service.PromotionService;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -19,10 +23,11 @@ import java.util.Map;
 import java.util.Objects;
 
 public class CheckoutGuestController {
-    private static final double VAT_RATE = 0.00;
+    public static double VAT_RATE = 0.00;
 
     @FXML
     public TextField emailField;
+    public TextField ExpiryDate;
     @FXML
     private TextField searchField;
     @FXML
@@ -93,7 +98,7 @@ public class CheckoutGuestController {
             updateSummaryLabels(0, 0.0);
             return;
         }
-        Map<Integer, BasketAccumulator> grouped = new LinkedHashMap<>();
+        Map<String, BasketAccumulator> grouped = new LinkedHashMap<>();
         for (Item item : Main.m.getBasket()) {
             if (item == null) continue;
             BasketAccumulator acc = grouped.get(item.getItemID());
@@ -142,8 +147,9 @@ public class CheckoutGuestController {
         }
         String deliveryAddress = safe(deliveryAddressArea.getText());
         String billingAddress = safe(billingAddressArea.getText());
-        String cardNumberRaw = safe(cardNumberField.getText());
+        String cardNumberRaw = safe(cardNumberField.getText()).replaceAll("\\s", "");
         String cvvRaw = safe(cvvField.getText());
+        String expDate = safe(ExpiryDate.getText());
         String email = safe(emailField.getText());
 
         String notes = safe(orderNotesArea.getText());
@@ -156,8 +162,7 @@ public class CheckoutGuestController {
             return;
         }
         String cardDigits = cardNumberRaw.replaceAll("\\s+", "");
-        if (!cardDigits.matches("\\d{12,19}")) {
-            purchaseStatusLabel.setText("Card number must be 12–19 digits (numbers only).");
+        if (!safeCardNumber(cardNumberRaw)) {
             return;
         }
         if (!cvvRaw.matches("\\d{3,4}")) {
@@ -173,6 +178,22 @@ public class CheckoutGuestController {
         String deliveryOption = "Standard Delivery";
         boolean success = Main.m.purchase(email, deliveryAddress, paymentMethod, deliveryOption, notes);
         if (success) {
+            PromotionRepository repository = new PromotionRepository();
+            PromotionService service = new PromotionService(repository);
+            PromotionController promotionController = new PromotionController(service);
+
+            String orderReference = "GST-" + System.currentTimeMillis();
+
+            for (PromotionBasketTracker.Entry entry : PromotionBasketTracker.getEntries()) {
+                promotionController.confirmOrderPayment(
+                        entry.getCampaignId(),
+                        entry.getItemId(),
+                        entry.getQuantity(),
+                        orderReference
+                );
+            }
+
+            PromotionBasketTracker.clear();
             purchaseStatusLabel.setText("Purchase completed successfully.");
             loadBasket();
         } else {
@@ -184,6 +205,22 @@ public class CheckoutGuestController {
         return s == null ? "" : s.trim();
     }
 
+    private boolean safeCardNumber(String cardNumber) {
+        if (!cardNumber.matches("\\d{12,19}")) {
+            purchaseStatusLabel.setText("Card number must be 12–19 digits (numbers only).");
+            return false;
+        }
+        if (cardNumber == null || cardNumber.isEmpty()) {
+            purchaseStatusLabel.setText("Card number must be 12–19 digits (numbers only).");
+
+            return false;
+        } else if (cardNumber.length() == 10) {
+
+        }
+
+        return true;
+    }
+
     @FXML
     public void handleSearchEnter(ActionEvent event) {
         String text = safe(searchField.getText());
@@ -193,33 +230,31 @@ public class CheckoutGuestController {
         }
     }
 
-    @FXML
-    public void goToCatalogue(ActionEvent event) {
+    @FXML public void goToCatalogue(ActionEvent event) {
         switchPage(event, "Catalogue.fxml");
     }
-
-    @FXML
-    public void goToCurrentPromotions(ActionEvent event) {
+    @FXML public void goToCurrentPromotions(ActionEvent event) {
         switchPage(event, "CurrentPromotions.fxml");
     }
-
-    @FXML
-    public void goToBasket(ActionEvent event) {
+    @FXML public void goToBasket(ActionEvent event) {
         switchPage(event, "Basket.fxml");
     }
-
-    @FXML
-    public void handleAccountButton(ActionEvent event) {
+    @FXML public void handleAccountButton(ActionEvent event) {
         switchPage(event, "Login.fxml");
     }
 
     private void updateAccountButtonText() {
         if (accountButton == null) return;
-        if (Main.m != null && Main.m.isSignedIn()) {
-            accountButton.setText("Account Settings");
-        } else {
-            accountButton.setText("Sign In");
+        switch (Main.userType()) {
+            case "NonCommercial" : {
+                accountButton.setText("Account Settings");break;
+            }
+            case "Admin" : {
+                accountButton.setText("Dashboard");break;
+            }
+            default: {accountButton.setText("Sign In");break;}
         }
+        // like yeah, itll always be Sign in, but yk, im too lazy 2 change it
     }
 
     private void switchPage(ActionEvent event, String fxmlFile) {

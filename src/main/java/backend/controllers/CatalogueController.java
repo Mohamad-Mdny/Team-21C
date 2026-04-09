@@ -41,12 +41,12 @@ public class CatalogueController {
     private Label memberSession;
 
     private final ObservableList<Item> masterData = FXCollections.observableArrayList();
-    private FilteredList<Item> filteredData; private Integer selectedItemId = null;
+    private FilteredList<Item> filteredData; private String selectedItemId = null;
 
     @FXML void initialize() {
         if(Main.member !=null) {
-            if (Main.member.isSignedIn())
-                memberSession.setText(Main.member.getEmailAddress());
+            if (Main.userType().equals("NonCommercial") )
+                memberSession.setText(Main.member.getUserName());
         }
         loadData();
         filteredData = new FilteredList<>(masterData, item -> true);
@@ -64,6 +64,7 @@ public class CatalogueController {
             System.out.println("Database connection failed.");
             return;
         }
+
         String sql = "SELECT * FROM Catalogue";
         try (
                 connection;
@@ -191,7 +192,6 @@ public class CatalogueController {
     private void addItemToCart(Item item) {
         if (item == null) { return; }
         Main.m.addItem(item);
-        System.out.println(item.getDescription() + " added to cart.");
     }
 
     private String safeLower(String value) {
@@ -210,9 +210,12 @@ public class CatalogueController {
     @FXML public void goToCatalogue(ActionEvent event) {
         switchPage(event, "Catalogue.fxml");
     }
-    @FXML public void goToCurrentPromotions(ActionEvent event) {
-        switchPage(event, "CurrentPromotions.fxml");
-    }
+    //@FXML public void goToCurrentPromotions(ActionEvent event) {switchPage(event, "PromotionsPage.fxml");}
+
+
+    @FXML public void goToCurrentPromotions(ActionEvent event) {switchPage(event, "PromotionsPage.fxml");}
+
+
     @FXML public void goToCheckout(ActionEvent event) {
         switchPage(event, "Basket.fxml");
     }
@@ -220,20 +223,23 @@ public class CatalogueController {
     @FXML public void goToNonCommercialRegister(ActionEvent event){switchPage(event, "NonCommercialRegister.fxml");}
 
     private void updateAccountButton() {
-        if (Main.m != null && Main.m.isSignedIn()) {
-            accountButton.setText("Account Settings");
-        } else {
-            accountButton.setText("Sign In");
+        switch (Main.userType()) {
+            case "NonCommercial" : {
+                accountButton.setText("Account Settings");break;
+            }
+            case "Admin" : {
+                accountButton.setText("Dashboard");break;
+            }
+            default: {accountButton.setText("Sign In");break;}
         }
     }
 
     @FXML
     public void handleAccountButton(ActionEvent event) {
-        if (Main.m.isSignedIn()) {
-            switchPage(event, "AccountSettings.fxml");
-        } else {
-            System.out.println("Going to login");
-            switchPage(event, "Login.fxml");
+        switch (Main.userType()) {
+            case "NonCommercial" : {switchPage(event, "AccountSettings.fxml"); break;}
+            case "Admin" : {switchPage(event, "AdminDashboard.fxml");break;}
+            default: {switchPage(event, "Login.fxml");break;}
         }
     }
     private void switchPage(ActionEvent event, String fxmlFile) {
