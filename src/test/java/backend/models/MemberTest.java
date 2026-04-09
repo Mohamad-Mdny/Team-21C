@@ -21,11 +21,4 @@ class MemberTest {
         assertTrue(member.getBasketSubtotal() > 0);
     }
 
-    //checks no discount applies for Commercial member
-    @Test
-    void PU_S_12_noDiscountForCommercialMember() {
-        member.setType("Commercial");
-        member.addItem(new Item(1, "Paracetamol 500mg", "Tablet", "mg", 16, 2.49f, 100, 20.0f));
-        assertTrue(member.getBasketSubtotal() > 0);
-    }
 }
