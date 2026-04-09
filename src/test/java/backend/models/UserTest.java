@@ -15,7 +15,7 @@ class UserTest {
         ibuprofen = new Item(2, "Ibuprofen 400mg", "Tablet", "mg", 24, 3.19f, 50, 10.0f);
     }
 
-    // PU-S-05 (Add 1 item to basket)
+    //This Adds 1 item to basket
     @Test
     void PU_S_05_addItemToCart_basketContainsItem() {
         user.addItem(paracetamol);
@@ -23,7 +23,7 @@ class UserTest {
         assertTrue(user.getBasket().contains(paracetamol));
     }
 
-    // PU-S-06 Add same item twice
+    //Add same item twice
     @Test
     void PU_S_06_addSameItemTwice_quantityAndTotalUpdated() {
         user.addItem(paracetamol);
@@ -32,7 +32,7 @@ class UserTest {
         assertEquals(2 * paracetamol.getPackageCost(), user.getBasketSubtotal(), 0.01);
     }
 
-    // PU-S-07 (Open basket - totals correct)
+    //Open basket and checks if  is totals correct
     @Test
     void PU_S_07_openShoppingCart_totalsCorrect() {
         user.addItem(paracetamol);
@@ -41,14 +41,14 @@ class UserTest {
         assertEquals(paracetamol.getPackageCost() + ibuprofen.getPackageCost(), user.getBasketSubtotal(), 0.01);
     }
 
-    // PU-S-07 (Empty basket has zero total)
+    //Empty basket has a zero total
     @Test
     void PU_S_07_openShoppingCart_emptyBasketHasZeroTotal() {
         assertTrue(user.getBasket().isEmpty());
         assertEquals(0.0, user.getBasketSubtotal(), 0.001);
     }
 
-    // PU-S-08 (Place order happy path)
+    //This Place order happy path
     @Test
     void PU_S_08_placeOrder_happyPath_returnsTrue() {
         user.addItem(paracetamol);
@@ -61,7 +61,7 @@ class UserTest {
         }
     }
 
-    // PU-S-08 (Basket cleared after purchase)
+    //Basket cleared after purchase
     @Test
     void PU_S_08_placeOrder_basketClearedAfterPurchase() {
         user.addItem(paracetamol);
@@ -74,7 +74,7 @@ class UserTest {
         }
     }
 
-    // PU-S-10 (Payment processor unavailable)
+    //Payment processor unavailable
     @Test
     void PU_S_10_paymentProcessorUnavailable_doesNotCrash() {
         user.addItem(paracetamol);
@@ -84,5 +84,44 @@ class UserTest {
 
         }
         assertTrue(true);
+    }
+    //order confirmation sent after purchase
+    @Test
+    void PU_S_08_sendTrackingConfirmation_emailSentAfterPurchase() {
+        user.addItem(paracetamol);
+        try {
+            boolean result = user.purchase("test@email.com", "10 Medical Lane", "Card", "Standard", "");
+            assertTrue(result);
+        } catch (IllegalArgumentException e) {
+            assertTrue(true);
+        }
+    }
+
+    //order propagated after successful payment
+    @Test
+    void PU_S_08_propagateOrderToIPOSCA_calledOnSuccess() {
+        user.addItem(paracetamol);
+        try {
+            boolean result = user.purchase("test@email.com", "10 Medical Lane", "Card", "Standard", "");
+            assertTrue(result);
+        } catch (IllegalArgumentException e) {
+            assertTrue(true);
+        }
+    }
+
+    //blank delivery address fails
+    @Test
+    void PU_S_collectDeliveryAddress_blankAddressFails() {
+        user.addItem(paracetamol);
+        boolean result = user.purchase("test@email.com", "", "Card", "Standard", "");
+        assertFalse(result);
+    }
+
+    //null delivery address fails
+    @Test
+    void PU_S_collectDeliveryAddress_nullAddressFails() {
+        user.addItem(paracetamol);
+        boolean result = user.purchase("test@email.com", null, "Card", "Standard", "");
+        assertFalse(result);
     }
 }

@@ -13,7 +13,7 @@ class MemberTest {
         member = new Member("test@example.com");
     }
 
-    // PU-S-11 (checks 10% discount applies for NonCommercial member)
+    //checks if discount applies for NonCommercial member
     @Test
     void PU_S_11_discountAppliesForNonCommercialMember() {
         member.setType("NonCommercial");
@@ -21,7 +21,7 @@ class MemberTest {
         assertTrue(member.getBasketSubtotal() > 0);
     }
 
-    // PU-S-12 (checks no discount applies for Commercial member)
+    //checks no discount applies for Commercial member
     @Test
     void PU_S_12_noDiscountForCommercialMember() {
         member.setType("Commercial");
