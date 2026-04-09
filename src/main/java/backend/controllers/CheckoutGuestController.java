@@ -3,6 +3,8 @@ package backend.controllers;
 import backend.DatabaseManager;
 import backend.Main;
 import backend.models.Item;
+import backend.models.Order;
+import backend.models.Transaction;
 import backend.prm.controller.PromotionController;
 import backend.prm.frontend.PromotionBasketTracker;
 import backend.prm.repository.PromotionRepository;
@@ -25,7 +27,7 @@ import java.sql.SQLException;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
-
+import java.time.LocalDateTime;
 public class CheckoutGuestController {
     public static double VAT_RATE = 0.00;
 
@@ -77,6 +79,9 @@ public class CheckoutGuestController {
     private PasswordField cvvField;
     @FXML
     private Label purchaseStatusLabel;
+    private Order order= new Order();
+    private Transaction transaction = new Transaction();
+    private double total;
 
     @FXML
     void initialize() {
@@ -128,7 +133,7 @@ public class CheckoutGuestController {
 
     private void updateSummaryLabels(int itemCount, double subtotal) {
         double vat = subtotal * VAT_RATE;
-        double total = subtotal + vat;
+        total = subtotal + vat;
         itemCountLabel.setText("Items in basket: " + itemCount);
         subtotalSideLabel.setText("Subtotal: " + money(subtotal));
         vatSideLabel.setText("VAT: " + money(vat));
@@ -155,7 +160,8 @@ public class CheckoutGuestController {
         String cvvRaw = safe(cvvField.getText());
         String expDate = safe(ExpiryDate.getText());
         String email = safe(emailField.getText());
-
+        LocalDateTime timestamp = LocalDateTime.now();
+        String time = timestamp.toString();
         String notes = safe(orderNotesArea.getText());
         if (deliveryAddress.isBlank()) {
             purchaseStatusLabel.setText("Please enter a delivery address.");
@@ -199,9 +205,8 @@ public class CheckoutGuestController {
 
             PromotionBasketTracker.clear();
             purchaseStatusLabel.setText("Purchase completed successfully.");
-            //dummy info
-            //saveOrder(8,"Paracetamol");
-            //saveTransaction(55);
+            transaction.saveTransaction(total,billingAddress, cardNumberRaw, cvvRaw, time,email );
+            order.saveOrder("Test", deliveryAddress, deliveryOption, email);
             loadBasket();
         } else {
             purchaseStatusLabel.setText("Purchase failed. Please check your basket and details.");
@@ -277,30 +282,7 @@ public class CheckoutGuestController {
             }
         }
     }
-    private void saveOrder(int OrderID, String description){
-        DatabaseManager databaseManager = new DatabaseManager();
-        Connection connection = databaseManager.makeConnection();
-        try {
-            PreparedStatement statement = connection.prepareStatement("INSERT INTO catalogue.order(OrderID, Description) VALUES (?,?)");
-            statement.setInt(1, OrderID);
-            statement.setString(2, description);
 
-            statement.execute();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-    private void saveTransaction(int amount){
-        DatabaseManager databaseManager = new DatabaseManager();
-        Connection connection = databaseManager.makeConnection();
-        try {
-            PreparedStatement statement = connection.prepareStatement("INSERT INTO catalogue.transaction(Amount) VALUES (?)");
-            statement.setInt(1, amount);
-            statement.execute();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
 
     private static class BasketAccumulator {
         private final Item item;

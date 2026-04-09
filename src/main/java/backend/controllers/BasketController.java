@@ -32,7 +32,7 @@ import java.util.Objects;
 public class BasketController {
 
     private static final double VAT_RATE = 0.00;
-    
+
     @FXML
     public Button accountButton;
 
@@ -157,8 +157,9 @@ public class BasketController {
         double vat = subtotal * VAT_RATE;
         double total = subtotal + vat;
 
-        if(Main.userType().equals("NonCommercial") && checkMemberDiscount(Main.member.getUserName())){
+        if(Main.userType().equals("NonCommercial") && Main.member.checkMemberDiscount(Main.member.getUserName())){
             total*=0.9;
+            System.out.println("DISCOUNT HAS BEEN ADDED");
         }
 
 
@@ -258,52 +259,6 @@ public class BasketController {
     }
 
 
-
-    //gathers the number of purchases made by the member that is logged in
-    //if the number of purchases is divisible by 10 then it will return true else false
-    private boolean checkMemberDiscount(String emailAddress){
-        DatabaseManager database = new DatabaseManager();
-        Connection connection= database.makeConnection();
-        try{
-            PreparedStatement statement = connection.prepareStatement("SELECT totalPurchases FROM member WHERE emailAddress=?");
-            statement.setString(1,emailAddress);
-            ResultSet resultSet = statement.executeQuery();
-            if(resultSet.next()){
-                if (resultSet.getInt("totalPurchases") % 10 == 0){
-                    System.out.println("Discount Active");
-                    return true;
-                }
-            }
-
-        }catch(SQLException e){
-            e.printStackTrace();
-        }
-        return false;
-    }
-    //this finds the number of purchases made by the member
-    //updates the table to increments total purchases by 1
-    private void incrementMemberPurchases(String emailAddress){
-        int totalPurchases=0;
-        DatabaseManager database = new DatabaseManager();
-        Connection connection= database.makeConnection();
-        try{
-            PreparedStatement statement = connection.prepareStatement("SELECT totalPurchases FROM member WHERE emailAddress=?");
-            statement.setString(1,emailAddress);
-            ResultSet resultSet = statement.executeQuery();
-            if(resultSet.next()){
-                totalPurchases=resultSet.getInt("totalPurchases");
-            }
-            PreparedStatement statementTwo = connection.prepareStatement("UPDATE member SET totalPurchases=? WHERE emailAddress=?");
-            statementTwo.setInt(1,totalPurchases+1);
-            statementTwo.setString(2,emailAddress);
-            statementTwo.execute();
-
-
-        }catch(SQLException e){
-            e.printStackTrace();
-        }
-
-    }
 
     private static class BasketAccumulator {
         private final Item item;

@@ -3,6 +3,8 @@ package backend.controllers;
 import backend.DatabaseManager;
 import backend.Main;
 import backend.models.Item;
+import backend.models.Order;
+import backend.models.Transaction;
 import backend.prm.controller.PromotionController;
 import backend.prm.frontend.PromotionBasketTracker;
 import backend.prm.repository.PromotionRepository;
@@ -19,16 +21,15 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
 
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.time.LocalDateTime;
 
 public class CheckoutAccountController {
     public static double VAT_RATE = 0.00;
+
     @FXML
     private TextField searchField;
     @FXML
@@ -71,6 +72,11 @@ public class CheckoutAccountController {
     private TextArea orderNotesArea;
     @FXML
     private Label purchaseStatusLabel;
+    @FXML
+    private Label discountStatus;
+    private Order order= new Order();
+    private Transaction transaction = new Transaction();
+    private double total;
 
     @FXML
     void initialize() {
@@ -83,6 +89,15 @@ public class CheckoutAccountController {
         }
         configureCheckoutOptions();
         loadBasket();
+        if(Main.member != null){
+            System.out.println("Logged in as " + Main.member.getUserName());
+            if (Main.member.checkMemberDiscount(Main.member.getUserName())){
+                discountStatus.setText("Discount Status: Active");
+            }
+            else {
+                discountStatus.setText("Discount Status: Inactive");
+            }
+        }
     }
 
     private void configureBasketTable() {
@@ -144,7 +159,11 @@ public class CheckoutAccountController {
 
     private void updateSummaryLabels(int itemCount, double subtotal) {
         double vat = subtotal * VAT_RATE;
-        double total = subtotal + vat;
+        total = subtotal + vat;
+        if(Main.member.checkMemberDiscount(Main.member.getUserName())){
+            total *= 0.9;
+            System.out.println("DISCOUNT HAS BEEN ADDED");
+        }
         itemCountLabel.setText("Items in basket: " + itemCount);
         subtotalSideLabel.setText("Subtotal: " + money(subtotal));
         vatSideLabel.setText("VAT: " + money(vat));
@@ -165,6 +184,8 @@ public class CheckoutAccountController {
         String paymentMethod = paymentMethodBox.getValue();
         String deliveryOption = deliveryOptionBox.getValue();
         String notes = orderNotesArea.getText();
+        LocalDateTime timestamp = LocalDateTime.now();
+        String time = timestamp.toString();
         if (address == null || address.isBlank()) {
             purchaseStatusLabel.setText("Please select a delivery address.");
             return;
@@ -196,8 +217,9 @@ public class CheckoutAccountController {
 
             PromotionBasketTracker.clear();
             purchaseStatusLabel.setText("Purchase completed successfully.");
-            saveOrder(5,"Test", Main.member.getUserName());
-            saveTransaction(55, Main.member.getUserName());
+            transaction.saveTransaction(total,Main.member.getBillingAddress(), Main.member.getCardNumber(), Integer.toString(Main.member.getCVV()), time, Main.member.getUserName() );
+            order.saveOrder("Test", Main.member.getDeliveryAddress(), deliveryOption, Main.member.getUserName());
+            Main.member.incrementMemberPurchases(Main.member.getUserName());
             loadBasket();
             switchPage(event, "Catalogue.fxml");
         } else {
@@ -267,32 +289,7 @@ public class CheckoutAccountController {
         }
     }
 
-    private void saveOrder(int OrderID, String description, String emailAddress){
-        DatabaseManager databaseManager = new DatabaseManager();
-        Connection connection = databaseManager.makeConnection();
-        try {
-            PreparedStatement statement = connection.prepareStatement("INSERT INTO 'order'(OrderID, Description, EmailAddress) VALUES (?,?,?)");
-            statement.setInt(1, OrderID);
-            statement.setString(2, description);
-            statement.setString(3, emailAddress);
 
-            statement.execute();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-    private void saveTransaction(int amount, String emailAddress){
-        DatabaseManager databaseManager = new DatabaseManager();
-        Connection connection = databaseManager.makeConnection();
-        try {
-            PreparedStatement statement = connection.prepareStatement("INSERT INTO catalogue.transaction(Amount, EmailAddress) VALUES (?,?)");
-            statement.setInt(1, amount);
-            statement.setString(2, emailAddress);
-            statement.execute();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
 
     private static class BasketAccumulator {
         private final Item item;
