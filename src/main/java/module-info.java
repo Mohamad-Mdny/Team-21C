@@ -16,8 +16,6 @@ module org.example.merchapp {
     requires java.desktop;
     requires itextpdf;
     requires mysql.connector.j;
-    //requires org.example.merchapp;
-
 
     requires javafx.base;
     requires jdk.httpserver;
