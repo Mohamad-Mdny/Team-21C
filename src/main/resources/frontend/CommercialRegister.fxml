@@ -1,24 +1,25 @@
-<?xml version="1.0" encoding="UTF-8"?> <?import javafx.scene.control.*?> <?import javafx.scene.layout.*?>
-<BorderPane prefHeight="700.0" prefWidth="1400.0" xmlns="http://javafx.com/javafx/17.0.12"
-            xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="backend.controllers.RegisterController">
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane prefHeight="700.0" prefWidth="1400.0" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="backend.controllers.RegisterController">
     <top>
         <VBox spacing="12.0" style="-fx-background-color: #1f2937; -fx-padding: 16;">
             <HBox>
-                <Label text="IPOS-PU" style="-fx-text-fill: white; -fx-font-size: 24px; -fx-font-weight: bold;"/>
-                <Region HBox.hgrow="ALWAYS"/>
-                <Label text="Commercial Registration" style="-fx-text-fill: #e5e7eb; -fx-font-size: 14px;"/>
+                <Label style="-fx-text-fill: white; -fx-font-size: 24px; -fx-font-weight: bold;" text="IPOS-PU" />
+                <Region HBox.hgrow="ALWAYS" />
+                <Label style="-fx-text-fill: #e5e7eb; -fx-font-size: 14px;" text="Commercial Registration" />
             </HBox>
             <StackPane>
-                <TextField fx:id="searchField" maxWidth="420.0" prefWidth="420.0" promptText="Search catalogue..."/>
+                <TextField fx:id="searchField" maxWidth="420.0" prefWidth="420.0" promptText="Search catalogue..." />
             </StackPane>
-            <HBox spacing="10.0"
-                  alignment="CENTER_LEFT">
-                <Button mnemonicParsing="false" text="Catalogue" onAction="#goToCatalogue"/>
-                <Button mnemonicParsing="false" text="Current Promotions" onAction="#goToCurrentPromotions"/>
-                <Region HBox.hgrow="ALWAYS"/>
-                <Button mnemonicParsing="false" text="Basket" onAction="#goToBasket"/>
-                <Button mnemonicParsing="false" text="Sign In" onAction="#goToLogin"/>
+            <HBox alignment="CENTER_LEFT" spacing="10.0">
+                <Button mnemonicParsing="false" onAction="#goToCatalogue" text="Catalogue" />
+                <Button mnemonicParsing="false" onAction="#goToCurrentPromotions" text="Current Promotions" />
+                <Region HBox.hgrow="ALWAYS" />
+                <Button mnemonicParsing="false" onAction="#goToBasket" text="Basket" />
+                <Button mnemonicParsing="false" onAction="#goToLogin" text="Sign In" />
             </HBox>
         </VBox>
     </top>
@@ -27,44 +28,38 @@
         <ScrollPane fitToWidth="true" style="-fx-background-color: transparent;">
             <content>
                 <StackPane style="-fx-padding: 40;">
-                    <VBox spacing="14.0" alignment="CENTER" maxWidth="640.0"
-                          style="-fx-background-color: white; -fx-padding: 28; -fx-border-color: #d1d5db; -fx-border-radius: 12; -fx-background-radius: 12;">
-                        <Label text="Apply for a commercial account"
-                               style="-fx-font-size: 22px; -fx-font-weight: bold;"/>
-                        <Label text="Enter your company details below. Your application will be forwarded to InfoPharma (IPOS-SA)."
-                               wrapText="true" style="-fx-text-fill: #4b5563;"/>
-                        <Separator/>
-                        <GridPane hgap="14" vgap="12" maxWidth="560.0">
+                    <VBox alignment="CENTER" maxWidth="640.0" spacing="14.0" style="-fx-background-color: white; -fx-padding: 28; -fx-border-color: #d1d5db; -fx-border-radius: 12; -fx-background-radius: 12;">
+                        <Label style="-fx-font-size: 22px; -fx-font-weight: bold;" text="Apply for a commercial account" />
+                        <Label style="-fx-text-fill: #4b5563;" text="Enter your company details below. Your application will be forwarded to InfoPharma (IPOS-SA)." wrapText="true" />
+                        <Separator />
+                        <GridPane hgap="14" maxWidth="560.0" vgap="12">
                             <columnConstraints>
-                                <ColumnConstraints minWidth="180" prefWidth="200"/>
-                                <ColumnConstraints hgrow="ALWAYS"/>
+                                <ColumnConstraints minWidth="180" prefWidth="200" />
+                                <ColumnConstraints hgrow="ALWAYS" />
                             </columnConstraints>
-                            <Label text="Email" style="-fx-font-weight: bold;" GridPane.rowIndex="0"
-                                   GridPane.columnIndex="0"/>
-                            <TextField fx:id="email" promptText="Enter Email" GridPane.rowIndex="0"
-                                       GridPane.columnIndex="1"/>
-                            <Label text="Company Registration No." style="-fx-font-weight: bold;" GridPane.rowIndex="1"
-                                   GridPane.columnIndex="0"/>
-                            <TextField fx:id="CompanyRegistration" promptText="Enter Company Registration Number"
-                                       GridPane.rowIndex="1" GridPane.columnIndex="1"/>
-                            <Label text="Company Director" style="-fx-font-weight: bold;" GridPane.rowIndex="2"
-                                   GridPane.columnIndex="0"/>
-                            <TextField fx:id="CompanyDirector" promptText="Enter Company Director" GridPane.rowIndex="2"
-                                       GridPane.columnIndex="1"/>
-                            <Label text="Type of Business" style="-fx-font-weight: bold;" GridPane.rowIndex="3"
-                                   GridPane.columnIndex="0"/>
-                            <TextField fx:id="typeOfBusiness" promptText="Enter type of business" GridPane.rowIndex="3"
-                                       GridPane.columnIndex="1"/>
-                            <Label text="Business Address" style="-fx-font-weight: bold;" GridPane.rowIndex="4"
-                                   GridPane.columnIndex="0"/>
-                            <TextField fx:id="businessAddress" promptText="Enter business address" GridPane.rowIndex="4"
-                                       GridPane.columnIndex="1"/>
+                            <Label style="-fx-font-weight: bold;" text="Email" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+                            <TextField fx:id="email" promptText="Enter Email" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+                            <Label style="-fx-font-weight: bold;" text="Company Registration No." GridPane.columnIndex="0" GridPane.rowIndex="1" />
+                            <TextField fx:id="CompanyRegistration" promptText="Enter Company Registration Number" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                            <Label style="-fx-font-weight: bold;" text="Company Name" GridPane.columnIndex="0" GridPane.rowIndex="2" />
+                            <TextField fx:id="companyName" promptText="Enter Company Name" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                            <Label style="-fx-font-weight: bold;" text="Company Director" GridPane.rowIndex="3" />
+                            <TextField fx:id="CompanyDirector" promptText="Enter Company Director" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                            <Label style="-fx-font-weight: bold;" text="Type of Business" GridPane.rowIndex="4" />
+                            <TextField fx:id="typeOfBusiness" promptText="Enter type of business" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+                            <Label style="-fx-font-weight: bold;" text="Business Address" GridPane.rowIndex="5" />
+                            <TextField fx:id="businessAddress" promptText="Enter business address" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+                     <rowConstraints>
+                        <RowConstraints />
+                        <RowConstraints />
+                        <RowConstraints />
+                        <RowConstraints />
+                        <RowConstraints />
+                        <RowConstraints />
+                     </rowConstraints>
                         </GridPane>
-                        <Button text="Submit Application" mnemonicParsing="false" maxWidth="Infinity"
-                                onAction="#submitCommercialApplication"
-                                style="-fx-font-weight: bold; -fx-padding: 10 0 10 0;"/>
-                        <Label fx:id="errorLabel" text="" wrapText="true"
-                               style="-fx-text-fill: #b91c1c; -fx-font-size: 13px;"/>
+                        <Button maxWidth="Infinity" mnemonicParsing="false" onAction="#submitCommercialApplication" style="-fx-font-weight: bold; -fx-padding: 10 0 10 0;" text="Submit Application" />
+                        <Label fx:id="errorLabel" style="-fx-text-fill: #b91c1c; -fx-font-size: 13px;" text="" wrapText="true" />
                     </VBox>
                 </StackPane>
             </content>
