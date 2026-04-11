@@ -101,18 +101,18 @@
                             <TextField fx:id="CVV" editable="false" promptText="123"
                                        GridPane.rowIndex="2" GridPane.columnIndex="1"/>
 
-                            <Label text="Expiry Date " style="-fx-font-weight: bold;" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+                            <Label text="Expiry Date " style="-fx-font-weight: bold;" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
                             <TextField fx:id="expDate" editable="false" promptText="MM/YYYY"
-                                       GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+                                       GridPane.rowIndex="3" GridPane.columnIndex="1"/>
 
-                            <Label text="Billing Address" style="-fx-font-weight: bold;" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
+                            <Label text="Billing Address" style="-fx-font-weight: bold;" GridPane.rowIndex="4" GridPane.columnIndex="0"/>
                             <TextArea fx:id="BillingAddress" editable="false" wrapText="true" prefRowCount="3"
                                       promptText="123 Avery Road"
-                                      GridPane.rowIndex="3" GridPane.columnIndex="1"/>
-
-                            <Label text="Phone Number" style="-fx-font-weight: bold;" GridPane.rowIndex="4" GridPane.columnIndex="0"/>
-                            <TextArea fx:id="PhoneNumber" editable="false" prefRowCount="1" promptText="07123456789"
                                       GridPane.rowIndex="4" GridPane.columnIndex="1"/>
+
+                            <Label text="Phone Number" style="-fx-font-weight: bold;" GridPane.rowIndex="5" GridPane.columnIndex="0"/>
+                            <TextArea fx:id="PhoneNumber" editable="false" prefRowCount="1" promptText="07123456789"
+                                      GridPane.rowIndex="5" GridPane.columnIndex="1"/>
                         </GridPane>
 
                         <Separator />

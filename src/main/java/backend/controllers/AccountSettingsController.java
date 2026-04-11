@@ -95,9 +95,10 @@ public class AccountSettingsController {
 
         String email = emailField.getText();
         String deliveryAddress = DeliveryAddress.getText();
-        String cardNumber = CardNumber.getText();
+        String cardNumber = CardNumber.getText().replaceAll("\\s", "");
         String billingAddress = BillingAddress.getText();
         int cvv = Integer.parseInt(CVV.getText());
+        String ExpDate = expDate.getText();
         String expiryDate = expDate.getText();
 
         String phoneNumber = PhoneNumber.getText();
@@ -112,6 +113,7 @@ public class AccountSettingsController {
         member.setExpiryDate(expiryDate);
         member.setBillingAddress(billingAddress);
         member.setCVV(cvv);
+        member.setExpiryDate(expiryDate);
         member.setPhoneNumber(phoneNumber);
 
 
@@ -129,6 +131,7 @@ public class AccountSettingsController {
         CardNumber.setEditable(enable);
         CVV.setEditable(enable);
         BillingAddress.setEditable(enable);
+        expDate.setEditable(enable);
 
 
         emailField.setEditable(false);
@@ -208,7 +211,7 @@ public class AccountSettingsController {
         switchPage(event, "Catalogue.fxml");
     }
     @FXML public void goToCurrentPromotions(ActionEvent event) {
-        switchPage(event, "CurrentPromotions.fxml");
+        switchPage(event, "Promotions.fxml");
     }
     @FXML public void goToCheckout(ActionEvent event) {
         switchPage(event, "Basket.fxml");

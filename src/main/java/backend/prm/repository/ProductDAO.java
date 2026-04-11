@@ -1,7 +1,7 @@
 package backend.prm.repository;
 
 import backend.DatabaseManager;
-import backend.models.Item;
+import backend.models.ItemCell;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -16,14 +16,14 @@ public class ProductDAO {
     DatabaseManager database = new DatabaseManager();
     public static class ProductSummary {
         private final String productId;
-        private final String description;
+        private final String descriptions;
         private final double packageCost;
 
 
 
-        public ProductSummary(String productId, String description, double packageCost) {
+        public ProductSummary(String productId, String descriptions, double packageCost) {
             this.productId = productId;
-            this.description = description;
+            this.descriptions = descriptions;
             this.packageCost = packageCost;
         }
 
@@ -31,8 +31,8 @@ public class ProductDAO {
             return productId;
         }
 
-        public String getDescription() {
-            return description;
+        public String getDescriptions() {
+            return descriptions;
         }
 
         public double getPackageCost() {
@@ -41,11 +41,11 @@ public class ProductDAO {
 
         @Override
         public String toString() {
-            return productId + " | " + description + " | £" + String.format("%.2f", packageCost);
+            return productId + " | " + descriptions + " | £" + String.format("%.2f", packageCost);
         }
     }
 
-    public Optional<Item> findById(String productId) {
+    public Optional<ItemCell> findById(String productId) {
         String sql = """
                 SELECT itemID, Description, PackageType, Unit,
                        UnitsInAPack, PackageCost, Availability,
@@ -62,7 +62,7 @@ public class ProductDAO {
 
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
-                    Item product = new Item(
+                    ItemCell product = new ItemCell(
                             rs.getInt("itemID"),
                             rs.getString("Description"),
                             rs.getString("PackageType"),

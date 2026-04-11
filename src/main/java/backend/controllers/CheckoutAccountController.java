@@ -1,8 +1,7 @@
 package backend.controllers;
 
-import backend.DatabaseManager;
 import backend.Main;
-import backend.models.Item;
+import backend.models.ItemCell;
 import backend.models.Order;
 import backend.models.Transaction;
 import backend.prm.controller.PromotionController;
@@ -21,14 +20,16 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
 
 import java.io.IOException;
-import java.sql.*;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.time.LocalDateTime;
+import static backend.Main.VAT_RATE;
+import static backend.Main.member;
+
 
 public class CheckoutAccountController {
-    public static double VAT_RATE = 0.00;
 
     @FXML
     private TextField searchField;
@@ -134,24 +135,24 @@ public class CheckoutAccountController {
             return;
         }
         Map<String, BasketAccumulator> grouped = new LinkedHashMap<>();
-        for (Item item : Main.m.getBasket()) {
-            if (item == null) continue;
-            BasketAccumulator acc = grouped.get(item.getItemID());
+        for (ItemCell itemCell : Main.m.getBasket()) {
+            if (itemCell == null) continue;
+            BasketAccumulator acc = grouped.get(itemCell.getItemID());
             if (acc == null) {
-                acc = new BasketAccumulator(item);
-                grouped.put(item.getItemID(), acc);
+                acc = new BasketAccumulator(itemCell);
+                grouped.put(itemCell.getItemID(), acc);
             }
             acc.quantity++;
         }
         int totalItemCount = 0;
         double subtotal = 0.0;
         for (BasketAccumulator acc : grouped.values()) {
-            Item item = acc.item;
+            ItemCell itemCell = acc.itemCell;
             int qty = acc.quantity;
-            double lineSubtotal = item.getPackageCost() * qty;
+            double lineSubtotal = itemCell.getPackageCost() * qty;
             totalItemCount += qty;
             subtotal += lineSubtotal;
-            rows.add(new BasketRow(item.getDescription(), item.getPackageType(), item.getUnit(), qty, money(item.getPackageCost()), money(lineSubtotal)));
+            rows.add(new BasketRow(itemCell.getDescriptions(), itemCell.getPackageType(), itemCell.getUnit(), qty, money(itemCell.getPackageCost()), money(lineSubtotal)));
         }
         basketTable.setItems(rows);
         updateSummaryLabels(totalItemCount, subtotal);
@@ -162,8 +163,8 @@ public class CheckoutAccountController {
         total = subtotal + vat;
         if(Main.member.checkMemberDiscount(Main.member.getUserName())){
             total *= 0.9;
-            System.out.println("DISCOUNT HAS BEEN ADDED");
         }
+
         itemCountLabel.setText("Items in basket: " + itemCount);
         subtotalSideLabel.setText("Subtotal: " + money(subtotal));
         vatSideLabel.setText("VAT: " + money(vat));
@@ -186,6 +187,8 @@ public class CheckoutAccountController {
         String notes = orderNotesArea.getText();
         LocalDateTime timestamp = LocalDateTime.now();
         String time = timestamp.toString();
+
+        // safe
         if (address == null || address.isBlank()) {
             purchaseStatusLabel.setText("Please select a delivery address.");
             return;
@@ -198,13 +201,18 @@ public class CheckoutAccountController {
             purchaseStatusLabel.setText("Please select a delivery option.");
             return;
         }
-        boolean success = Main.member.purchase(address, paymentMethod, deliveryOption, notes);
+        String OrderID = Order.newUUID();
+
+        List<ItemCell> items = Main.member.getBasket();
+        boolean success = Main.m.purchase(OrderID, member.getUserName(), member.getDeliveryAddress(), paymentMethod, deliveryOption, notes);
         if (success) {
+            Order.saveOrderWithItems(OrderID, member.getDeliveryAddress(), deliveryOption, member.getUserName(), items);
+
             PromotionRepository repository = new PromotionRepository();
             PromotionService service = new PromotionService(repository);
             PromotionController promotionController = new PromotionController(service);
 
-            String orderReference = "ACC-" + System.currentTimeMillis();
+            String orderReference = "GST-" + System.currentTimeMillis();
 
             for (PromotionBasketTracker.Entry entry : PromotionBasketTracker.getEntries()) {
                 promotionController.confirmOrderPayment(
@@ -217,9 +225,10 @@ public class CheckoutAccountController {
 
             PromotionBasketTracker.clear();
             purchaseStatusLabel.setText("Purchase completed successfully.");
-            transaction.saveTransaction(total,Main.member.getBillingAddress(), Main.member.getCardNumber(), Integer.toString(Main.member.getCVV()), time, Main.member.getUserName() );
-            order.saveOrder("Test", Main.member.getDeliveryAddress(), deliveryOption, Main.member.getUserName());
-            Main.member.incrementMemberPurchases(Main.member.getUserName());
+
+
+            transaction.saveTransaction(total, member.getBillingAddress(), member.getCardNumber(), Integer.toString(member.getCVV()), time,member.getUserName());
+
             loadBasket();
             switchPage(event, "Catalogue.fxml");
         } else {
@@ -256,7 +265,7 @@ public class CheckoutAccountController {
     public void handleAccountButton(ActionEvent event) {
         switch (Main.userType()) {
             case "NonCommercial" : {switchPage(event, "AccountSettings.fxml"); break;}
-            case "Admin" : {switchPage(event, "AdminDashboard.fxml");break;}
+            case "Admin" : {switchPage(event, "AdminPage.fxml");break;}
             default: {switchPage(event, "Login.fxml");break;}
         }
     }
@@ -292,11 +301,11 @@ public class CheckoutAccountController {
 
 
     private static class BasketAccumulator {
-        private final Item item;
+        private final ItemCell itemCell;
         private int quantity;
 
-        private BasketAccumulator(Item item) {
-            this.item = item;
+        private BasketAccumulator(ItemCell itemCell) {
+            this.itemCell = itemCell;
             this.quantity = 0;
         }
     }

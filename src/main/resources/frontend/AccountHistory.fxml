@@ -33,6 +33,8 @@
                 <Region HBox.hgrow="ALWAYS" />
 
                 <Button mnemonicParsing="false" text="Basket" onAction="#goToBasket" />
+                <Button mnemonicParsing="false" text="Back" onAction="#goToAccountSettings" />
+
             </HBox>
         </VBox>
     </top>
@@ -52,8 +54,11 @@
                         <TableView fx:id="orderHistory" prefHeight="260.0">
                             <columns>
                                 <TableColumn fx:id="OrderID" prefWidth="120.0" text="Order ID" />
-                                <TableColumn fx:id="description" prefWidth="520.0" text="Description" />
-                                <TableColumn fx:id="orderEmailAddress" prefWidth="260.0" text="Email Address" />
+                                <TableColumn fx:id="Descriptions" prefWidth="520.0" text="Description" />
+                                <TableColumn fx:id="EmailAddress" prefWidth="260.0" text="Email Address" />
+                                <TableColumn fx:id="DeliveryAddress" prefWidth="260.0" text="Delivery Address" />
+
+
                             </columns>
                         </TableView>
                     </VBox>

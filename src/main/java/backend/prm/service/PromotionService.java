@@ -1,6 +1,5 @@
 package backend.prm.service;
 
-import backend.models.Item;
 import backend.prm.model.PromotionCampaign;
 import backend.prm.model.PromotionItem;
 import backend.prm.model.PromotionStatus;
@@ -162,7 +161,7 @@ public class PromotionService {
 
         PromotionCampaign campaign = getCampaignOrThrow(campaignId);
         campaign.setTitle(title.trim());
-        campaign.setDescription(description);
+        campaign.setDescriptions(description);
         campaign.setStartDateTime(startDateTime);
         campaign.setEndDateTime(endDateTime);
         campaign.setDiscountPercent(discountPercent);

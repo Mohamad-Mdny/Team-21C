@@ -2,7 +2,7 @@ package backend.controllers;
 
 import backend.DatabaseManager;
 import backend.Main;
-import backend.models.Order;
+import backend.models.OrderCell;
 import backend.models.Transaction;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -28,13 +28,16 @@ public class AccountHistoryController {
     private TextField searchField;
 
     @FXML
-    public TableView<Order> orderHistory;
+    public TableView<OrderCell> orderHistory;
     @FXML
     public TableColumn OrderID;
     @FXML
-    public TableColumn description;
+    public TableColumn Descriptions;
     @FXML
-    public TableColumn orderEmailAddress;
+    public TableColumn EmailAddress;
+    @FXML
+    public TableColumn DeliveryAddress;
+
     @FXML
     public TableView<Transaction> transactionHistory;
     @FXML
@@ -54,16 +57,16 @@ public class AccountHistoryController {
         DatabaseManager database = new DatabaseManager();
         Connection connection = database.makeConnection();
         try{
-            PreparedStatement statement = connection.prepareStatement("SELECT * FROM ipospu.order WHERE EmailAddress = ?");
-            System.out.println(Main.member.getUserName());
+            PreparedStatement statement = connection.prepareStatement("SELECT * FROM catalogue.orders WHERE EmailAddress = ?");
             statement.setString(1, Main.member.getUserName());
             ResultSet resultSet = statement.executeQuery();
             while(resultSet.next()){
-                orderHistory.getItems().add(new Order(resultSet.getInt("OrderID"),resultSet.getString("Description"),resultSet.getString("EmailAddress")));
-            }
+                orderHistory.getItems().add(new OrderCell(resultSet.getString("OrderID") ,resultSet.getString(2),resultSet.getString("EmailAddress"), resultSet.getString("Address")));
+            }// Dont replace 2 with descirptions, it doesnt work, dont touch this i hate this
             OrderID.setCellValueFactory(new PropertyValueFactory<>("OrderID"));
-            description.setCellValueFactory(new PropertyValueFactory<>("description"));
-            orderEmailAddress.setCellValueFactory(new PropertyValueFactory<>("orderEmailAddress"));
+            Descriptions.setCellValueFactory(new PropertyValueFactory<>("Descriptions"));
+            EmailAddress.setCellValueFactory(new PropertyValueFactory<>("OrderEmailAddress"));
+            DeliveryAddress.setCellValueFactory(new PropertyValueFactory<>("DeliveryAddress"));
 
         }catch(SQLException e){
             e.printStackTrace();
@@ -74,7 +77,7 @@ public class AccountHistoryController {
         DatabaseManager database = new DatabaseManager();
         Connection connection = database.makeConnection();
         try{
-            PreparedStatement statement = connection.prepareStatement("SELECT * FROM ipospu.transaction where EmailAddress = ?");
+            PreparedStatement statement = connection.prepareStatement("SELECT * FROM catalogue.transaction where EmailAddress = ?");
             statement.setString(1, Main.member.getUserName());
             ResultSet resultSet = statement.executeQuery();
             while(resultSet.next()){
@@ -83,6 +86,7 @@ public class AccountHistoryController {
             transactionID.setCellValueFactory(new PropertyValueFactory<>("transactionID"));
             amount.setCellValueFactory(new PropertyValueFactory<>("amount"));
             transactionEmailAddress.setCellValueFactory(new PropertyValueFactory<>("transactionEmailAddress"));
+
 
         }catch(SQLException e){
             e.printStackTrace();
@@ -103,10 +107,13 @@ public class AccountHistoryController {
         switchPage(event, "Catalogue.fxml");
     }
     @FXML public void goToCurrentPromotions(ActionEvent event) {
-        switchPage(event, "CurrentPromotions.fxml");
+        switchPage(event, "PromotionsPage.fxml");
     }
     @FXML public void goToBasket(ActionEvent event) {
         switchPage(event, "Basket.fxml");
+    }
+    @FXML public void goToAccountSettings(ActionEvent event){
+        switchPage(event, "AccountSettings.fxml");
     }
 
     private void switchPage(ActionEvent event, String fxmlFile) {
@@ -126,3 +133,4 @@ public class AccountHistoryController {
 
 
 }
+

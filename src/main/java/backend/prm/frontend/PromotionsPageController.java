@@ -145,7 +145,7 @@ public class PromotionsPageController {
     private void handleAccountButton(javafx.event.ActionEvent event) {
         switch (Main.userType()) {
             case "NonCommercial" : {switchPage(event, "AccountSettings.fxml");break;}
-            case "Admin" : {switchPage(event, "AdminDashboard.fxml");break;}
+            case "Admin" : {switchPage(event, "AdminPage.fxml");break;}
             default: {switchPage(event, "Login.fxml");break;}
         }
     }

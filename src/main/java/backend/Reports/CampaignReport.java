@@ -111,7 +111,6 @@ public class CampaignReport {
 
     private static String safeDateTime(java.time.LocalDateTime dt) {
         if (dt == null) return "-";
-        // keep it simple/consistent
         return dt.toString().replace('T', ' ');
     }
 }

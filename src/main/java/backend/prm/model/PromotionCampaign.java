@@ -7,7 +7,7 @@ public class PromotionCampaign {
     private long id;
     private String campaignCode;
     private String title;
-    private String description;
+    private String descriptions;
     private double discountPercent;
     private LocalDateTime startDateTime;
     private LocalDateTime endDateTime;
@@ -17,14 +17,14 @@ public class PromotionCampaign {
     public PromotionCampaign(long id,
                              String campaignCode,
                              String title,
-                             String description,
+                             String descriptions,
                              LocalDateTime startDateTime,
                              LocalDateTime endDateTime,
                              double discountPercent) {
         this.id = id;
         this.campaignCode = campaignCode;
         this.title = title;
-        this.description = description;
+        this.descriptions = descriptions;
         this.startDateTime = startDateTime;
         this.endDateTime = endDateTime;
         this.discountPercent = discountPercent;
@@ -55,12 +55,12 @@ public class PromotionCampaign {
         this.title = title;
     }
 
-    public String getDescription() {
-        return description;
+    public String getDescriptions() {
+        return descriptions;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
+    public void setDescriptions(String descriptions) {
+        this.descriptions = descriptions;
     }
 
     public double getDiscountPercent() { return discountPercent; }

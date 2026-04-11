@@ -1,8 +1,7 @@
 package backend.controllers;
 
-import backend.DatabaseManager;
 import backend.Main;
-import backend.models.Item;
+import backend.models.ItemCell;
 import backend.models.Order;
 import backend.models.Transaction;
 import backend.prm.controller.PromotionController;
@@ -21,18 +20,17 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
 
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.time.LocalDateTime;
+import static backend.Main.VAT_RATE;
+
 public class CheckoutGuestController {
-    public static double VAT_RATE = 0.00;
 
     @FXML
     public TextField emailField;
+    @FXML
     public TextField ExpiryDate;
     @FXML
     private TextField searchField;
@@ -108,24 +106,24 @@ public class CheckoutGuestController {
             return;
         }
         Map<String, BasketAccumulator> grouped = new LinkedHashMap<>();
-        for (Item item : Main.m.getBasket()) {
-            if (item == null) continue;
-            BasketAccumulator acc = grouped.get(item.getItemID());
+        for (ItemCell itemCell : Main.m.getBasket()) {
+            if (itemCell == null) continue;
+            BasketAccumulator acc = grouped.get(itemCell.getItemID());
             if (acc == null) {
-                acc = new BasketAccumulator(item);
-                grouped.put(item.getItemID(), acc);
+                acc = new BasketAccumulator(itemCell);
+                grouped.put(itemCell.getItemID(), acc);
             }
             acc.quantity++;
         }
         int totalItemCount = 0;
         double subtotal = 0.0;
         for (BasketAccumulator acc : grouped.values()) {
-            Item item = acc.item;
+            ItemCell itemCell = acc.itemCell;
             int qty = acc.quantity;
-            double lineSubtotal = item.getPackageCost() * qty;
+            double lineSubtotal = itemCell.getPackageCost() * qty;
             totalItemCount += qty;
             subtotal += lineSubtotal;
-            rows.add(new BasketRow(item.getDescription(), item.getPackageType(), item.getUnit(), qty, money(item.getPackageCost()), money(lineSubtotal)));
+            rows.add(new BasketRow(itemCell.getDescriptions(), itemCell.getPackageType(), itemCell.getUnit(), qty, money(itemCell.getPackageCost()), money(lineSubtotal)));
         }
         basketTable.setItems(rows);
         updateSummaryLabels(totalItemCount, subtotal);
@@ -163,6 +161,8 @@ public class CheckoutGuestController {
         LocalDateTime timestamp = LocalDateTime.now();
         String time = timestamp.toString();
         String notes = safe(orderNotesArea.getText());
+
+        // checks
         if (deliveryAddress.isBlank()) {
             purchaseStatusLabel.setText("Please enter a delivery address.");
             return;
@@ -172,7 +172,7 @@ public class CheckoutGuestController {
             return;
         }
         String cardDigits = cardNumberRaw.replaceAll("\\s+", "");
-        if (!safeCardNumber(cardNumberRaw)) {
+        if (!safeCardNumber(cardDigits)) {
             return;
         }
         if (!cvvRaw.matches("\\d{3,4}")) {
@@ -183,11 +183,17 @@ public class CheckoutGuestController {
             purchaseStatusLabel.setText("Please enter an email address.");
             return;
         }
-        String last4 = cardDigits.substring(cardDigits.length() - 4);
+        String last4 = cardDigits.substring(cardDigits.length() - 4); // idk why but its not removing the space
         String paymentMethod = "Card ending in " + last4;
         String deliveryOption = "Standard Delivery";
-        boolean success = Main.m.purchase(email, deliveryAddress, paymentMethod, deliveryOption, notes);
+        String OrderID = Order.newUUID();
+
+        var basket = Main.m.getBasket();
+
+        boolean success = Main.m.purchase(OrderID, email, deliveryAddress, paymentMethod, deliveryOption, notes);
         if (success) {
+            Order.saveOrderWithItems(OrderID, deliveryAddress, deliveryOption, email, basket);
+
             PromotionRepository repository = new PromotionRepository();
             PromotionService service = new PromotionService(repository);
             PromotionController promotionController = new PromotionController(service);
@@ -205,9 +211,12 @@ public class CheckoutGuestController {
 
             PromotionBasketTracker.clear();
             purchaseStatusLabel.setText("Purchase completed successfully.");
-            transaction.saveTransaction(total,billingAddress, cardNumberRaw, cvvRaw, time,email );
-            order.saveOrder("Test", deliveryAddress, deliveryOption, email);
+
+
+            transaction.saveTransaction(total,billingAddress, cardDigits, cvvRaw, time,email );
+
             loadBasket();
+            switchPage(event, "Catalogue.fxml");
         } else {
             purchaseStatusLabel.setText("Purchase failed. Please check your basket and details.");
         }
@@ -233,26 +242,39 @@ public class CheckoutGuestController {
         return true;
     }
 
-    @FXML
-    public void handleSearchEnter(ActionEvent event) {
+
+    // switch page
+    @FXML public void handleSearchEnter(ActionEvent event) {
         String text = safe(searchField.getText());
         if (!text.isBlank()) {
             CatalogueController.pendingSearchText = text;
             switchPage(event, "Catalogue.fxml");
         }
     }
-
     @FXML public void goToCatalogue(ActionEvent event) {
         switchPage(event, "Catalogue.fxml");
     }
     @FXML public void goToCurrentPromotions(ActionEvent event) {
-        switchPage(event, "CurrentPromotions.fxml");
+        switchPage(event, "PromotionsPage.fxml");
     }
     @FXML public void goToBasket(ActionEvent event) {
         switchPage(event, "Basket.fxml");
     }
     @FXML public void handleAccountButton(ActionEvent event) {
         switchPage(event, "Login.fxml");
+    }
+    private void switchPage(ActionEvent event, String fxmlFile) {
+        try {
+            Parent root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("/frontend/" + fxmlFile)));
+            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+            stage.getScene().setRoot(root);
+            stage.show();
+        } catch (IOException e) {
+            e.printStackTrace();
+            if (purchaseStatusLabel != null) {
+                purchaseStatusLabel.setText("Navigation failed: " + e.getMessage());
+            }
+        }
     }
 
     private void updateAccountButtonText() {
@@ -269,32 +291,17 @@ public class CheckoutGuestController {
         // like yeah, itll always be Sign in, but yk, im too lazy 2 change it
     }
 
-    private void switchPage(ActionEvent event, String fxmlFile) {
-        try {
-            Parent root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("/frontend/" + fxmlFile)));
-            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-            stage.getScene().setRoot(root);
-            stage.show();
-        } catch (IOException e) {
-            e.printStackTrace();
-            if (purchaseStatusLabel != null) {
-                purchaseStatusLabel.setText("Navigation failed: " + e.getMessage());
-            }
-        }
-    }
-
-
-    private static class BasketAccumulator {
-        private final Item item;
+    private class BasketAccumulator {
+        private final ItemCell itemCell;
         private int quantity;
 
-        private BasketAccumulator(Item item) {
-            this.item = item;
+        private BasketAccumulator(ItemCell itemCell) {
+            this.itemCell = itemCell;
             this.quantity = 0;
         }
     }
 
-    public static class BasketRow {
+    public class BasketRow {
         private final String item;
         private final String packageType;
         private final String unit;

@@ -7,23 +7,23 @@ import java.util.ArrayList;
 
 
 public class User {
-    ArrayList<Item> Basket = new ArrayList<>();
+    ArrayList<ItemCell> Basket = new ArrayList<>();
     boolean signedIn;
-    private final ArrayList<Item> masterData = new ArrayList<>();
+    private final ArrayList<ItemCell> masterData = new ArrayList<>();
 
     public User() {
         signedIn = false;
     }
 
-    public void addItem(Item item) {
-        Basket.add(item);
+    public void addItem(ItemCell itemCell) {
+        Basket.add(itemCell);
     }
 
-    public void removeItem(Item item) {
-        Basket.remove(item);
+    public void removeItem(ItemCell itemCell) {
+        Basket.remove(itemCell);
     }
 
-    public ArrayList<Item> getBasket() {
+    public ArrayList<ItemCell> getBasket() {
         return Basket;
     }
 
@@ -31,18 +31,19 @@ public class User {
         return signedIn;
     }
 
-    public void signIn(){
-        this.signedIn=true;
+    public void signIn() {
+        this.signedIn = true;
     }
 
-    public void signOut(){
-        this.signedIn=false;
+    public void signOut() {
+        this.signedIn = false;
     }
 
-    public void bringBasket(ArrayList<Item> basket) {
-        this.Basket=basket;
+    public void bringBasket(ArrayList<ItemCell> basket) {
+        this.Basket = basket;
     }
-    public ArrayList<Item>  getBasketItems() {
+
+    public ArrayList<ItemCell> getBasketItems() {
         return Basket;
     }
 
@@ -50,48 +51,44 @@ public class User {
     public double getBasketSubtotal() {
         double subtotal = 0.0;
 
-        for (Item item : Basket) {
-            if (item != null) {
-                subtotal += item.getPackageCost();
+        for (ItemCell itemCell : Basket) {
+            if (itemCell != null) {
+                subtotal += itemCell.getPackageCost();
             }
         }
 
         return subtotal;
     }
 
-    public boolean purchase(String email, String deliveryAddress, String paymentMethod, String deliveryOption, String notes) {
-        if (Basket == null || Basket.isEmpty()) {
-            return false;
+    public boolean purchase(String orderId, String email, String deliveryAddress,
+                            String paymentMethod, String deliveryOption, String notes) {
+
+        if (Basket == null || Basket.isEmpty()) return false;
+        if (deliveryAddress == null || deliveryAddress.isBlank()) return false;
+        if (paymentMethod == null || paymentMethod.isBlank()) return false;
+        if (deliveryOption == null || deliveryOption.isBlank()) return false;
+
+        StringBuilder body = new StringBuilder();
+        body.append("Thank you for your purchase.")
+                .append("\nOrder ID: ").append(orderId)
+                .append("\n\nItems purchased:");
+
+        for (ItemCell itemCell : Basket) {
+            body.append("\n   - ").append(itemCell.getDescriptions());
         }
 
-        if (deliveryAddress == null || deliveryAddress.isBlank()) {
-            return false;
-        }
+        body.append("\n\nDelivery Address: ").append(deliveryAddress)
+                .append("\nDelivery Option: ").append(deliveryOption)
+                .append("\nNotes: ").append(notes)
+                .append("\n\nPayment Method: ").append(paymentMethod)
+                .append("\n\nSubtotal: £").append(String.format("%.2f", getBasketSubtotal()));
 
-        if (paymentMethod == null || paymentMethod.isBlank()) {
-            return false;
-        }
-
-        if (deliveryOption == null || deliveryOption.isBlank()) {
-            return false;
-        }
-        String body = "Thank you for your purchase. " +
-                "\nItems purchased:";
-
-        for (Item item : Basket) {
-            body = body + "\n   - " + item.getDescription();
-        }
-        body = body + "\nDelivery Address: " + deliveryAddress + "\nDelivery Option: " + deliveryOption +
-                "\nNotes: " + notes ;
-
-        body = body + "\n\nPayment Method: " + paymentMethod + "\n \n    Subtotal: £" + String.format("%.2f", getBasketSubtotal());
-
-        EmailSendResult result = SendGmail.sendGmail(email, "Order ", body);
+        EmailSendResult result = SendGmail.sendGmail(email, "Order " + orderId, body.toString());
 
         Basket.clear();
         return true;
     }
 
-    public void update(){
+    public void update() {
     }
 }

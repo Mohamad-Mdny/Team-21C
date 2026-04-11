@@ -1,7 +1,7 @@
 package backend.prm.frontend;
 
 import backend.Main;
-import backend.models.Item;
+import backend.models.ItemCell;
 import backend.prm.controller.PromotionController;
 import backend.prm.model.PromotionCampaign;
 import backend.prm.model.PromotionItem;
@@ -83,9 +83,9 @@ public class PromotionDetailsPageController {
         }
         PromotionCampaign freshCampaign = promotionController.getCampaignById(campaign.getId());
         titleLabel.setText(freshCampaign.getTitle());
-        descriptionLabel.setText(freshCampaign.getDescription() == null || freshCampaign.getDescription().isBlank()
+        descriptionLabel.setText(freshCampaign.getDescriptions() == null || freshCampaign.getDescriptions().isBlank()
                 ? "No description available."
-                : freshCampaign.getDescription());
+                : freshCampaign.getDescriptions());
         PromotionStatus status = freshCampaign.getStatus(LocalDateTime.now());
         statusLabel.setText("Status: " + status.name() + " | Clicks: " + freshCampaign.getClickCount());
         startLabel.setText("Start: " + formatDate(freshCampaign.getStartDateTime()));
@@ -102,7 +102,7 @@ public class PromotionDetailsPageController {
 
     private PromotionProductView mapToProductView(PromotionItem item) {
         var productOpt = productDAO.findById(item.getItemId());
-        String productName = productOpt.map(p -> p.getDescription()).orElse("Unknown product");
+        String productName = productOpt.map(p -> p.getDescriptions()).orElse("Unknown product");
         float originalPrice = productOpt.map(p -> p.getPackageCost()).orElse(0.0f);
 
         double effectiveDiscount = item.getOverrideDiscountPercent() != null
@@ -130,11 +130,11 @@ public class PromotionDetailsPageController {
                 return;
             }
 
-            Item baseItem = productOpt.get();
+            ItemCell baseItem = productOpt.get();
 
-            Item promoItem = new Item(
+            ItemCell promoItem = new ItemCell(
                     Integer.parseInt(baseItem.getItemID()),
-                    baseItem.getDescription(),
+                    baseItem.getDescriptions(),
                     baseItem.getPackageType(),
                     baseItem.getUnit(),
                     baseItem.getUnitsInAPack(),

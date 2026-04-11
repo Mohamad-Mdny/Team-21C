@@ -121,7 +121,7 @@ public class LoginController {
 
     @FXML
     public void goToCurrentPromotions(ActionEvent event) {
-        switchPage(event, "CurrentPromotions.fxml");
+        switchPage(event, "PromotionsPage.fxml");
     }
 
     @FXML

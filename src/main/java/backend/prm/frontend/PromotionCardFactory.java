@@ -37,7 +37,7 @@ public class PromotionCardFactory {
         );
 
         Label descriptionLabel = new Label(
-                campaign.getDescription() == null ? "No description available." : campaign.getDescription()
+                campaign.getDescriptions() == null ? "No description available." : campaign.getDescriptions()
         );
         descriptionLabel.setWrapText(true);
         descriptionLabel.setStyle(

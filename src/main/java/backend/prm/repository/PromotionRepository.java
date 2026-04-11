@@ -29,7 +29,7 @@ public class PromotionRepository {
 
             ps.setString(1, generateCampaignCode(connection));
             ps.setString(2, campaign.getTitle());
-            ps.setString(3, campaign.getDescription());
+            ps.setString(3, campaign.getDescriptions());
             ps.setTimestamp(4, Timestamp.valueOf(campaign.getStartDateTime()));
             ps.setTimestamp(5, Timestamp.valueOf(campaign.getEndDateTime()));
             ps.setDouble(6, campaign.getDiscountPercent());
@@ -145,7 +145,7 @@ public class PromotionRepository {
         try (Connection connection = database.makeConnection();
              PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setString(1, campaign.getTitle());
-            ps.setString(2, campaign.getDescription());
+            ps.setString(2, campaign.getDescriptions());
             ps.setTimestamp(3, Timestamp.valueOf(campaign.getStartDateTime()));
             ps.setTimestamp(4, Timestamp.valueOf(campaign.getEndDateTime()));
             ps.setDouble(5, campaign.getDiscountPercent());

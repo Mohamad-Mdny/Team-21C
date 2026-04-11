@@ -1,8 +1,6 @@
 package backend.prm.frontend;
 
 import backend.Reports.*;
-import backend.controllers.CheckoutAccountController;
-import backend.controllers.CheckoutGuestController;
 import backend.prm.controller.PromotionController;
 import backend.prm.model.PromotionCampaign;
 import backend.prm.model.PromotionItem;
@@ -35,12 +33,12 @@ import java.util.Map;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import static backend.Main.VAT_RATE;
 
 public class AdminDashboardController {
 
@@ -343,7 +341,7 @@ public class AdminDashboardController {
         productIdColumn.setCellValueFactory(data ->
                 new ReadOnlyStringWrapper(data.getValue().getProductId()));
         productDescriptionColumn.setCellValueFactory(data ->
-                new ReadOnlyStringWrapper(data.getValue().getDescription()));
+                new ReadOnlyStringWrapper(data.getValue().getDescriptions()));
         productPriceColumn.setCellValueFactory(data ->
                 new ReadOnlyObjectWrapper<>(data.getValue().getPackageCost()));
 
@@ -372,7 +370,7 @@ public class AdminDashboardController {
         itemsCampaignLabel.setText("Items in: " + campaign.getTitle());
 
         titleField.setText(campaign.getTitle());
-        descriptionArea.setText(campaign.getDescription());
+        descriptionArea.setText(campaign.getDescriptions());
         campaignDiscountField.setText(String.valueOf(campaign.getDiscountPercent()));
 
         startDatePicker.setValue(campaign.getStartDateTime() == null ? null : campaign.getStartDateTime().toLocalDate());
@@ -1448,8 +1446,7 @@ public class AdminDashboardController {
     }
     public void setVAT(ActionEvent event){
         float newVATRate= Float.parseFloat(VATInput.getText())/100;
-        CheckoutAccountController.VAT_RATE = newVATRate;
-        CheckoutGuestController.VAT_RATE = newVATRate;
+        VAT_RATE = newVATRate;
     }
 
     @FXML

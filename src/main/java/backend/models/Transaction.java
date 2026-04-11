@@ -10,6 +10,7 @@ public class Transaction {
     private int transactionID;
     private int amount;
     private String transactionEmailAddress;
+
     public Transaction(int transactionID, int amount, String emailAddress){
         this.transactionID = transactionID;
         this.amount = amount;

@@ -125,7 +125,7 @@ public class RegisterController {
         switchPage(event, "Catalogue.fxml");
     }
     @FXML public void goToCurrentPromotions(ActionEvent event) {
-        switchPage(event, "CurrentPromotions.fxml");
+        switchPage(event, "PromotionsPage.fxml");
     }
     @FXML public void goToBasket(ActionEvent event) {switchPage(event, "Basket.fxml");}
     @FXML public void goToLogin(ActionEvent event) {switchPage(event, "Login.fxml");}

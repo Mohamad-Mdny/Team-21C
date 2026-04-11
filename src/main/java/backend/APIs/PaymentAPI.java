@@ -21,7 +21,7 @@ public class PaymentAPI {
 
     public PaymentAPI(int port) throws IOException {
         server = HttpServer.create(new InetSocketAddress(port), 0);
-        server.createContext("/api/payment/store", new PaymentAPI.SavePaymentHandler());
+        server.createContext("/api/payment/store", new propagatePaymentHandler());
         server.setExecutor(null);
     }
 
@@ -35,7 +35,7 @@ public class PaymentAPI {
         server.stop(delaySeconds);
     }
 
-    private static class SavePaymentHandler implements HttpHandler {
+    private static class propagatePaymentHandler implements HttpHandler {
         @Override
         public void handle(HttpExchange exchange) throws IOException {
             if (!"POST".equalsIgnoreCase(exchange.getRequestMethod())) {

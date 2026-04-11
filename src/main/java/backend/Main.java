@@ -14,6 +14,7 @@ import java.util.List;
 
 
 public class Main extends Application {
+    public static double VAT_RATE = 0.00;
     public static User m = new User();
     public static Member member;
     public static Admin admin;
@@ -68,7 +69,8 @@ public class Main extends Application {
 //        EngagementReport.generateReport(engagement, "Campaign 1", "March Advertising Campaign, 3 items, Fixed Discount of 5%", "01/03/2025", "31/03/2025", "engagement_reportMain.pdf");
         try {
             new backend.APIs.EmailAPI(8085).start();
-            System.out.println("wre");
+            new backend.APIs.PaymentAPI(8086).start();
+
 
         } catch (IOException e) {
             e.printStackTrace();

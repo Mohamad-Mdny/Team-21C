@@ -2,7 +2,7 @@ package backend.controllers;
 
 import backend.DatabaseManager;
 import backend.Main;
-import backend.models.Item;
+import backend.models.ItemCell;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
@@ -40,8 +40,8 @@ public class CatalogueController {
     @FXML
     private Label memberSession;
 
-    private final ObservableList<Item> masterData = FXCollections.observableArrayList();
-    private FilteredList<Item> filteredData; private String selectedItemId = null;
+    private final ObservableList<ItemCell> masterData = FXCollections.observableArrayList();
+    private FilteredList<ItemCell> filteredData; private String selectedItemId = null;
 
     @FXML void initialize() {
         if(Main.member !=null) {
@@ -71,8 +71,8 @@ public class CatalogueController {
                 Statement statement = connection.createStatement();
                 ResultSet resultSet = statement.executeQuery(sql)) {
             while (resultSet.next()) {
-                masterData.add(new Item( resultSet.getInt("ItemID"),
-                        resultSet.getString("Description"),
+                masterData.add(new ItemCell( resultSet.getInt("ItemID"),
+                        resultSet.getString("Descriptions"),
                         resultSet.getString("PackageType"),
                         resultSet.getString("Unit"),
                         resultSet.getInt("UnitsInAPack"),
@@ -92,11 +92,11 @@ public class CatalogueController {
 
         packageTypeFilter.getItems().add("All");
         packageTypeFilter.getItems().addAll(
-                masterData.stream().map(Item::getPackageType).filter(Objects::nonNull).distinct().sorted().toList());
+                masterData.stream().map(ItemCell::getPackageType).filter(Objects::nonNull).distinct().sorted().toList());
         packageTypeFilter.setValue("All");
         unitFilter.getItems().clear();
         unitFilter.getItems().add("All");
-        unitFilter.getItems().addAll( masterData.stream() .map(Item::getUnit) .filter(Objects::nonNull) .distinct() .sorted() .toList() );
+        unitFilter.getItems().addAll( masterData.stream() .map(ItemCell::getUnit) .filter(Objects::nonNull) .distinct() .sorted() .toList() );
         unitFilter.setValue("All");
         searchField.textProperty().addListener((obs, oldValue, newValue) -> updateFilters());
         packageTypeFilter.valueProperty().addListener((obs, oldValue, newValue) -> updateFilters());
@@ -116,7 +116,7 @@ public class CatalogueController {
             String selectedUnit = unitFilter.getValue();
             if (!searchText.isEmpty()) {
                 boolean matchesSearch = String.valueOf(item.getItemID()).toLowerCase().contains(searchText) ||
-                        safeLower(item.getDescription()).contains(searchText);
+                        safeLower(item.getDescriptions()).contains(searchText);
                 if (!matchesSearch) { return false; }
             }
             if (selectedPackageType != null && !selectedPackageType.equals("All")) {
@@ -142,8 +142,8 @@ public class CatalogueController {
         catalogueGrid.getChildren().clear();
         int column = 0;
         int row = 0;
-        for (Item item : filteredData) {
-            VBox itemCard = createItemCard(item);
+        for (ItemCell itemCell : filteredData) {
+            VBox itemCard = createItemCard(itemCell);
             catalogueGrid.add(itemCard, column, row);
             column++;
             if (column == 5) {
@@ -152,46 +152,46 @@ public class CatalogueController {
         }
     }
 
-    private VBox createItemCard(Item item) {
+    private VBox createItemCard(ItemCell itemCell) {
         VBox card = new VBox(8);
         card.setPadding(new Insets(12));
         card.setPrefWidth(180); card.setMinWidth(180);
         card.setMaxWidth(Double.MAX_VALUE);
         card.setAlignment(Pos.TOP_LEFT);
-        applyCardStyle(card, item);
-        Label titleLabel = new Label(item.getDescription());
+        applyCardStyle(card, itemCell);
+        Label titleLabel = new Label(itemCell.getDescriptions());
         titleLabel.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
         titleLabel.setWrapText(true);
-        Label itemIdLabel = new Label("Item ID: " + item.getItemID());
-        Label packageTypeLabel = new Label("Package: " + item.getPackageType());
-        Label unitLabel = new Label("Unit: " + item.getUnit());
-        Label unitsInPackLabel = new Label("Units in pack: " + item.getUnitsInAPack());
-        Label priceLabel = new Label(String.format("Price: £%.2f", item.getPackageCost()));
-        Label availabilityLabel = new Label("Availability: " + item.getAvailability());
-        Label stockLimitLabel = new Label("Stock limit: " + item.getStockLimit());
+        Label itemIdLabel = new Label("Item ID: " + itemCell.getItemID());
+        Label packageTypeLabel = new Label("Package: " + itemCell.getPackageType());
+        Label unitLabel = new Label("Unit: " + itemCell.getUnit());
+        Label unitsInPackLabel = new Label("Units in pack: " + itemCell.getUnitsInAPack());
+        Label priceLabel = new Label(String.format("Price: £%.2f", itemCell.getPackageCost()));
+        Label availabilityLabel = new Label("Availability: " + itemCell.getAvailability());
+//        Label stockLimitLabel = new Label("Stock limit: " + item.getStockLimit());
         Region spacer = new Region();
         VBox.setVgrow(spacer, Priority.ALWAYS);
         Button addToCartButton = new Button("Add to Cart");
         addToCartButton.setMaxWidth(Double.MAX_VALUE);
-        addToCartButton.setOnAction(event -> addItemToCart(item));
-        card.setOnMouseClicked(event -> { selectedItemId = item.getItemID();
+        addToCartButton.setOnAction(event -> addItemToCart(itemCell));
+        card.setOnMouseClicked(event -> { selectedItemId = itemCell.getItemID();
             refreshCatalogueGrid();
         });
-        card.getChildren().addAll( titleLabel, itemIdLabel, packageTypeLabel, unitLabel, unitsInPackLabel, priceLabel, availabilityLabel, stockLimitLabel, spacer, addToCartButton );
+        card.getChildren().addAll( titleLabel, itemIdLabel, packageTypeLabel, unitLabel, unitsInPackLabel, priceLabel, availabilityLabel, spacer, addToCartButton );
         return card;
     }
 
-    private void applyCardStyle(VBox card, Item item) {
-        boolean isSelected = selectedItemId != null && selectedItemId == item.getItemID();
+    private void applyCardStyle(VBox card, ItemCell itemCell) {
+        boolean isSelected = selectedItemId != null && selectedItemId == itemCell.getItemID();
         String baseStyle = "-fx-background-color: white; " + "-fx-border-color: #d1d5db; " + "-fx-border-radius: 8; " + "-fx-background-radius: 8; " + "-fx-cursor: hand;";
         String selectedStyle = "-fx-border-color: #2563eb; -fx-border-width: 2;";
         String normalStyle = "-fx-border-width: 1;";
         card.setStyle(baseStyle + (isSelected ? selectedStyle : normalStyle));
     }
 
-    private void addItemToCart(Item item) {
-        if (item == null) { return; }
-        Main.m.addItem(item);
+    private void addItemToCart(ItemCell itemCell) {
+        if (itemCell == null) { return; }
+        Main.m.addItem(itemCell);
     }
 
     private String safeLower(String value) {
@@ -238,7 +238,7 @@ public class CatalogueController {
     public void handleAccountButton(ActionEvent event) {
         switch (Main.userType()) {
             case "NonCommercial" : {switchPage(event, "AccountSettings.fxml"); break;}
-            case "Admin" : {switchPage(event, "AdminDashboard.fxml");break;}
+            case "Admin" : {switchPage(event, "AdminPage.fxml");break;}
             default: {switchPage(event, "Login.fxml");break;}
         }
     }

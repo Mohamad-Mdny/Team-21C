@@ -1,8 +1,7 @@
 package backend.controllers;
 
-import backend.DatabaseManager;
 import backend.Main;
-import backend.models.Item;
+import backend.models.ItemCell;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -21,17 +20,14 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
 
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
 
-public class BasketController {
+import static backend.Main.VAT_RATE;
 
-    private static final double VAT_RATE = 0.00;
+
+public class BasketController {
 
     @FXML
     public Button accountButton;
@@ -113,16 +109,16 @@ public class BasketController {
 
         Map<String, BasketAccumulator> groupedItems = new LinkedHashMap<>();
 
-        for (Item item : Main.m.getBasket()) {
-            if (item == null) {
+        for (ItemCell itemCell : Main.m.getBasket()) {
+            if (itemCell == null) {
                 continue;
             }
 
-            BasketAccumulator accumulator = groupedItems.get(item.getItemID());
+            BasketAccumulator accumulator = groupedItems.get(itemCell.getItemID());
 
             if (accumulator == null) {
-                accumulator = new BasketAccumulator(item);
-                groupedItems.put(item.getItemID(), accumulator);
+                accumulator = new BasketAccumulator(itemCell);
+                groupedItems.put(itemCell.getItemID(), accumulator);
             }
 
             accumulator.quantity++;
@@ -132,19 +128,19 @@ public class BasketController {
         double subtotal = 0.0;
 
         for (BasketAccumulator accumulator : groupedItems.values()) {
-            Item item = accumulator.item;
+            ItemCell itemCell = accumulator.itemCell;
             int quantity = accumulator.quantity;
-            double lineSubtotal = item.getPackageCost() * quantity;
+            double lineSubtotal = itemCell.getPackageCost() * quantity;
 
             totalItemCount += quantity;
             subtotal += lineSubtotal;
 
             rows.add(new BasketRow(
-                    item.getDescription(),
-                    item.getPackageType(),
-                    item.getUnit(),
+                    itemCell.getDescriptions(),
+                    itemCell.getPackageType(),
+                    itemCell.getUnit(),
                     quantity,
-                    money(item.getPackageCost()),
+                    money(itemCell.getPackageCost()),
                     money(lineSubtotal)
             ));
         }
@@ -225,7 +221,7 @@ public class BasketController {
     public void handleAccountButton(ActionEvent event) {
         switch (Main.userType()) {
             case "NonCommercial" : {switchPage(event, "AccountSettings.fxml");break;}
-            case "Admin" : {switchPage(event, "AdminDashboard.fxml");break;}
+            case "Admin" : {switchPage(event, "AdminPage.fxml");break;}
             default: {switchPage(event, "Login.fxml");}
         }
     }
@@ -261,11 +257,11 @@ public class BasketController {
 
 
     private static class BasketAccumulator {
-        private final Item item;
+        private final ItemCell itemCell;
         private int quantity;
 
-        private BasketAccumulator(Item item) {
-            this.item = item;
+        private BasketAccumulator(ItemCell itemCell) {
+            this.itemCell = itemCell;
             this.quantity = 0;
         }
     }
