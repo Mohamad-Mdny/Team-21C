@@ -155,7 +155,6 @@ public class BasketController {
 
         if(Main.userType().equals("NonCommercial") && Main.member.checkMemberDiscount(Main.member.getUserName())){
             total*=0.9;
-            System.out.println("DISCOUNT HAS BEEN ADDED");
         }
 
 

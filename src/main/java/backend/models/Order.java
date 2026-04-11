@@ -46,6 +46,7 @@ public class Order {
     }
 
 
+
     public static String buildDescriptionFromBasket(List<ItemCell> basket) {
         if (basket == null || basket.isEmpty()) return "Order: (empty)";
         Map<Integer, Integer> qty = new LinkedHashMap<>();
@@ -93,8 +94,8 @@ public class Order {
         String description = buildDescriptionFromBasket(basketList);
 
         String insertOrderSql = """
-                INSERT INTO catalogue.`order`
-                (OrderID, Description, Address, DeliveryType, OrderStatus, EmailAddress)
+                INSERT INTO catalogue.orders
+                (OrderID, Descriptions, Address, DeliveryType, OrderStatus, EmailAddress)
                 VALUES (?, ?, ?, ?, ?, ?)
                 """;
 
@@ -149,13 +150,13 @@ public class Order {
 
         String headerSql = """
                 SELECT OrderID, Description, Address, DeliveryType, OrderStatus, EmailAddress, CreatedAt
-                FROM catalogue.`order`
+                FROM catalogue.orders
                 WHERE OrderID = ?
                 """;
 
         String itemsSql = """
                 SELECT ItemID, Quantity, UnitPrice, ItemDescription
-                FROM catalogue.`order_items`
+                FROM catalogue.order_items
                 WHERE OrderID = ?
                 ORDER BY OrderItemID ASC
                 """;

@@ -20,7 +20,7 @@ public class PromotionRepository {
     public PromotionCampaign saveCampaign(PromotionCampaign campaign) {
         String sql = """
             INSERT INTO promotion_campaigns
-            (campaign_code, title, description, start_datetime, end_datetime, discount_percent, status, cancelled_at, click_count)
+            (campaign_code, title, descriptions, start_datetime, end_datetime, discount_percent, status, cancelled_at, click_count)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
             """;
 
@@ -62,7 +62,7 @@ public class PromotionRepository {
 
     public Optional<PromotionCampaign> findCampaignById(long id) {
         String sql = """
-                SELECT campaign_id, campaign_code, title, description,
+                SELECT campaign_id, campaign_code, title, descriptions,
                        start_datetime, end_datetime, discount_percent,
                        cancelled_at, click_count
                 FROM promotion_campaigns
@@ -84,7 +84,7 @@ public class PromotionRepository {
 
     public List<PromotionCampaign> findAllCampaigns() {
         String sql = """
-                SELECT campaign_id, campaign_code, title, description,
+                SELECT campaign_id, campaign_code, title, descriptions,
                        start_datetime, end_datetime, discount_percent,
                        cancelled_at, click_count
                 FROM promotion_campaigns
@@ -107,7 +107,7 @@ public class PromotionRepository {
 
     public List<PromotionCampaign> findActiveCampaigns(LocalDateTime now) {
         String sql = """
-                SELECT campaign_id, campaign_code, title, description,
+                SELECT campaign_id, campaign_code, title, descriptions,
                        start_datetime, end_datetime, discount_percent,
                        cancelled_at, click_count
                 FROM promotion_campaigns
@@ -133,7 +133,7 @@ public class PromotionRepository {
         String sql = """
                 UPDATE promotion_campaigns
                 SET title = ?,
-                    description = ?,
+                    descriptions = ?,
                     start_datetime = ?,
                     end_datetime = ?,
                     discount_percent = ?,
@@ -477,7 +477,7 @@ public class PromotionRepository {
     public List<SalesReportRow> getSalesReport(LocalDateTime from, LocalDateTime to) {
         String sql = """
             SELECT e.product_id,
-                   COALESCE(c.description, 'Unknown product') AS product_description,
+                   COALESCE(c.descriptions, 'Unknown product') AS product_description,
                    SUM(e.quantity) AS quantity_sold,
                    e.unit_price,
                    SUM(e.quantity * e.unit_price) AS total_price
@@ -485,7 +485,7 @@ public class PromotionRepository {
             LEFT JOIN catalogue c ON c.ItemID = e.product_id
             WHERE e.event_type = 'PURCHASED'
               AND e.event_time BETWEEN ? AND ?
-            GROUP BY e.product_id, c.description, e.unit_price
+            GROUP BY e.product_id, c.descriptions, e.unit_price
             ORDER BY e.product_id
             """;
 
@@ -561,7 +561,7 @@ public class PromotionRepository {
             SELECT c.campaign_code,
                    c.title,
                    i.product_id,
-                   COALESCE(cat.description, 'Unknown product') AS product_description,
+                   COALESCE(cat.descriptions, 'Unknown product') AS product_description,
                    c.click_count,
                    i.added_to_order_count,
                    i.purchased_count,
@@ -609,7 +609,7 @@ public class PromotionRepository {
                 rs.getLong("campaign_id"),
                 rs.getString("campaign_code"),
                 rs.getString("title"),
-                rs.getString("description"),
+                rs.getString("descriptions"),
                 rs.getTimestamp("start_datetime").toLocalDateTime(),
                 rs.getTimestamp("end_datetime").toLocalDateTime(),
                 rs.getDouble("discount_percent")

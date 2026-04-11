@@ -134,7 +134,6 @@ public class Member extends User {
 
         EmailSendResult result = SendGmail.sendGmail(getUserName(), "Order " + OrderID, body);
 
-        Basket.clear();
         return true;
     }
 
@@ -153,7 +152,6 @@ public class Member extends User {
                 currentPurchaseCount = resultSet.getInt("totalPurchases");
                 nextPurchaseCount = currentPurchaseCount + 1;
                 if (nextPurchaseCount % 10 == 0) {
-                    System.out.println("Discount Active");
                     return true;
                 }
             }
@@ -166,20 +164,20 @@ public class Member extends User {
 
     //this finds the number of purchases made by the member
     //updates the table to increments total purchases by 1
-    public void incrementMemberPurchases(String emailAddress) {
+    public void incrementMemberPurchases() {
         int totalPurchases = 0;
         DatabaseManager database = new DatabaseManager();
         Connection connection = database.makeConnection();
         try {
             PreparedStatement statement = connection.prepareStatement("SELECT totalPurchases FROM member WHERE emailAddress=?");
-            statement.setString(1, emailAddress);
+            statement.setString(1, userName);
             ResultSet resultSet = statement.executeQuery();
             if (resultSet.next()) {
                 totalPurchases = resultSet.getInt("totalPurchases");
             }
             PreparedStatement statementTwo = connection.prepareStatement("UPDATE member SET totalPurchases=? WHERE emailAddress=?");
             statementTwo.setInt(1, totalPurchases + 1);
-            statementTwo.setString(2, emailAddress);
+            statementTwo.setString(2, userName);
             statementTwo.execute();
 
 

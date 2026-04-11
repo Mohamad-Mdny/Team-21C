@@ -1,6 +1,6 @@
 package backend.APIs;
 
-import backend.models.Transaction;
+import backend.communication.*;
 
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
@@ -14,31 +14,30 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
-public class PaymentAPI {
+public class OrderAPI {
 
     private final HttpServer server;
 
-    public PaymentAPI(int port) throws IOException {
+
+    public OrderAPI(int port) throws IOException {
         server = HttpServer.create(new InetSocketAddress(port), 0);
-        server.createContext("/api/payment/store", new StorePaymentHandler());
+        server.createContext("/api/payment/store", new propagatePaymentHandler());
         server.setExecutor(null);
     }
 
+
     public void start() {
         server.start();
-        System.out.println("Payment API running at http://localhost:" +
-                server.getAddress().getPort() + "/api/payment/store");
+        System.out.println("Payment API running at http://localhost:" + server.getAddress().getPort() + "/api/payment/store");
     }
 
     public void stop(int delaySeconds) {
         server.stop(delaySeconds);
     }
 
-    private static class StorePaymentHandler implements HttpHandler {
-
+    private static class propagatePaymentHandler implements HttpHandler {
         @Override
         public void handle(HttpExchange exchange) throws IOException {
-
             if (!"POST".equalsIgnoreCase(exchange.getRequestMethod())) {
                 sendJson(exchange, 405, jsonError("Method not allowed. Use POST."));
                 return;
@@ -47,41 +46,21 @@ public class PaymentAPI {
             String body = readBody(exchange.getRequestBody());
             Map<String, String> payload = parseJsonFlat(body);
 
-            String amountStr = payload.get("amount");
-            String billingAddress = payload.get("billingAddress");
-            String cardNumber = payload.get("cardNumber");
-            String cvv = payload.get("cvv");
-            String purchaseDate = payload.get("purchaseDate");
-            String emailAddress = payload.get("emailAddress");
+            String to = payload.get("to");
+            String subject = payload.get("subject");
+            String messageBody = payload.get("body");
 
-            if (isBlank(amountStr) || isBlank(billingAddress) || isBlank(cardNumber)
-                    || isBlank(cvv) || isBlank(purchaseDate) || isBlank(emailAddress)) {
-                sendJson(exchange, 400, jsonError(
-                        "Missing required fields: amount, billingAddress, cardNumber, cvv, purchaseDate, emailAddress"
-                ));
-                return;
-            }
-
-            double amount;
-            try {
-                amount = Double.parseDouble(amountStr);
-            } catch (NumberFormatException e) {
-                sendJson(exchange, 400, jsonError("amount must be a valid number."));
-                return;
-            }
-
-            if (amount <= 0) {
-                sendJson(exchange, 400, jsonError("amount must be > 0."));
+            if (isBlank(to) || isBlank(subject) || isBlank(messageBody)) {
+                sendJson(exchange, 400, jsonError("Missing required fields: to, subject, body"));
                 return;
             }
 
             try {
-                Transaction tx = new Transaction();
-                tx.saveTransaction(amount, billingAddress, cardNumber, cvv, purchaseDate, emailAddress);
+                EmailSendResult result = SendGmail.sendGmail(to, subject, messageBody);
 
                 String resp = "{"
-                        + "\"success\":true,"
-                        + "\"message\":\"Payment stored successfully\""
+                        + "\"success\":" + result.isSuccess() + ","
+                        + "\"message\":" + jsonString(result.getMessage())
                         + "}";
 
                 sendJson(exchange, 200, resp);
@@ -97,7 +76,9 @@ public class PaymentAPI {
             return new String(bytes, StandardCharsets.UTF_8);
         }
 
-
+        /**
+         * {"to":"x","subject":"y","body":"z"}
+         */
         private static Map<String, String> parseJsonFlat(String json) {
             Map<String, String> map = new HashMap<>();
             if (json == null) return map;
@@ -124,9 +105,7 @@ public class PaymentAPI {
             String out = s;
             if (out.startsWith("\"")) out = out.substring(1);
             if (out.endsWith("\"")) out = out.substring(0, out.length() - 1);
-
-            // minimal unescape for common cases
-            out = out.replace("\\n", "\n").replace("\\\"", "\"").replace("\\\\", "\\");
+            out = out.replace("\\n", "\n").replace("\\\"", "\"");
             return out;
         }
 

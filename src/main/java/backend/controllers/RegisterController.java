@@ -109,15 +109,12 @@ public class RegisterController {
             int randomNumber = random.nextInt(character.length()-1);
             password = password + character.charAt(randomNumber);
         }
-        System.out.println(password);
         return password;
     }
     public boolean emailCheck(String email){
         if(email.contains("@")){
-            System.out.println("valid");
             return true;
         }
-        System.out.println("invalid");
         return false;
     }
 

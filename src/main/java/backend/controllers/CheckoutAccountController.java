@@ -91,7 +91,6 @@ public class CheckoutAccountController {
         configureCheckoutOptions();
         loadBasket();
         if(Main.member != null){
-            System.out.println("Logged in as " + Main.member.getUserName());
             if (Main.member.checkMemberDiscount(Main.member.getUserName())){
                 discountStatus.setText("Discount Status: Active");
             }
@@ -207,6 +206,8 @@ public class CheckoutAccountController {
         boolean success = Main.m.purchase(OrderID, member.getUserName(), member.getDeliveryAddress(), paymentMethod, deliveryOption, notes);
         if (success) {
             Order.saveOrderWithItems(OrderID, member.getDeliveryAddress(), deliveryOption, member.getUserName(), items);
+            Main.member.clearBasket();
+            Main.member.incrementMemberPurchases();
 
             PromotionRepository repository = new PromotionRepository();
             PromotionService service = new PromotionService(repository);

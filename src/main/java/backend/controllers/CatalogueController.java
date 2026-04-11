@@ -61,7 +61,6 @@ public class CatalogueController {
         DatabaseManager databaseManager = new DatabaseManager();
         Connection connection = databaseManager.makeConnection();
         if (connection == null) {
-            System.out.println("Database connection failed.");
             return;
         }
 

@@ -47,7 +47,7 @@ public class ProductDAO {
 
     public Optional<ItemCell> findById(String productId) {
         String sql = """
-                SELECT itemID, Description, PackageType, Unit,
+                SELECT itemID, Descriptions, PackageType, Unit,
                        UnitsInAPack, PackageCost, Availability,
                        StockLimit
                 FROM catalogue
@@ -64,7 +64,7 @@ public class ProductDAO {
                 if (rs.next()) {
                     ItemCell product = new ItemCell(
                             rs.getInt("itemID"),
-                            rs.getString("Description"),
+                            rs.getString("Descriptions"),
                             rs.getString("PackageType"),
                             rs.getString("Unit"),
                             rs.getInt("UnitsInAPack"),
@@ -86,11 +86,11 @@ public class ProductDAO {
     public List<ProductSummary> findAllActiveProducts() {
         String sql = """
         SELECT CAST(ItemID AS CHAR(20)) AS product_id,
-               Description AS description,
+               Descriptions AS descriptions,
                PackageCost AS package_cost
         FROM catalogue
         WHERE is_active = TRUE
-        ORDER BY Description ASC, ItemID ASC
+        ORDER BY Descriptions ASC, ItemID ASC
         """;
 
         List<ProductSummary> result = new ArrayList<>();
@@ -103,7 +103,7 @@ public class ProductDAO {
             while (rs.next()) {
                 result.add(new ProductSummary(
                         rs.getString("product_id"),
-                        rs.getString("description"),
+                        rs.getString("descriptions"),
                         rs.getDouble("package_cost")
                 ));
             }
@@ -118,15 +118,15 @@ public class ProductDAO {
     public List<ProductSummary> searchActiveProducts(String queryText) {
         String sql = """
         SELECT CAST(ItemID AS CHAR(20)) AS product_id,
-               Description AS description,
+               Descriptions AS description,
                PackageCost AS package_cost
         FROM catalogue
         WHERE is_active = TRUE
           AND (
               CAST(ItemID AS CHAR(20)) LIKE ?
-              OR Description LIKE ?
+              OR Descriptions LIKE ?
           )
-        ORDER BY Description ASC, ItemID ASC
+        ORDER BY Descriptions ASC, ItemID ASC
         """;
 
         String q = "%" + (queryText == null ? "" : queryText.trim()) + "%";
@@ -143,7 +143,7 @@ public class ProductDAO {
                 while (rs.next()) {
                     result.add(new ProductSummary(
                             rs.getString("product_id"),
-                            rs.getString("description"),
+                            rs.getString("descriptions"),
                             rs.getDouble("package_cost")
                     ));
                 }
