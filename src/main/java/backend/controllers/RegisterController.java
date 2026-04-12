@@ -22,6 +22,7 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.Objects;
 import java.util.Random;
+import backend.models.CommercialApplication;
 
 public class RegisterController {
     @FXML
@@ -90,11 +91,11 @@ public class RegisterController {
                 statement.setString(6,businessType);
                 statement.setString(7, businessAddress);
                 statement.execute();
-            }
-            catch(SQLException e){
+            } catch(SQLException e){
                 e.printStackTrace();
             }
             EmailSendResult result = SendGmail.sendGmail(emailAddress, "Account validation in progress", "Your account is getting validated. This may take a while.");
+            new CommercialApplication(emailAddress.toLowerCase(), companyRegNumber, CompanyDirector, businessType, businessAddress);
         }else{
             errorLabel.setText("Invalid Email Address");
         }
@@ -126,7 +127,6 @@ public class RegisterController {
     }
     @FXML public void goToBasket(ActionEvent event) {switchPage(event, "Basket.fxml");}
     @FXML public void goToLogin(ActionEvent event) {switchPage(event, "Login.fxml");}
-
 
     private void switchPage(ActionEvent event, String fxmlFile) {
         try {
