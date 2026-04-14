@@ -2,7 +2,7 @@ package backend.models;
 
 public class CommercialApplication {
     String emailAddress;
-    int companyRegNumber;
+    String companyRegNumber;
     String companyDirector;
     String businessType;
     String businessAddress;
@@ -10,7 +10,7 @@ public class CommercialApplication {
 
 
     public CommercialApplication(String lowerCase,
-                                 int companyRegNumber,
+                                 String companyRegNumber,
                                  String companyDirector,
                                  String businessType,
                                  String businessAddress) {

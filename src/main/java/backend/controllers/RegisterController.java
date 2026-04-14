@@ -39,6 +39,8 @@ public class RegisterController {
     TextField businessAddress;
     @FXML
     Label errorLabel;
+    @FXML
+    TextField companyName;
     //creates a member object and calls the function to register a non-commercial member while passing the required arguments
     public void submitNonCommercialApplication(ActionEvent event){
         submitNonCommercialApplication(email.getText());
@@ -51,13 +53,12 @@ public class RegisterController {
         String generatedPassword = generatePassword();
         if (emailCheck(emailAddress)) {
             try {
-                PreparedStatement statement = connection.prepareStatement("INSERT INTO member(emailAddress,password,type,validityStatus,totalPurchases,firstLogin) VALUES (?,?,?,?,?,?)");
+                PreparedStatement statement = connection.prepareStatement("INSERT INTO member(emailAddress,password,type,totalPurchases,firstLogin) VALUES (?,?,?,?,?)");
                 statement.setString(1, emailAddress.toLowerCase());
                 statement.setString(2, generatedPassword);
                 statement.setString(3, "NonCommercial");
-                statement.setString(4, "valid");
-                statement.setInt(5, 0);
-                statement.setBoolean(6, true);
+                statement.setInt(4, 0);
+                statement.setBoolean(5, true);
                 statement.execute();
             } catch (SQLException e) {
                 e.printStackTrace();
@@ -72,30 +73,31 @@ public class RegisterController {
 
     //creates a member object and calls the function to register a commercial member while passing the required arguments
     public void submitCommercialApplication(ActionEvent event) {
-        submitCommercialApplication(email.getText(), Integer.parseInt(CompanyRegistration.getText()), CompanyDirector.getText(), typeOfBusiness.getText(), businessAddress.getText());
+        submitCommercialApplication(email.getText(),companyName.getText() ,CompanyRegistration.getText(), CompanyDirector.getText(), typeOfBusiness.getText(), businessAddress.getText());
+        switchPage(event, "Login.fxml");
     }
 
 
     // Ship to json file
-    public void submitCommercialApplication(String emailAddress, int companyRegNumber, String CompanyDirector,String businessType, String businessAddress ) {
+    public void submitCommercialApplication(String emailAddress,String companyName ,String companyRegNumber, String CompanyDirector,String businessType, String businessAddress ) {
         DatabaseManager database = new DatabaseManager();
         Connection connection = database.makeConnection();
         if(emailCheck(emailAddress)){
             try {
-                PreparedStatement statement = connection.prepareStatement("INSERT INTO member(emailAddress,type,validityStatus,CompanyRegistration, CompanyDirector, typeOfBusiness,  businessAddress) VALUES (?,?,?,?,?,?,?)");
+                PreparedStatement statement = connection.prepareStatement("INSERT INTO commercial_applications(emailAddress,companyName,companyRegistration, companyDirector, typeOfBusiness,  businessAddress) VALUES (?,?,?,?,?,?)");
                 statement.setString(1,emailAddress.toLowerCase());
-                statement.setString(2,"Commercial");
-                statement.setString(3,"invalid");
-                statement.setInt(4,companyRegNumber);
-                statement.setString(5,CompanyDirector);
-                statement.setString(6,businessType);
-                statement.setString(7, businessAddress);
+                statement.setString(2,companyRegNumber);
+                statement.setString(3,companyRegNumber);
+                statement.setString(4,CompanyDirector);
+                statement.setString(5,businessType);
+                statement.setString(6, businessAddress);
                 statement.execute();
             } catch(SQLException e){
                 e.printStackTrace();
             }
             EmailSendResult result = SendGmail.sendGmail(emailAddress, "Account validation in progress", "Your account is getting validated. This may take a while.");
             new CommercialApplication(emailAddress.toLowerCase(), companyRegNumber, CompanyDirector, businessType, businessAddress);
+
         }else{
             errorLabel.setText("Invalid Email Address");
         }

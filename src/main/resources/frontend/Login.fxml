@@ -50,7 +50,7 @@
                 </VBox>
 
                 <Button maxWidth="Infinity" mnemonicParsing="false" onAction="#login" style="-fx-font-weight: bold; -fx-padding: 10 0 10 0;" text="Login" />
-                <Label fx:id="errorLabel" layoutX="176.0" layoutY="339.0" prefHeight="19.0" prefWidth="247.0" />
+                <Label fx:id="errorLabel" alignment="CENTER" contentDisplay="CENTER" layoutX="176.0" layoutY="339.0" prefHeight="19.0" prefWidth="247.0" />
             <Label prefHeight="18.0" prefWidth="147.0" text="Don't have a membership?" />
             <Button mnemonicParsing="false" onAction="#goToCommercialRegister" prefHeight="26.0" prefWidth="153.0" text="Commercial Sign up" />
             <Button mnemonicParsing="false" onAction="#goToNonCommercialRegister" prefHeight="26.0" prefWidth="155.0" text="non-Commercial Sign up" />
