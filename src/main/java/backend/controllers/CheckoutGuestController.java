@@ -21,10 +21,12 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.time.LocalDateTime;
 import static backend.Main.VAT_RATE;
+import static backend.Main.main;
 
 public class CheckoutGuestController {
 
@@ -183,16 +185,19 @@ public class CheckoutGuestController {
             purchaseStatusLabel.setText("Please enter an email address.");
             return;
         }
-        String last4 = cardDigits.substring(cardDigits.length() - 4); // idk why but its not removing the space
+        String last4 = cardDigits.substring(cardDigits.length() - 4); // i fixed that
         String paymentMethod = "Card ending in " + last4;
         String deliveryOption = "Standard Delivery";
         String OrderID = Order.newUUID();
 
-        var basket = Main.m.getBasket();
+
+        List<ItemCell> items = Main.m.getBasket();
 
         boolean success = Main.m.purchase(OrderID, email, deliveryAddress, paymentMethod, deliveryOption, notes);
         if (success) {
-            Order.saveOrderWithItems(OrderID, deliveryAddress, deliveryOption, email, basket);
+            Order.saveOrderWithItems(OrderID, deliveryAddress, deliveryOption, email, items);
+            Main.m.clearBasket();
+
 
             PromotionRepository repository = new PromotionRepository();
             PromotionService service = new PromotionService(repository);

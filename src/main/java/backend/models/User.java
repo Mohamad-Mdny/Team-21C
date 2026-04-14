@@ -85,10 +85,13 @@ public class User {
 
         EmailSendResult result = SendGmail.sendGmail(email, "Order " + orderId, body.toString());
 
-        Basket.clear();
         return true;
     }
 
     public void update() {
+    }
+
+    public void clearBasket(){
+        Basket.clear();
     }
 }
