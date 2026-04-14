@@ -78,7 +78,8 @@ public class BasketController {
 
     @FXML
     private Label purchaseStatusLabel;
-
+    @FXML
+    private Label discountStatus;
 
 
     @FXML
@@ -87,6 +88,14 @@ public class BasketController {
         basketTable.setPlaceholder(new Label("Your basket is empty."));
         loadUserBasket();
         updateAccountButtonText();
+        if(Main.member != null){
+            if (Main.member.checkMemberDiscount(Main.member.getUserName())){
+                discountStatus.setText("Discount Status: Active");
+            }
+            else {
+                discountStatus.setText("Discount Status: Inactive");
+            }
+        }
     }
 
     private void configureBasketTable() {

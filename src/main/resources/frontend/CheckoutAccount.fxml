@@ -69,7 +69,7 @@
                         <Label fx:id="subtotalBottomLabel" style="-fx-font-size: 14px; -fx-font-weight: bold;" text="Subtotal: £0.00" />
                         <Label fx:id="vatBottomLabel" style="-fx-font-size: 14px; -fx-font-weight: bold;" text="VAT: £0.00" />
                         <Label fx:id="totalBottomLabel" style="-fx-font-size: 16px; -fx-font-weight: bold;" text="Total: £0.00" />
-                        <Label fx:id="discountStatus" style="-fx-font-size: 16px; -fx-font-weight: bold;" text="Discount Status:"/>
+                        <Label fx:id="discountStatus" style="-fx-font-size: 16px; -fx-font-weight: bold;" text="Discount Status: Inactive"/>
                     </HBox>
 
                     <TextArea fx:id="orderNotesArea" prefHeight="80.0" promptText="Order notes (Leave with neighbour etc.)" wrapText="true" />

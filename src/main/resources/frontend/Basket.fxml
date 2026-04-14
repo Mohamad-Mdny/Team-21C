@@ -85,6 +85,7 @@
                                style="-fx-font-size: 14px; -fx-font-weight: bold;"/>
                         <Label fx:id="totalBottomLabel" text="Total: £0.00"
                                style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
+                        <Label fx:id="discountStatus" style="-fx-font-size: 16px; -fx-font-weight: bold;" text="Discount Status: Inactive"/>
                     </HBox>
 
                     <TextArea fx:id="orderNotesArea"

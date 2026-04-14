@@ -196,6 +196,7 @@ public class CheckoutGuestController {
         boolean success = Main.m.purchase(OrderID, email, deliveryAddress, paymentMethod, deliveryOption, notes);
         if (success) {
             Order.saveOrderWithItems(OrderID, deliveryAddress, deliveryOption, email, items);
+
             Main.m.clearBasket();
 
 
