@@ -36,9 +36,7 @@
                 <Label style="-fx-font-size: 22px; -fx-font-weight: bold;" text="Sign in" />
 
                 <Label style="-fx-text-fill: #4b5563;" text="Use your email and password to access your account." wrapText="true" />
-
                 <Separator />
-
                 <VBox spacing="8.0">
                     <Label style="-fx-font-weight: bold;" text="Email" />
                     <TextField fx:id="emailInput" promptText="Enter Email" />
@@ -53,7 +51,7 @@
                 <Label fx:id="errorLabel" alignment="CENTER" contentDisplay="CENTER" layoutX="176.0" layoutY="339.0" prefHeight="19.0" prefWidth="247.0" />
             <Label prefHeight="18.0" prefWidth="147.0" text="Don't have a membership?" />
             <Button mnemonicParsing="false" onAction="#goToCommercialRegister" prefHeight="26.0" prefWidth="153.0" text="Commercial Sign up" />
-            <Button mnemonicParsing="false" onAction="#goToNonCommercialRegister" prefHeight="26.0" prefWidth="155.0" text="non-Commercial Sign up" />
+            <Button mnemonicParsing="false" onAction="#goToNonCommercialRegister" prefHeight="26.0" prefWidth="155.0" text="Non-Commercial Sign up" />
             </VBox>
         </StackPane>
 

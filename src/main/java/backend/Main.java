@@ -29,11 +29,25 @@ public class Main extends Application {
 
     public static void main(String[] args) {
         try {
+            String json = """
+                    {
+                      "to": "estroyer221@gmail.com",
+                      "subject": "IPOS-PU",
+                      "body": "Test IPOS-PU",
+                    }
+                    """;
             new backend.APIs.EmailAPI(8085).start();
             new PaymentAPI(8086).start();
+
+            new EmailEndpoint(json);
+
         } catch (IOException e) {
             e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
         }
+
 
         //dont remove
         launch(args);
