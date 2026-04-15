@@ -32,6 +32,10 @@ public class ForgetPasswordController {
     public void changePassword(ActionEvent event){
         DatabaseManager database= new DatabaseManager();
         Connection connection = database.makeConnection();
+        String email = emailInput.getText();
+        String oldPassword = passwordInput.getText();
+        String newPassword = newPasswordInput.getText();
+        if(!email.isBlank() && !oldPassword.isBlank() && !newPassword.isBlank()){
 
         try{
             PreparedStatement statement = connection.prepareStatement("Select * from member where emailAddress=?;");
@@ -43,7 +47,7 @@ public class ForgetPasswordController {
                 statementTwo.setString(1, newPasswordInput.getText());
                 statementTwo.setString(2, emailInput.getText());
                 statementTwo.execute();
-
+                switchPage(event, "Login.fxml");
 
             }
             else{
@@ -53,7 +57,10 @@ public class ForgetPasswordController {
         catch(SQLException e){
             e.printStackTrace();
         }
-        switchPage(event, "Login.fxml");
+        }
+        else{
+            errorLabel.setText("Invalid Fields");
+        }
     }
 
     @FXML public void goToCatalogue(ActionEvent event) {

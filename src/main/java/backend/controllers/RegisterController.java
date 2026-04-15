@@ -19,6 +19,7 @@ import javafx.stage.Stage;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Objects;
 import java.util.Random;
@@ -43,11 +44,13 @@ public class RegisterController {
     TextField companyName;
     //creates a member object and calls the function to register a non-commercial member while passing the required arguments
     public void submitNonCommercialApplication(ActionEvent event){
-        submitNonCommercialApplication(email.getText());
+        boolean success = submitNonCommercialApplication(email.getText());
+        if (success){
         switchPage(event, "Login.fxml");
+        }
     };
     //Inserts all non-commercial user's into the database (registration)
-    public void submitNonCommercialApplication(String emailAddress) {
+    public boolean submitNonCommercialApplication(String emailAddress) {
         DatabaseManager database = new DatabaseManager();
         Connection connection = database.makeConnection();
         String generatedPassword = generatePassword();
@@ -64,8 +67,10 @@ public class RegisterController {
                 e.printStackTrace();
             }
             EmailSendResult result = SendGmail.sendGmail(emailAddress, "AccountCreation", "Account Created!\n   Your random generated password is : " + generatedPassword);
+            return true;
         } else {
             errorLabel.setText("Invalid Email Address");
+            return false;
         }
     }
 
@@ -73,34 +78,40 @@ public class RegisterController {
 
     //creates a member object and calls the function to register a commercial member while passing the required arguments
     public void submitCommercialApplication(ActionEvent event) {
-        submitCommercialApplication(email.getText(),companyName.getText() ,CompanyRegistration.getText(), CompanyDirector.getText(), typeOfBusiness.getText(), businessAddress.getText());
-        switchPage(event, "Login.fxml");
+        boolean success=submitCommercialApplication(email.getText(),companyName.getText() ,CompanyRegistration.getText(), CompanyDirector.getText(), typeOfBusiness.getText(), businessAddress.getText());
+        if(success){
+            switchPage(event, "Login.fxml");
+        }
+
     }
 
 
     // Ship to json file
-    public void submitCommercialApplication(String emailAddress,String companyName ,String companyRegNumber, String CompanyDirector,String businessType, String businessAddress ) {
+    public boolean submitCommercialApplication(String emailAddress,String companyName ,String companyRegNumber, String CompanyDirector,String businessType, String businessAddress ) {
         DatabaseManager database = new DatabaseManager();
         Connection connection = database.makeConnection();
-        if(emailCheck(emailAddress)){
+        if(emailCheck(emailAddress)&& !companyName.isBlank()&& !companyRegNumber.isBlank()&& !CompanyDirector.isBlank()&& !businessType.isBlank()&& !businessAddress.isBlank()){
             try {
-                PreparedStatement statement = connection.prepareStatement("INSERT INTO commercial_applications(emailAddress,companyName,companyRegistration, companyDirector, typeOfBusiness,  businessAddress) VALUES (?,?,?,?,?,?)");
-                statement.setString(1,emailAddress.toLowerCase());
-                statement.setString(2,companyRegNumber);
+                PreparedStatement statement = connection.prepareStatement("INSERT INTO commercial_applications(accountNo,emailAddress,companyName,companyRegistration, companyDirector, typeOfBusiness,  businessAddress) VALUES (?,?,?,?,?,?,?)");
+                statement.setString(1,"PU000"+ Integer.toString(getApplicationCount()));
+                statement.setString(2,emailAddress.toLowerCase());
                 statement.setString(3,companyRegNumber);
-                statement.setString(4,CompanyDirector);
-                statement.setString(5,businessType);
-                statement.setString(6, businessAddress);
+                statement.setString(4,companyRegNumber);
+                statement.setString(5,CompanyDirector);
+                statement.setString(6,businessType);
+                statement.setString(7, businessAddress);
                 statement.execute();
             } catch(SQLException e){
                 e.printStackTrace();
             }
             EmailSendResult result = SendGmail.sendGmail(emailAddress, "Account validation in progress", "Your account is getting validated. This may take a while.");
             new CommercialApplication(emailAddress.toLowerCase(), companyRegNumber, CompanyDirector, businessType, businessAddress);
-
+            return true;
         }else{
-            errorLabel.setText("Invalid Email Address");
+            errorLabel.setText("Invalid Fields");
+            return false;
         }
+
 
     }
 
@@ -120,6 +131,26 @@ public class RegisterController {
         }
         return false;
     }
+
+
+    //Functions that returns the amount of applications. Used for Incrementing account no. for new Accounts
+    public int getApplicationCount(){
+        int count = 0;
+        DatabaseManager database = new DatabaseManager();
+        Connection connection = database.makeConnection();
+        try {
+            PreparedStatement statement = connection.prepareStatement("SELECT COUNT(*) FROM commercial_applications");
+            ResultSet resultset = statement.executeQuery();
+            if(resultset.next()){
+                count = resultset.getInt(1);
+            }
+
+        }catch (SQLException e){
+            e.printStackTrace();
+        }
+        return count;
+    }
+
 
     @FXML public void goToCatalogue(ActionEvent event) {
         switchPage(event, "Catalogue.fxml");
