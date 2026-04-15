@@ -37,6 +37,8 @@ public class AccountHistoryController {
     public TableColumn EmailAddress;
     @FXML
     public TableColumn DeliveryAddress;
+    @FXML
+    public TableColumn OrderStatus;
 
     @FXML
     public TableView<Transaction> transactionHistory;
@@ -46,6 +48,12 @@ public class AccountHistoryController {
     public TableColumn amount;
     @FXML
     public TableColumn transactionEmailAddress;
+    @FXML
+    public TableColumn purchaseDate;
+    @FXML
+    public TableColumn cardNumber;
+    @FXML
+    public TableColumn billingAddress;
 
 
     public void initialize(){
@@ -61,12 +69,13 @@ public class AccountHistoryController {
             statement.setString(1, Main.member.getUserName());
             ResultSet resultSet = statement.executeQuery();
             while(resultSet.next()){
-                orderHistory.getItems().add(new OrderCell(resultSet.getString("OrderID") ,resultSet.getString(2),resultSet.getString("EmailAddress"), resultSet.getString("Address")));
+                orderHistory.getItems().add(new OrderCell(resultSet.getString("OrderID") ,resultSet.getString(2),resultSet.getString("EmailAddress"), resultSet.getString("Address"), resultSet.getString("OrderStatus")));
             }// Dont replace 2 with descirptions, it doesnt work, dont touch this i hate this
             OrderID.setCellValueFactory(new PropertyValueFactory<>("OrderID"));
             Descriptions.setCellValueFactory(new PropertyValueFactory<>("Descriptions"));
             EmailAddress.setCellValueFactory(new PropertyValueFactory<>("OrderEmailAddress"));
             DeliveryAddress.setCellValueFactory(new PropertyValueFactory<>("DeliveryAddress"));
+            OrderStatus.setCellValueFactory(new PropertyValueFactory<>("OrderStatus"));
 
         }catch(SQLException e){
             e.printStackTrace();
@@ -81,11 +90,14 @@ public class AccountHistoryController {
             statement.setString(1, Main.member.getUserName());
             ResultSet resultSet = statement.executeQuery();
             while(resultSet.next()){
-                transactionHistory.getItems().add(new Transaction(resultSet.getInt("TransactionID"),resultSet.getInt("Amount"),resultSet.getString("EmailAddress")));
+                transactionHistory.getItems().add(new Transaction(resultSet.getInt("TransactionID"),resultSet.getDouble("Amount"),resultSet.getString("EmailAddress"), resultSet.getString("BillingAddress"),resultSet.getString("CardNumber"),resultSet.getString("PurchaseDate") ));
             }
             transactionID.setCellValueFactory(new PropertyValueFactory<>("transactionID"));
             amount.setCellValueFactory(new PropertyValueFactory<>("amount"));
             transactionEmailAddress.setCellValueFactory(new PropertyValueFactory<>("transactionEmailAddress"));
+            cardNumber.setCellValueFactory(new PropertyValueFactory<>("cardNumber"));
+            billingAddress.setCellValueFactory(new PropertyValueFactory<>("billingAddress"));
+            purchaseDate.setCellValueFactory(new PropertyValueFactory<>("purchaseDate"));
 
 
         }catch(SQLException e){

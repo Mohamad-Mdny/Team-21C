@@ -8,24 +8,42 @@ import java.sql.SQLException;
 
 public class Transaction {
     private int transactionID;
-    private int amount;
+    private double amount;
     private String transactionEmailAddress;
+    private String billingAddress;
+    private String purchaseDate;
+    private String cardNumber;
 
-    public Transaction(int transactionID, int amount, String emailAddress){
+    public Transaction(int transactionID, double amount, String emailAddress, String billingAddress,  String cardNumber, String purchaseDate){
+        this.transactionID = transactionID;
+        this.amount = amount;
+        this.transactionEmailAddress = emailAddress;
+        this.billingAddress = billingAddress;
+        this.purchaseDate = purchaseDate;
+        this.cardNumber = cardNumber;
+    }
+    public Transaction(){};
+
+    public Transaction(int transactionID, double amount, String emailAddress){
         this.transactionID = transactionID;
         this.amount = amount;
         this.transactionEmailAddress = emailAddress;
     }
-    public Transaction(){};
-
     public int getTransactionID(){
         return transactionID;
     }
-    public int getAmount(){
+    public double getAmount(){
         return amount;
     }
     public String getTransactionEmailAddress(){
         return transactionEmailAddress;
+    }
+    public String getBillingAddress(){
+        return billingAddress;
+    }
+    public String getPurchaseDate(){return purchaseDate;}
+    public String getCardNumber(){
+        return cardNumber;
     }
 
 
