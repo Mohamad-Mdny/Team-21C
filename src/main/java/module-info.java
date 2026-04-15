@@ -10,7 +10,6 @@ module org.example.merchapp {
     requires org.kordamp.bootstrapfx.core;
     requires eu.hansolo.tilesfx;
     requires com.almasb.fxgl.all;
-    requires java.sql;
     requires jakarta.mail;
     requires javafx.graphics;
     requires java.desktop;
@@ -22,6 +21,8 @@ module org.example.merchapp {
     requires javafx.base;
     requires jdk.httpserver;
     requires java.net.http;
+    requires com.google.gson;
+    requires java.sql;
 
     //requires org.example.merchapp;
 
