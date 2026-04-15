@@ -1,5 +1,6 @@
 package backend.models;
 
+import backend.EndPoints.StockServiceLayer;
 import backend.communication.EmailSendResult;
 import backend.communication.SendGmail;
 
@@ -64,6 +65,19 @@ public class User {
                             String paymentMethod, String deliveryOption, String notes) {
 
         if (Basket == null || Basket.isEmpty()) return false;
+        for (ItemCell item : Basket) {
+
+            boolean success =
+                    StockServiceLayer.decrement(
+                            ItemCell.getItemID(),
+                            1,
+                            orderId
+                    );
+
+            if (!success) {
+                return false;
+            }
+        }
         if (deliveryAddress == null || deliveryAddress.isBlank()) return false;
         if (paymentMethod == null || paymentMethod.isBlank()) return false;
         if (deliveryOption == null || deliveryOption.isBlank()) return false;
@@ -75,6 +89,7 @@ public class User {
 
         for (ItemCell itemCell : Basket) {
             body.append("\n   - ").append(itemCell.getDescriptions());
+
         }
 
         body.append("\n\nDelivery Address: ").append(deliveryAddress)

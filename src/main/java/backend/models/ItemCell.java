@@ -1,7 +1,7 @@
 package backend.models;
 
 public class ItemCell {
-    private int ItemID;
+    private static int ItemID;
     private String Descriptions;
     private String PackageType;
     private String Unit;
@@ -23,7 +23,7 @@ public class ItemCell {
         this.StockLimit = StockLimit;
     }
 
-    public String getItemID() {return Integer.toString(ItemID);}
+    public static String getItemID() {return Integer.toString(ItemID);}
     public String getDescriptions() {return Descriptions;}
     public String getPackageType() {return PackageType;}
     public String getUnit(){return Unit;}
