@@ -66,17 +66,23 @@ public class User {
 
         if (Basket == null || Basket.isEmpty()) return false;
         for (ItemCell item : Basket) {
+            /*
+            try {
+                boolean success =
+                        StockServiceLayer.decrement(
+                                Integer.toString(item.getItemID()),
+                                1,
+                                orderId
+                        );
 
-            boolean success =
-                    StockServiceLayer.decrement(
-                            Integer.toString(item.getItemID()),
-                            1,
-                            orderId
-                    );
+                if (!success) {
+                    return false;
+                }
+            } catch (Exception e) {
 
-            if (!success) {
-                return false;
             }
+             */
+
         }
         if (deliveryAddress == null || deliveryAddress.isBlank()) return false;
         if (paymentMethod == null || paymentMethod.isBlank()) return false;
