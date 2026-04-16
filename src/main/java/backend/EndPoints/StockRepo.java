@@ -9,6 +9,7 @@ public class StockRepo {
 
     public static void decrementLocalStock(int productId, int qty) {
 
+        // decrements stock on the local db
         try {
             Connection conn = new DatabaseManager().makeConnection();
 

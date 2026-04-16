@@ -11,13 +11,11 @@ public class StockServiceLayer {
     public static boolean decrement(String productId, int qty, String orderId) {
         boolean success =
                 StockSyncServices.decrementStockInCA(Integer.parseInt(productId), qty, orderId);
+                // attempts to decrement the in the server
 
         if (success) {
             StockRepo.decrementLocalStock(Integer.parseInt(productId), qty);
         }
-
         return success;
     }
-
-
 }
