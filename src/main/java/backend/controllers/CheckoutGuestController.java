@@ -20,13 +20,13 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
 
 import java.io.IOException;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.time.LocalDateTime;
 import static backend.Main.VAT_RATE;
 import static backend.Main.main;
+import java.time.YearMonth;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 
 public class CheckoutGuestController {
 
@@ -181,6 +181,28 @@ public class CheckoutGuestController {
             purchaseStatusLabel.setText("CVV must be 3 or 4 digits.");
             return;
         }
+        if (expDate.isBlank()) {
+            purchaseStatusLabel.setText("Please enter a expiry date.");
+            return;
+        }
+
+        try {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/yyyy");
+            YearMonth expiry = YearMonth.parse(expDate, formatter);
+            YearMonth now = YearMonth.now();
+
+            if (expiry.isBefore(now)){
+                purchaseStatusLabel.setText("Invalid expiry date.");
+                return;
+            }
+        } catch (DateTimeParseException e) {
+            purchaseStatusLabel.setText("Invalid expiry date.");
+            return;
+        }
+
+
+
+
         if (email.isBlank()) {
             purchaseStatusLabel.setText("Please enter an email address.");
             return;

@@ -124,6 +124,12 @@
 
                             <Region HBox.hgrow="ALWAYS"/>
 
+                            <Button text="Delete my Account"
+                            mnemonicParsing="false"
+                                    onAction="#deleteAccount"
+                                    style="-fx-font-weight: bold; -fx-padding: 10 18 10 18;"/>
+
+
                             <Button text="Sign Out"
                                     mnemonicParsing="false"
                                     onAction="#signOut"

@@ -98,7 +98,6 @@ public class AccountSettingsController {
         String cardNumber = CardNumber.getText().replaceAll("\\s", "");
         String billingAddress = BillingAddress.getText();
         int cvv = Integer.parseInt(CVV.getText());
-        String ExpDate = expDate.getText();
         String expiryDate = expDate.getText();
 
         String phoneNumber = PhoneNumber.getText();
@@ -106,6 +105,7 @@ public class AccountSettingsController {
         if (email == null || email.isBlank()) {
             return;
         }
+
 
         member.setUserName(email);
         member.setDeliveryAddress(deliveryAddress);
@@ -197,6 +197,16 @@ public class AccountSettingsController {
             CatalogueController.pendingSearchText = text.trim();
             switchPage(event, "Catalogue.fxml");
         }
+    }
+
+    @FXML
+    public void deleteAccount(ActionEvent event) {
+        Main.m.signOut();
+        Main.member = null;
+        Main.admin = null;
+        switchPage(event, "Login.fxml");
+
+        // WILL add later, maybe
     }
 
     @FXML
