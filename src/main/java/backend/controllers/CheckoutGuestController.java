@@ -113,7 +113,7 @@ public class CheckoutGuestController {
             BasketAccumulator acc = grouped.get(itemCell.getItemID());
             if (acc == null) {
                 acc = new BasketAccumulator(itemCell);
-                grouped.put(itemCell.getItemID(), acc);
+                grouped.put(Integer.toString(itemCell.getItemID()), acc);
             }
             acc.quantity++;
         }

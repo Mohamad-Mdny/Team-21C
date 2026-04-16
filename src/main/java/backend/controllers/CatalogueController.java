@@ -41,7 +41,7 @@ public class CatalogueController {
     private Label memberSession;
 
     private final ObservableList<ItemCell> masterData = FXCollections.observableArrayList();
-    private FilteredList<ItemCell> filteredData; private String selectedItemId = null;
+    private FilteredList<ItemCell> filteredData; private Integer selectedItemId = null;
 
     @FXML void initialize() {
         if(Main.member !=null) {
@@ -70,7 +70,8 @@ public class CatalogueController {
                 Statement statement = connection.createStatement();
                 ResultSet resultSet = statement.executeQuery(sql)) {
             while (resultSet.next()) {
-                masterData.add(new ItemCell( resultSet.getInt("ItemID"),
+                masterData.add(new ItemCell(
+                        resultSet.getInt("ItemID"),
                         resultSet.getString("Descriptions"),
                         resultSet.getString("PackageType"),
                         resultSet.getString("Unit"),
@@ -173,7 +174,7 @@ public class CatalogueController {
         Button addToCartButton = new Button("Add to Cart");
         addToCartButton.setMaxWidth(Double.MAX_VALUE);
         addToCartButton.setOnAction(event -> addItemToCart(itemCell));
-        card.setOnMouseClicked(event -> { selectedItemId = itemCell.getItemID();
+        card.setOnMouseClicked(event -> { selectedItemId =  itemCell.getItemID();
             refreshCatalogueGrid();
         });
         card.getChildren().addAll( titleLabel, itemIdLabel, packageTypeLabel, unitLabel, unitsInPackLabel, priceLabel, availabilityLabel, spacer, addToCartButton );
@@ -181,7 +182,9 @@ public class CatalogueController {
     }
 
     private void applyCardStyle(VBox card, ItemCell itemCell) {
-        boolean isSelected = selectedItemId != null && selectedItemId == itemCell.getItemID();
+
+        boolean isSelected = selectedItemId != null && selectedItemId.equals(itemCell.getItemID());
+
         String baseStyle = "-fx-background-color: white; " + "-fx-border-color: #d1d5db; " + "-fx-border-radius: 8; " + "-fx-background-radius: 8; " + "-fx-cursor: hand;";
         String selectedStyle = "-fx-border-color: #2563eb; -fx-border-width: 2;";
         String normalStyle = "-fx-border-width: 1;";

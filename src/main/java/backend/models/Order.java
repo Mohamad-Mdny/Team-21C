@@ -54,8 +54,8 @@ public class Order {
 
         for (ItemCell it : basket) {
             if (it == null) continue;
-            qty.put(Integer.parseInt(it.getItemID()), qty.getOrDefault(it.getItemID(), 0) + 1);
-            desc.putIfAbsent(Integer.parseInt(it.getItemID()), it.getDescriptions());
+            qty.put(Integer.parseInt(Integer.toString( it.getItemID())), qty.getOrDefault(it.getItemID(), 0) + 1);
+            desc.putIfAbsent(Integer.parseInt(Integer.toString(it.getItemID())), it.getDescriptions());
         }
 
         StringBuilder sb = new StringBuilder("Order: ");
@@ -86,7 +86,7 @@ public class Order {
         Map<Integer, ItemCell> anyItemForId = new HashMap<>();
         for (ItemCell it : basketList) {
             if (it == null) continue;
-            int id = Integer.parseInt(it.getItemID());
+            int id = it.getItemID();
             qty.put(id, qty.getOrDefault(id, 0) + 1);
             anyItemForId.putIfAbsent(id, it);
         }

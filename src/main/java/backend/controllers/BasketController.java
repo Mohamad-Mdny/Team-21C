@@ -123,11 +123,11 @@ public class BasketController {
                 continue;
             }
 
-            BasketAccumulator accumulator = groupedItems.get(itemCell.getItemID());
+            BasketAccumulator accumulator = groupedItems.get(Integer.toString(itemCell.getItemID()));
 
             if (accumulator == null) {
                 accumulator = new BasketAccumulator(itemCell);
-                groupedItems.put(itemCell.getItemID(), accumulator);
+                groupedItems.put(Integer.toString(itemCell.getItemID()), accumulator);
             }
 
             accumulator.quantity++;

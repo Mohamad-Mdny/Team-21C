@@ -136,10 +136,10 @@ public class CheckoutAccountController {
         Map<String, BasketAccumulator> grouped = new LinkedHashMap<>();
         for (ItemCell itemCell : Main.m.getBasket()) {
             if (itemCell == null) continue;
-            BasketAccumulator acc = grouped.get(itemCell.getItemID());
+            BasketAccumulator acc = grouped.get(Integer.toString(itemCell.getItemID()));
             if (acc == null) {
                 acc = new BasketAccumulator(itemCell);
-                grouped.put(itemCell.getItemID(), acc);
+                grouped.put(Integer.toString(itemCell.getItemID()), acc);
             }
             acc.quantity++;
         }

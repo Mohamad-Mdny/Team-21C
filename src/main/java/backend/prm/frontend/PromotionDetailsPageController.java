@@ -133,7 +133,7 @@ public class PromotionDetailsPageController {
             ItemCell baseItem = productOpt.get();
 
             ItemCell promoItem = new ItemCell(
-                    Integer.parseInt(baseItem.getItemID()),
+                    baseItem.getItemID(),
                     baseItem.getDescriptions(),
                     baseItem.getPackageType(),
                     baseItem.getUnit(),

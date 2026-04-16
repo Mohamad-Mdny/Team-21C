@@ -69,7 +69,7 @@ public class User {
 
             boolean success =
                     StockServiceLayer.decrement(
-                            item.getItemID(),
+                            Integer.toString(item.getItemID()),
                             1,
                             orderId
                     );
