@@ -107,13 +107,13 @@ public class CheckoutGuestController {
             updateSummaryLabels(0, 0.0);
             return;
         }
-        Map<String, BasketAccumulator> grouped = new LinkedHashMap<>();
+        Map<Integer, BasketAccumulator> grouped = new LinkedHashMap<>();
         for (ItemCell itemCell : Main.m.getBasket()) {
             if (itemCell == null) continue;
             BasketAccumulator acc = grouped.get(itemCell.getItemID());
             if (acc == null) {
                 acc = new BasketAccumulator(itemCell);
-                grouped.put(Integer.toString(itemCell.getItemID()), acc);
+                grouped.put(itemCell.getItemID(), acc);
             }
             acc.quantity++;
         }
