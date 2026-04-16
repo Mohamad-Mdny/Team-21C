@@ -145,10 +145,11 @@ public class AccountSettingsController {
     private void refreshFieldsFromMember() {
         emailField.setText(safe(member.getUserName()));
         DeliveryAddress.setText(safe(member.getDeliveryAddress()));
-        CardNumber.setText((member.getCardNumber()));
+        CardNumber.setText(member.getCardNumber());
         BillingAddress.setText(safe(member.getBillingAddress()));
         CVV.setText((Integer.toString(member.getCVV())));
         PhoneNumber.setText(member.getPhoneNumber());
+        expDate.setText(safe(member.getExpiryDate()));
 
     }
 

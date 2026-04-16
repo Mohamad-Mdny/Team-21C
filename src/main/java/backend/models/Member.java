@@ -16,7 +16,7 @@ public class Member extends User {
     private String type;
 
     private String DeliveryAddress;
-    private String cardNumber = "123412341234";
+    private String cardNumber ="";
     private int CVV;
     private String expiryDate;
     private String BillingAddress;
@@ -69,6 +69,9 @@ public class Member extends User {
     }
 
     public String getCardNumber() {
+        if (cardNumber.isEmpty()) {
+            return "";
+        }
         return cardNumber.substring(cardNumber.length() - 4);
     }
 
@@ -77,6 +80,9 @@ public class Member extends User {
     }
 
     public int getCVV() {
+        if (CVV == 0) {
+            return 0;
+        }
         return CVV;
     }
 
