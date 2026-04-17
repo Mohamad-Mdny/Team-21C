@@ -1,5 +1,6 @@
 package backend.controllers;
 
+import backend.DatabaseManager;
 import backend.Main;
 import backend.models.Member;
 import javafx.event.ActionEvent;
@@ -11,6 +12,11 @@ import javafx.scene.control.*;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Objects;
 
 public class AccountSettingsController {
@@ -202,12 +208,59 @@ public class AccountSettingsController {
 
     @FXML
     public void deleteAccount(ActionEvent event) {
+        DatabaseManager database = new DatabaseManager();
+        Connection connection = database.makeConnection();
+
+        ArrayList<String> Orders = new ArrayList<>();
+
+        try{
+            PreparedStatement statement = connection.prepareStatement("SELECT OrderID FROM catalogue.orders WHERE EmailAddress = ?");
+            statement.setString(1, Main.member.getUserName());
+            ResultSet resultSet = statement.executeQuery();
+
+            while(resultSet.next()){
+                Orders.add(resultSet.getString("OrderID"));
+            }
+        }catch(SQLException e){
+            e.printStackTrace();
+        }
+
+        try{
+            PreparedStatement statement = connection.prepareStatement("DELETE FROM catalogue.orders WHERE EmailAddress = ? ;");
+            statement.setString(1, Main.member.getUserName());
+            statement.executeQuery();
+
+        }catch(SQLException e){
+            e.printStackTrace();
+        }
+
+        for (String orderID : Orders) {
+            try{
+                PreparedStatement statement = connection.prepareStatement("DELETE FROM catalogue.order_items WHERE EmailAddress = ? ;");
+                statement.setString(1,orderID);
+                statement.executeQuery();
+
+            }catch(SQLException e){
+                e.printStackTrace();
+            }
+        }
+
+
+
+        try{
+            PreparedStatement statement = connection.prepareStatement("DELETE FROM member WHERE CustomerName = ? ;");
+            statement.setString(1, Main.member.getUserName());
+            statement.executeQuery();
+
+        }catch(SQLException e){
+            e.printStackTrace();
+        }
         Main.m.signOut();
         Main.member = null;
         Main.admin = null;
         switchPage(event, "Login.fxml");
 
-        // WILL add later, maybe
+
     }
 
     @FXML
